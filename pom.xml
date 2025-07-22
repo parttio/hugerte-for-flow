@@ -2,18 +2,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.parttio</groupId>
-    <artifactId>tinymce-for-flow</artifactId>
-    <version>4.2.8-SNAPSHOT</version>
-    <name>TinyMCE for Flow</name>
-    <description>Integration of TinyMCE for Vaadin 10+</description>
-    <url>https://github.com/parttio/tinymce-for-flow</url>
+    <artifactId>hugerte-for-flow</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>HugeRTE for Flow</name>
+    <description>Integration of HugeRTE for Vaadin Flow</description>
+    <url>https://github.com/parttio/hugerte-for-flow</url>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <vaadin.version>24.3.1</vaadin.version>
+        <vaadin.version>24.8.4</vaadin.version>
     </properties>
     <organization>
         <name>Team Parttio</name>
@@ -32,22 +32,15 @@
     </licenses>
     
     <scm>
-        <url>https://github.com/parttio/tinymce-for-flow</url>
-        <connection>scm:git:git://github.com/parttio/tinymce-for-flow.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:/parttio/tinymce-for-flow.git</developerConnection>
+        <url>https://github.com/parttio/hugerte-for-flow</url>
+        <connection>scm:git:git://github.com/parttio/hugerte-for-flow.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:/parttio/hugerte-for-flow.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/parttio/tinymce-for-flow/issues</url>
+        <url>https://github.com/parttio/hugerte-for-flow/issues</url>
     </issueManagement>
 
     <dependencyManagement>
@@ -65,7 +58,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.2.0</version>
+                <version>3.5.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

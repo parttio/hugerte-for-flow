@@ -1,23 +1,20 @@
-# TinyMCE for Flow
+# HugeRTE for Flow
 
-Vaadin 10 Java integration for TinyMCE text editor. 
+Vaadin Flow Java API for HugeRTE text editor. HugeRTE is an MIT-licensed fork of TinyMCE, the world's #1 JavaScript library for rich text editing, which switched from MIT to a GPL-or-pay license model in its latest version.
 
-Works with binder as the component implements HasValue interfaces. The value is plain HTML. If you can't trust your clients, apply converter that filters the input with e.g. JSOUP library.
+This add-on is a direct port of the [TinyMCE for Flow](https://vaadin.com/directory/component/tinymce-for-flow) add-on to use HugeRTE instead. Comments in the code may though refer to previous issues in the TinyMCE add-on, as the code is mostly a copy of it.
+
+Works with binder as the component implements HasValue interfaces. The value is plain HTML. If you can't trust your clients, consider adding a converter that filters the input with e.g. JSOUP library.
 
 Builds will be available from https://vaadin.com/directory 
 
-## Limitations
-
-TinyMCE (like most traditional wysiwyg editors) don't work inside shadow DOM. You most probably have issues if you use templates or use the editor in Dialog.
-
 ## Development instructions
 
-Starting the test/demo server:
-```
-mvn jetty:run
-```
+Check out the project to your IDE and run the Application class from src/test/java folder.
 
-This deploys demo at http://localhost:8080
+This opens up a Spring Boot based testing setup to http://localhost:9998
+
+Some very basic tests are executed on `mvn install` using Playwright.
 
 ## Cutting a release
 

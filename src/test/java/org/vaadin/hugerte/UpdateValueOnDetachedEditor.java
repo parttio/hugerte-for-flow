@@ -1,0 +1,26 @@
+package org.vaadin.hugerte;
+
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
+
+import java.time.LocalDateTime;
+
+@Route
+public class UpdateValueOnDetachedEditor extends VerticalLayout {
+    public UpdateValueOnDetachedEditor() {
+
+        HugeRte hugeRte = new HugeRte();
+        hugeRte.setValue("Jorma");
+
+        Button b = new Button("Replace value while detached");
+        b.addClickListener(e -> {
+            hugeRte.removeFromParent();
+            hugeRte.setValue("Now: " + LocalDateTime.now());
+            add(hugeRte);
+        });
+
+        add(b, hugeRte);
+
+    }
+}
