@@ -31,7 +31,7 @@ import com.vaadin.flow.router.RouterLink;
  * @author mstahv
  */
 @Route
-@Menu(order = 3)
+@Menu(order = 4)
 public class DifferentSizes extends VerticalLayout {
 
     private TextField questionKey = new TextField("Question Key");

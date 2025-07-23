@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
-@Menu(order = 0)
+@Menu(order = 1)
 public class AllPluginsDemoView extends Div {
 
     protected HugeRte hugeRte;
