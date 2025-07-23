@@ -5,9 +5,11 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
+@Menu(order = 1)
 public class EditorInDialog extends Div {
 
     public EditorInDialog() {

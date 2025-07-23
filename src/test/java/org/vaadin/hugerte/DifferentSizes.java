@@ -22,6 +22,7 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 
@@ -30,6 +31,7 @@ import com.vaadin.flow.router.RouterLink;
  * @author mstahv
  */
 @Route
+@Menu(order = 3)
 public class DifferentSizes extends VerticalLayout {
 
     private TextField questionKey = new TextField("Question Key");
@@ -162,25 +164,10 @@ public class DifferentSizes extends VerticalLayout {
         }
         );
 
-        Div title = new Div();
-        title.add("Navigator");
-        Div menu = new Div();
-        menu.add(new RouterLink("Page 1", DemoView.class));
-        menu.add(new RouterLink("Page 2", EditorInDialog.class));
-
-        VerticalLayout navigator = new VerticalLayout(title, menu);
         VerticalLayout formLayout = new VerticalLayout(questionKey, firstName, lastName, address, group, tmcdeditor1, group1, tmcdeditor2, group2, tmcdeditor3, group3, tmcdeditor4, group4, tmcdeditor5, group5, tmcdeditor6);
         firstName.setWidth("50%");
         lastName.setWidthFull();
-        SplitLayout splitLayout = new SplitLayout(navigator, formLayout);
-        formLayout.setDefaultHorizontalComponentAlignment(Alignment.BASELINE);
-        splitLayout.setWidth("100%");
-        splitLayout.setSplitterPosition(25);
-
-        add(
-                new H1("Page 1 Configuration"),
-                splitLayout
-        );
+        add(formLayout);
 
     }
 

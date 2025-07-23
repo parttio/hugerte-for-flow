@@ -3,9 +3,11 @@ package org.vaadin.hugerte;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Pre;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
+@Menu(order = 2)
 public class ConfigurationOptions extends Div {
 
     public ConfigurationOptions() {

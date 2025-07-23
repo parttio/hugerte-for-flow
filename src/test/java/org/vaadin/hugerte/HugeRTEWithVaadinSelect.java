@@ -3,6 +3,7 @@ package org.vaadin.hugerte;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route

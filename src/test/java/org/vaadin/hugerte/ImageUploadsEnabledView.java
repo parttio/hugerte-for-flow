@@ -3,11 +3,13 @@ package org.vaadin.hugerte;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.hugerte.imageuploads.ActiveEditors;
 
 @Route
+@Menu
 public class ImageUploadsEnabledView extends Div {
 
     protected HugeRte hugeRte;
