@@ -1,41 +1,109 @@
 package org.vaadin.hugerte;
 
+import java.util.Objects;
+import jakarta.annotation.Nullable;
+
 public enum Language {
-    //@formatter:off
-    ENGLISH(""),
-    NORWEGIAN("nb_NO"),
-    FINNISH("fi"),
-    GERMAN("de"),
-    SWEDISH("sv_SE"),
-    PORTUGESE("pt_PT"),
-    POLISH("pl"),
-    DUTCH("nl"),
-    ESTONIAN("et"),
-    SERBIAN("sr"),
-    SPANISH("es"),
-    SLOVENIAN("sl_SI"),
-    BULGARIAN("bg_BG"),
-    FRENCH("fr_FR"),
-    ROMANIAN("ro"),
-    LATVIAN("lt"),
-    LITHUANIAN("li"),
-    RUSSIAN("ru"),
-    UKRANIAN("uk"),
-    SLOVAK("sk"),
-    TURKISH("tr"),
+    /**
+     * Default language. Has no code, since there is no lang file for it, and is optional to be used. So we provide it
+     * for the sake of completeness.
+     * <p/>
+     * You can also set "null" on {@link HugeRte#configureLanguage(Language)}
+     */
+    ENGLISH(null),
+
+    // Languages
+    ARABIC("ar"),
+    AZERBAIJANI("az"),
+    BELARUSIAN("be"),
+    CATALAN("ca"),
+    CZECH("cs"),
+    WELSH("cy"),
     DANISH("da"),
+    GERMAN("de"),
+    GREEK("el"),
+    ESPERANTO("eo"),
+    SPANISH("es"),
+    ESTONIAN("et"),
+    BASQUE("eu"),
+    PERSIAN("fa"),
+    FINNISH("fi"),
+    IRISH("ga"),
+    GALICIAN("gl"),
     CROATIAN("hr"),
-    ITALIAN("it");
-    //@formatter:on
+    HUNGARIAN("hu_HU"), // No generic Hungarian code provided, using hu_HU
+    ARMENIAN("hy"),
+    INDONESIAN("id"),
+    ITALIAN("it"),
+    JAPANESE("ja"),
+    KABYLE("kab"),
+    KAZAKH("kk"),
+    KURDISH("ku"),
+    LITHUANIAN("lt"),
+    LATVIAN("lv"),
+    NEPALI("ne"),
+    DUTCH("nl"),
+    OCCITAN("oc"),
+    POLISH("pl"),
+    PORTUGUESE("pt_PT"), // Using pt_PT as generic, as pt_BR is also present
+    ROMANIAN("ro"),
+    RUSSIAN("ru"),
+    SLOVAK("sk"),
+    ALBANIAN("sq"),
+    SERBIAN("sr"),
+    TAJIK("tg"),
+    TURKISH("tr"),
+    UIGHUR("ug"),
+    UKRAINIAN("uk"),
+    UZBEK("uz"),
+    VIETNAMESE("vi"),
+    TAMIL("ta"), // No region specified, treating as generic language
 
-    public final String language;
+    // Regional variations
+    ARABIC_SAUDI_ARABIA("ar_SA"),
+    BULGARIAN_BULGARIA("bg_BG"),
+    BENGALI_BANGLADESH("bn_BD"),
+    SPANISH_MEXICO("es_MX"),
+    FRENCH_FRANCE("fr_FR"),
+    HEBREW_ISRAEL("he_IL"),
+    ICELANDIC_ICELAND("is_IS"),
+    GEORGIAN_GEORGIA("ka_GE"),
+    KOREAN_KOREA("ko_KR"),
+    NORWEGIAN_NORWAY("nb_NO"),
+    DUTCH_BELGIUM("nl_BE"),
+    PORTUGUESE_BRAZIL("pt_BR"),
+    SLOVENIAN_SLOVENIA("sl_SI"),
+    SWEDISH_SWEDEN("sv_SE"),
+    THAI_THAILAND("th_TH"),
+    CHINESE_CHINA("zh_CN"),
+    CHINESE_HONG_KONG("zh_HK"),
+    CHINESE_MACAO("zh_MO"),
+    CHINESE_SINGAPORE("zh_SG"),
+    CHINESE_TAIWAN("zh_TW");
 
-    private Language(String language) {
-        this.language = language;
+    private final String code;
+
+    Language(@Nullable String code) {
+        this.code = code;
     }
 
-    @Override
-    public String toString() {
-        return language;
+    @Nullable public String getCode() {
+        return code;
+    }
+
+    /**
+     * Returns the Language enum member corresponding to the given code.
+     *
+     * @param code The language or country code string (e.g., "de", "fr_FR").
+     * @return The Language enum member.
+     * @throws IllegalArgumentException If the code is not found.
+     */
+    public static Language fromCode(@Nullable String code) {
+        for (Language lang : Language.values()) {
+            if (Objects.equals(lang.code, code)) {
+                return lang;
+            }
+        }
+        throw new IllegalArgumentException("No Language enum member found for code: " + code);
     }
 }
