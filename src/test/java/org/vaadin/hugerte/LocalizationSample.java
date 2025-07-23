@@ -7,7 +7,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
-@Menu
+@Menu(order = 5)
 public class LocalizationSample extends VerticalLayout {
 
     private final ComboBox<Language> languageComboBox;
