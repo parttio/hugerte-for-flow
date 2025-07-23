@@ -13,17 +13,22 @@
 
 .tox .tox-editor-container .tox-editor-header:not(.tox-hugerte-inline) {
   box-shadow: var(--lumo-box-shadow-xs);
-  padding: 0px;
+  padding: 0;
 }
 
 .tox .tox-editor-container .tox-editor-header .tox-toolbar-overlord {
     border-top: unset;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 .tox:not([dir=rtl]) .tox-toolbar-overlord .tox-toolbar__group:not(:last-of-type) {
     border-right: 1px solid var(--lumo-contrast-20pct);
+}
+
+.tox button:is(.tox-tbtn, .tox-mbtn) {
+  /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
+  background: transparent;
 }
 
 .tox button.tox-tbtn--enabled {
@@ -95,7 +100,6 @@ button.tox-tbtn.tox-tbtn--select.tox-tbtn--bespoke {
 
 .tox-menu.tox-collection.tox-collection--list {
   background: var(--lumo-base-color);
-  box-shadow: var(--lumo-box-shadow-s);
   box-shadow: var(--lumo-box-shadow-m);
 }
 
