@@ -9,9 +9,11 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import org.vaadin.firitin.components.RichText;
 
 @Route
+@RouteAlias("")
 @Menu(order = 0)
 public class DemoView extends Div {
     
