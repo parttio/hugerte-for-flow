@@ -7,7 +7,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
-@Menu(order = 2)
+@Menu(order = 3)
 public class ConfigurationOptions extends Div {
 
     public ConfigurationOptions() {

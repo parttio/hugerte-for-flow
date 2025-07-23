@@ -9,7 +9,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
-@Menu(order = 1)
+@Menu(order = 2)
 public class EditorInDialog extends Div {
 
     public EditorInDialog() {
