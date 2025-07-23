@@ -9,11 +9,13 @@ import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 
 @Route("hugerte-attach")
 @PreserveOnRefresh
+@Menu
 public class OnAttachTest extends VerticalLayout {
 
     int i = 0;
