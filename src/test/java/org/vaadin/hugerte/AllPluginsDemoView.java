@@ -1,5 +1,6 @@
 package org.vaadin.hugerte;
 
+import org.vaadin.firitin.components.RichText;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
@@ -9,22 +10,21 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-import org.vaadin.firitin.components.RichText;
 
 @Route
-@RouteAlias("")
 @Menu(order = 0)
-public class DemoView extends Div {
+public class AllPluginsDemoView extends Div {
 
     protected HugeRte hugeRte;
 
-    public DemoView() {
+    public AllPluginsDemoView() {
         hugeRte = new HugeRte();
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");
-        
+
+        hugeRte.configurePlugin(false, Plugin.values());
+
         add(hugeRte);
 
         Button b = new Button("Set content dynamically", e -> {
@@ -66,6 +66,8 @@ public class DemoView extends Div {
         });
         blur.addClickShortcut(Key.KEY_B, KeyModifier.CONTROL);
         add(blur);
+
+
 
         hugeRte.addValueChangeListener(e -> {
             Notification.show("ValueChange event!");
