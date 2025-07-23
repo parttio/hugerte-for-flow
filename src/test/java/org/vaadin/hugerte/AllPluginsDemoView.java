@@ -13,11 +13,11 @@ import com.vaadin.flow.router.Route;
 
 @Route
 @Menu(order = 0)
-public class FullFeaturesDemoView extends Div {
+public class AllPluginsDemoView extends Div {
 
     protected HugeRte hugeRte;
 
-    public FullFeaturesDemoView() {
+    public AllPluginsDemoView() {
         hugeRte = new HugeRte();
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
