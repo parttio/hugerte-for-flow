@@ -48,8 +48,10 @@ public class MopoSmokeTest {
         mopo.trackClientSideErrors();
         String rootUrl = "http://localhost:" + port + "/";
         mopo.getViewsReportedByDevMode(browser, rootUrl).forEach(viewName -> {
+            System.out.println("Checking %s".formatted(viewName));
             String url = rootUrl + viewName;
             page.navigate(url);
+            mopo.waitForConnectionToSettle();
             mopo.failOnClientSideErrors();
             System.out.println("Checked %s and it contained no JS errors.".formatted(viewName));
         });

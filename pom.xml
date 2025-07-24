@@ -95,7 +95,7 @@
         <dependency>
             <groupId>in.virit</groupId>
             <artifactId>mopo</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -122,14 +122,11 @@
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
 				<version>${vaadin.version}</version>
-				<configuration>
-					<requireHomeNodeExec>true</requireHomeNodeExec>
-					<pnpmEnable>true</pnpmEnable>
-				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>prepare-frontend</goal>
+                            <goal>build-frontend</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -196,7 +193,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.7.0</version>
+                        <version>0.8.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
