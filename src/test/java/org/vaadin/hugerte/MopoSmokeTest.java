@@ -45,11 +45,12 @@ public class MopoSmokeTest {
 
     @Test
     public void smokeTest() {
+        mopo.trackClientSideErrors();
         String rootUrl = "http://localhost:" + port + "/";
         mopo.getViewsReportedByDevMode(browser, rootUrl).forEach(viewName -> {
             String url = rootUrl + viewName;
             page.navigate(url);
-            mopo.assertNoJsErrors();
+            mopo.failOnClientSideErrors();
             System.out.println("Checked %s and it contained no JS errors.".formatted(viewName));
         });
 
@@ -57,10 +58,11 @@ public class MopoSmokeTest {
 
     @Test
     public void menuConfig() throws InterruptedException {
+        mopo.trackClientSideErrors();
         String url = "http://localhost:" + port + "/demo";
         page.navigate(url);
         PlaywrightAssertions.assertThat(page.locator("button").getByText("File")).isVisible();
-//        Assertions.assertEquals(0, page.locator("button").getByText("Insert").count());
+        mopo.failOnClientSideErrors();
     }
 
 }
