@@ -272,7 +272,10 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
     }
 
     public HugeRte configureLanguage(Language language) {
-        config.put("language", language.toString());
+        String code = language.getCode();
+        if (code != null) { // English has no code, since it has no dedicated lang file.
+            config.put("language", code);
+        }
         return this;
     }
 
