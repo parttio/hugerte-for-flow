@@ -1,7 +1,6 @@
 package org.vaadin.hugerte;
 
 import java.util.Objects;
-import jakarta.annotation.Nullable;
 
 public enum Language {
     /**
@@ -83,11 +82,11 @@ public enum Language {
 
     private final String code;
 
-    Language(@Nullable String code) {
+    Language(String code) {
         this.code = code;
     }
 
-    @Nullable public String getCode() {
+    public String getCode() {
         return code;
     }
 
@@ -98,7 +97,7 @@ public enum Language {
      * @return The Language enum member.
      * @throws IllegalArgumentException If the code is not found.
      */
-    public static Language fromCode(@Nullable String code) {
+    public static Language fromCode(String code) {
         for (Language lang : Language.values()) {
             if (Objects.equals(lang.code, code)) {
                 return lang;
