@@ -13,7 +13,6 @@ import com.vaadin.flow.router.RouteAlias;
 import org.vaadin.firitin.components.RichText;
 
 @Route
-@RouteAlias("")
 @Menu(order = 0)
 public class DemoView extends Div {
 
