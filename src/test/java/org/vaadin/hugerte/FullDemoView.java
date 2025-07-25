@@ -1,6 +1,5 @@
 package org.vaadin.hugerte;
 
-import java.util.stream.Stream;
 import org.vaadin.firitin.components.RichText;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -14,7 +13,7 @@ import com.vaadin.flow.router.Route;
 
 @Route
 @Menu(order = 1)
-public class AllPluginsDemoView extends Div {
+public class FullDemoView extends Div {
 
     // sample of a full toolbar
     public static final Toolbar[] FULL_TOOLBAR = {
@@ -37,7 +36,7 @@ public class AllPluginsDemoView extends Div {
     };
     protected HugeRte hugeRte;
 
-    public AllPluginsDemoView() {
+    public FullDemoView() {
         hugeRte = new HugeRte();
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
