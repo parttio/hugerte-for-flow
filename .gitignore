@@ -12,3 +12,5 @@ src/main/frontend/generated
 /types.d.ts
 /vite.config.ts
 /vite.generated.ts
+/.flattened-pom.xml
+/src/main/bundles/prod.bundle
