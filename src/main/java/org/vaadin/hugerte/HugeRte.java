@@ -390,7 +390,7 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         this.configureMenubar(false, Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
                 Menubar.FORMAT);
         this.configureToolbar(false, Toolbar.UNDO, Toolbar.REDO,
-                Toolbar.SEPARATOR, Toolbar.FORMAT_SELECT, Toolbar.SEPARATOR,
+                Toolbar.SEPARATOR, Toolbar.BLOCKS, Toolbar.SEPARATOR,
                 Toolbar.BOLD, Toolbar.ITALIC, Toolbar.SEPARATOR,
                 Toolbar.ALIGN_LEFT, Toolbar.ALIGN_CENTER, Toolbar.ALIGN_RIGHT,
                 Toolbar.ALIGN_JUSTIFY, Toolbar.SEPARATOR, Toolbar.OUTDENT,

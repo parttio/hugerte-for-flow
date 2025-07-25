@@ -1,5 +1,6 @@
 package org.vaadin.hugerte;
 
+import java.util.stream.Stream;
 import org.vaadin.firitin.components.RichText;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -15,6 +16,25 @@ import com.vaadin.flow.router.Route;
 @Menu(order = 1)
 public class AllPluginsDemoView extends Div {
 
+    // sample of a full toolbar
+    public static final Toolbar[] FULL_TOOLBAR = {
+            Toolbar.UNDO, Toolbar.REDO, Toolbar.SEPARATOR,
+            Toolbar.BLOCKS, Toolbar.FONT_FAMILY, Toolbar.FONTSIZE, Toolbar.SEPARATOR,
+            Toolbar.BOLD, Toolbar.ITALIC, Toolbar.UNDERLINE, Toolbar.STRIKETHROUGH, Toolbar.BLOCKQUOTE, Toolbar.SEPARATOR,
+            Toolbar.ALIGN_LEFT, Toolbar.ALIGN_CENTER, Toolbar.ALIGN_RIGHT, Toolbar.ALIGN_JUSTIFY, Toolbar.SEPARATOR,
+            Toolbar.NUMLIST, Toolbar.BULLIST, Toolbar.SEPARATOR,
+            Toolbar.LINK, Toolbar.IMAGE, Toolbar.INSERT_DATETIME, Toolbar.SEPARATOR,
+            Toolbar.TABLE, Toolbar.MEDIA, Toolbar.SEPARATOR,
+            Toolbar.LINE_HEIGHT, Toolbar.OUTDENT, Toolbar.INDENT, Toolbar.SEPARATOR,
+            Toolbar.FORECOLOR, Toolbar.BACKCOLOR, Toolbar.REMOVE_FORMAT, Toolbar.SEPARATOR,
+            Toolbar.CHARMAP, Toolbar.EMOTICONS, Toolbar.SEPARATOR,
+            Toolbar.CODE, Toolbar.FULLSCREEN, Toolbar.PREVIEW, Toolbar.SEPARATOR,
+            Toolbar.SAVE, Toolbar.PRINT, Toolbar.SEPARATOR,
+            Toolbar.PAGEBREAK, Toolbar.ANCHOR, Toolbar.CODE_SAMPLE, Toolbar.SEPARATOR,
+            Toolbar.ACCORDION, Toolbar.ACCORDION_REMOVE, Toolbar.SEPARATOR,
+            Toolbar.LTR, Toolbar.RTL, Toolbar.SEPARATOR,
+            Toolbar.HELP
+    };
     protected HugeRte hugeRte;
 
     public AllPluginsDemoView() {
@@ -24,6 +44,7 @@ public class AllPluginsDemoView extends Div {
         hugeRte.setHeight("700px");
 
         hugeRte.configurePlugin(false, Plugin.values());
+        hugeRte.configureToolbar(false, FULL_TOOLBAR);
 
         add(hugeRte);
 
