@@ -1,5 +1,7 @@
 package org.vaadin.hugerte;
 
+import java.util.Arrays;
+import java.util.function.Predicate;
 import org.vaadin.firitin.components.RichText;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -34,6 +36,15 @@ public class FullDemoView extends Div {
             Toolbar.LTR, Toolbar.RTL, Toolbar.SEPARATOR,
             Toolbar.HELP
     };
+
+    /**
+     * Full set of plugins. We exclude the autoresize plugin, since that might be unexpected for a general demo due
+     * to its maybe not so wide usage?
+     */
+    public static final Plugin[] ALL_PLUGINS_WITHOUT_AUTO_RESIZE = Arrays.stream(Plugin.values())
+            .filter(Predicate.not(Plugin.AUTORESIZE::equals))
+            .toArray(Plugin[]::new);
+
     protected HugeRte hugeRte;
 
     public FullDemoView() {
@@ -42,7 +53,7 @@ public class FullDemoView extends Div {
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");
 
-        hugeRte.configurePlugin(false, Plugin.values());
+        hugeRte.configurePlugin(false, ALL_PLUGINS_WITHOUT_AUTO_RESIZE);
         hugeRte.configureToolbar(false, FULL_TOOLBAR);
 
         add(hugeRte);
