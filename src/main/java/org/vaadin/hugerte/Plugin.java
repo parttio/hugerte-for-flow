@@ -5,6 +5,12 @@ public enum Plugin {
     ADVLIST("advlist"),
     ANCHOR("anchor"),
     AUTOLINK("autolink"),
+
+    /**
+     * Enables the "autoresize" plugin. That will make the editor take as less space as needed to
+     * show all the content. Please be aware, that the editor might be smaller than a fixed height
+     * you have set.
+     */
     AUTORESIZE("autoresize"),
     AUTOSAVE("autosave"),
     CHARMAP("charmap"),

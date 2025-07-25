@@ -30,6 +30,7 @@ import com.vaadin.flow.dom.DomEventListener;
 import com.vaadin.flow.dom.DomListenerRegistration;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ShadowRoot;
+import com.vaadin.flow.dom.Style.Overflow;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.shared.Registration;
 import elemental.json.Json;
@@ -81,6 +82,8 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
     public HugeRte(boolean shadowRoot) {
         super("");
         setHeight("500px");
+        getStyle().setOverflow(Overflow.AUTO); // see https://github.com/parttio/hugerte-for-flow/issues/9
+
         ta.getStyle().set("height", "100%");
         if (shadowRoot) {
             ShadowRoot shadow = getElement().attachShadow();
