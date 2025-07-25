@@ -2,6 +2,7 @@ package org.vaadin.hugerte;
 
 public enum Plugin {
     //@formatter:off    
+    ACCORDION("accordion"),
     ADVLIST("advlist"),
     ANCHOR("anchor"),
     AUTOLINK("autolink"),
