@@ -26,7 +26,7 @@
     border-right: 1px solid var(--lumo-contrast-20pct);
 }
 
-.tox button:is(.tox-tbtn, .tox-mbtn) {
+.tox :is(.tox-tbtn, .tox-mbtn) {
   /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
   background: transparent;
 }
