@@ -26,21 +26,21 @@
     border-right: 1px solid var(--lumo-contrast-20pct);
 }
 
-.tox :is(.tox-tbtn, .tox-mbtn) {
+.tox :is(.tox-tbtn, .tox-mbtn, .tox-split-button:focus) {
   /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
   background: transparent;
 }
 
-.tox button.tox-tbtn--enabled {
+.tox .tox-tbtn--enabled:not(.tox-split-button__chevron) {
   background: var(--lumo-primary-color);
 }
 
-.tox button.tox-tbtn--enabled:hover {
-  background: var(--lumo-primary-color);
-}
-
-.tox button.tox-tbtn:hover {
+.tox .tox-tbtn:hover {
   background: var(--lumo-contrast-10pct);
+}
+
+.tox .tox-tbtn--enabled:hover:not(.tox-split-button__chevron) {
+  background: var(--lumo-primary-color-50pct);
 }
 
 .tox .tox-tbtn--disabled[aria-disabled="true"] .tox-icon > svg {
@@ -76,21 +76,21 @@
   font-size: var(--lumo-font-size-s);
 }
 
-button.tox-mbtn.tox-mbtn--select.tox-mbtn--active {
+.tox-mbtn.tox-mbtn--select.tox-mbtn--active {
   background: var(--lumo-primary-color-50pct);
   color: var(--lumo-primary-contrast-color);  
 }
 
-.tox-menubar > button.tox-mbtn.tox-mbtn--select:hover:not(:disabled) {
-  background: var(--lumo-primary-color-10pct);
-}
+/*.tox-menubar > .tox-mbtn.tox-mbtn--select:hover:not(:disabled) {*/
+/*  background: var(--lumo-primary-color-10pct);*/
+/*}*/
 
-button.tox-mbtn.tox-mbtn--select {
+.tox-mbtn.tox-mbtn--select {
   color: var(--lumo-body-text-color);
   font-size: var(--lumo-font-size-m);
 }
 
-button.tox-tbtn.tox-tbtn--select.tox-tbtn--bespoke {
+.tox-tbtn.tox-tbtn--select.tox-tbtn--bespoke {
   color: var(--lumo-body-text-color);
 }
 
