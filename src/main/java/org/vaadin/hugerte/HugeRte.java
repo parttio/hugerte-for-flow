@@ -29,7 +29,6 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.dom.DomEventListener;
 import com.vaadin.flow.dom.DomListenerRegistration;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.dom.ShadowRoot;
 import com.vaadin.flow.dom.Style.Overflow;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.shared.Registration;
@@ -59,38 +58,25 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
     private String currentValue = "";
     private String rawConfig;
     JsonObject config = Json.createObject();
-    private Element ta = new Element("div");
+    private final Element editorContainer = new Element("div");
+    private boolean connectorInitialized;
 
-    private int debounceTimeout = 0;
-    private boolean basicTinyMCECreated;
+    private final int debounceTimeout = 0;
+    private boolean basicEditorCreated;
     private boolean enabled = true;
     private boolean readOnly = false;
 
     /**
-     * Creates a new TinyMce editor with shadowroot set or disabled. The shadow
-     * root should be used if the editor is in used in Dialog component,
-     * otherwise menu's and certain other features don't work. On the other
-     * hand, the shadow root must not be on when for example used in inline
-     * mode.
-     *
-     * @deprecated No longer needed since version x.x
-     * 
-     * @param shadowRoot
-     *            true of shadow root hack should be used
+     * Creates a new instance. Use the different `configure` methods to apply any necessary configuration before
+     * attaching it.
      */
-    @Deprecated
-    public HugeRte(boolean shadowRoot) {
+    public HugeRte() {
         super("");
         setHeight("500px");
         getStyle().setOverflow(Overflow.AUTO); // see https://github.com/parttio/hugerte-for-flow/issues/9
 
-        ta.getStyle().set("height", "100%");
-        if (shadowRoot) {
-            ShadowRoot shadow = getElement().attachShadow();
-            shadow.appendChild(ta);
-        } else {
-            getElement().appendChild(ta);
-        }
+        editorContainer.getStyle().set("height", "100%");
+        getElement().appendChild(editorContainer);
 
         domListenerRegistration = getElement().addEventListener("tchange",
                 (DomEventListener) event -> {
@@ -105,14 +91,13 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         domListenerRegistration.debounce(debounceTimeout);
     }
 
-
     /**
      * Define the mode of value change triggering. BLUR: Value is triggered only
      * when TinyMce loses focus, TIMEOUT: TinyMce will send value change eagerly
      * but debounced with timeout, CHANGE: value change is sent when TinyMce
      * emits change event (e.g. enter, tab)
      *
-     * @see setDebounceTimeout(int)
+     * @see #setDebounceTimeout(int)
      * @param mode
      *            The mode.
      */
@@ -138,7 +123,7 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
      * is more than 0 the value change is emitted with delay of given timeout
      * milliseconds after last keystroke.
      *
-     * @see setValueChangeMode(ValueChangeMode)
+     * @see #setValueChangeMode(ValueChangeMode)
      * @param debounceTimeout
      *            the debounce timeout in milliseconds
      */
@@ -155,28 +140,11 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         domListenerRegistration.debounce(debounceTimeout);
     }
 
-    public HugeRte() {
-        this(false);
-    }
-
-    /**
-     * Old public method from era when this component didn't properly implement
-     * the HasValue interfaces. Don't use this but the standard setValue method
-     * instead.
-     *
-     * @param html
-     * @deprecated use {@link #setValue(Object)} instead
-     */
-    @Deprecated(forRemoval = true)
-    public void setEditorContent(String html) {
-        setPresentationValue(html);
-    }
-
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         if (id == null) {
             id = UUID.randomUUID().toString();
-            ta.setAttribute("id", id);
+            editorContainer.setAttribute("id", id);
         }
         if (!getEventBus().hasListener(BlurEvent.class)) {
             // adding fake blur listener so throttled value
@@ -191,7 +159,7 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         }
         super.onAttach(attachEvent);
         if (attachEvent.isInitialAttach())
-            injectTinyMceScript();
+            injectEditorScript();
         initConnector();
         saveOnClose();
     }
@@ -206,13 +174,12 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         }
         super.onDetach(detachEvent);
         initialContentSent = false;
+        connectorInitialized = false;
         // save the current value to the dom element in case the component gets
         // reattached
     }
 
-    @SuppressWarnings("deprecation")
     private void initConnector() {
-
         runBeforeClientResponse(ui -> {
             if(rawConfig == null) {
                 rawConfig = "{}";
@@ -221,9 +188,11 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
                     "const editor = $0;" +
                     "const rawconfig = " + rawConfig + ";\n" +
                     "window.Vaadin.Flow.hugerteConnector.initLazy(rawconfig, $0, $1, $2, $3, $4)",
-                    getElement(), ta, config, currentValue,
+                    getElement(), editorContainer, config, currentValue,
                     (enabled && !readOnly))
                     .then(res -> initialContentSent = true);
+
+            connectorInitialized = true;
         });
     }
     
@@ -244,18 +213,21 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
     /**
      * Sets the base configuration object as RAW JS. So be very careful what you pass in here.
      *
-     * @param jsConfig
+     * @param jsConfig config to apply
      */
     public void setConfig(String jsConfig) {
+        checkAlreadyInitialized();
         this.rawConfig = jsConfig;
     }
 
     public HugeRte configure(String configurationKey, String value) {
+        checkAlreadyInitialized();
         config.put(configurationKey, value);
         return this;
     }
 
     public HugeRte configure(String configurationKey, String... value) {
+        checkAlreadyInitialized();
         JsonArray array = Json.createArray();
         for (int i = 0; i < value.length; i++) {
             array.set(i, value[i]);
@@ -265,11 +237,13 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
     }
 
     public HugeRte configure(String configurationKey, boolean value) {
+        checkAlreadyInitialized();
         config.put(configurationKey, value);
         return this;
     }
 
     public HugeRte configure(String configurationKey, double value) {
+        checkAlreadyInitialized();
         config.put(configurationKey, value);
         return this;
     }
@@ -305,8 +279,8 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
      * Override this with an empty implementation if you to use the cloud hosted
      * version, or own custom script if needed.
      */
-    protected void injectTinyMceScript() {
-        getUI().get().getPage().addJavaScript(
+    protected void injectEditorScript() {
+        getUI().orElseThrow().getPage().addJavaScript(
                 "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
     }
 
@@ -348,8 +322,8 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
 
     @Override
     public void blur() {
-        throw new RuntimeException(
-                "Not implemented, TinyMce does not support programmatic blur.");
+        throw new UnsupportedOperationException(
+                "Not implemented, HugeRTE does not support programmatic blur.");
     }
 
     @Override
@@ -381,10 +355,10 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         }
     }
 
-    private HugeRte createBasicTinyMce() {
+    private HugeRte initBasicEditorConfiguration() {
         setValue("");
         this.configure("branding", false);
-        this.basicTinyMCECreated = true;
+        this.basicEditorCreated = true;
         this.configurePlugin(false, Plugin.ADVLIST, Plugin.AUTOLINK,
                 Plugin.LISTS, Plugin.SEARCH_REPLACE);
         this.configureMenubar(false, Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
@@ -399,9 +373,15 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
 
     }
 
-    public HugeRte configurePlugin(boolean basicTinyMCE, Plugin... plugins) {
-        if (basicTinyMCE && !basicTinyMCECreated) {
-            createBasicTinyMce();
+    public HugeRte configurePlugin(Plugin... plugins) {
+        return configurePlugin(false, plugins);
+    }
+
+    public HugeRte configurePlugin(boolean setupBasicConfig, Plugin... plugins) {
+        checkAlreadyInitialized();
+
+        if (setupBasicConfig && !basicEditorCreated) {
+            initBasicEditorConfiguration();
         }
 
         JsonArray jsonArray = config.get("plugins");
@@ -422,9 +402,15 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         return this;
     }
 
-    public HugeRte configureMenubar(boolean basicTinyMCE, Menubar... menubars) {
-        if (basicTinyMCE && !basicTinyMCECreated) {
-            createBasicTinyMce();
+    public HugeRte configureMenubar(Menubar... menubars) {
+        return configureMenubar(false, menubars);
+    }
+
+    public HugeRte configureMenubar(boolean setupBasicConfig, Menubar... menubars) {
+        checkAlreadyInitialized();
+
+        if (setupBasicConfig && !basicEditorCreated) {
+            initBasicEditorConfiguration();
         }
 
         String newconfig = Arrays.stream(menubars).map(m -> m.menubarLabel)
@@ -442,9 +428,15 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         return this;
     }
 
-    public HugeRte configureToolbar(boolean basicTinyMCE, Toolbar... toolbars) {
-        if (basicTinyMCE && !basicTinyMCECreated) {
-            createBasicTinyMce();
+    public HugeRte configureToolbar(Toolbar... toolbars) {
+        return  configureToolbar(false, toolbars);
+    }
+
+    public HugeRte configureToolbar(boolean setupBasicConfig, Toolbar... toolbars) {
+        checkAlreadyInitialized();
+
+        if (setupBasicConfig && !basicEditorCreated) {
+            initBasicEditorConfiguration();
         }
 
         JsonValue jsonValue = config.get("toolbar");
@@ -461,6 +453,19 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
 
         config.put("toolbar", toolbarStr);
         return this;
+    }
+
+    private void checkAlreadyInitialized() {
+        if (connectorInitialized) {
+            throw new AlreadyInitializedException();
+        }
+    }
+
+    public static class AlreadyInitializedException extends RuntimeException {
+        public AlreadyInitializedException() {
+            super("Cannot apply configuration to the editor, it already has been initialized. You need to " +
+                  "detach it first");
+        }
     }
 
 }
