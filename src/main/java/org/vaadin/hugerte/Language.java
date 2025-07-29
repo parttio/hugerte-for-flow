@@ -6,8 +6,9 @@ public enum Language {
     /**
      * Default language. Has no code, since there is no lang file for it, and is optional to be used. So we provide it
      * for the sake of completeness.
-     * <p/>
+     * <p>
      * You can also set "null" on {@link HugeRte#configureLanguage(Language)}
+     * </p>
      */
     ENGLISH(null),
 
