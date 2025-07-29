@@ -22,10 +22,6 @@
     padding: 0;
 }
 
-.tox:not([dir=rtl]) .tox-toolbar-overlord .tox-toolbar__group:not(:last-of-type) {
-    border-right: 1px solid var(--lumo-contrast-20pct);
-}
-
 .tox :is(.tox-tbtn, .tox-mbtn, .tox-split-button:focus) {
   /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
   background: transparent;
