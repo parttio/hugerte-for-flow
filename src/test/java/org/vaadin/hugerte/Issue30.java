@@ -13,13 +13,13 @@ import com.vaadin.flow.router.Route;
 @PreserveOnRefresh
 public class Issue30 extends VerticalLayout {
 
-    public static class TinyMceField extends CustomField<String> {
+    public static class HugeRteField extends CustomField<String> {
 
         private static final long serialVersionUID = 1L;
 
         private HugeRte ivEditor = null;
 
-        public TinyMceField() {
+        public HugeRteField() {
             super();
             setWidth("100%");
             setHeight("500px");
@@ -82,20 +82,20 @@ public class Issue30 extends VerticalLayout {
 
     public Issue30() {
         Dialog dialog = new Dialog();
-        TinyMceField tinyMce = new TinyMceField();
-        tinyMce.setWidthFull();
-        tinyMce.getEditor().configure("branding", false);
-        tinyMce.getEditor().configure("statusbar", false);
-        tinyMce.setValue("<h2>Hallo Leute,</h2>");
+        HugeRteField rte = new HugeRteField();
+        rte.setWidthFull();
+        rte.getEditor().configure("branding", false);
+        rte.getEditor().configure("statusbar", false);
+        rte.setValue("<h2>Hallo Leute,</h2>");
         AnotherCustomField anotherCustomField = new AnotherCustomField();
         anotherCustomField.setValue("Jorma");
 
         Button close = new Button("Close", e -> {
             dialog.close();
-            Notification.show(tinyMce.getValue());
+            Notification.show(rte.getValue());
             Notification.show(anotherCustomField.getValue());
         });
-        dialog.add(tinyMce, anotherCustomField, close);
+        dialog.add(rte, anotherCustomField, close);
         Button open = new Button("Open", e -> {
             dialog.open();
         });

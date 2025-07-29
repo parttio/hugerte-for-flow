@@ -15,8 +15,8 @@ public class HugeRTEWithVaadinSelect extends VerticalLayout {
 
     public HugeRTEWithVaadinSelect() {
         
-        HugeRte tiny = new HugeRte();
-        tiny.setValue("Edit me");
+        HugeRte rte = new HugeRte();
+        rte.setValue("Edit me");
         
         Select<Options> select = new Select<>();
         select.setItems(Options.values());
@@ -25,11 +25,11 @@ public class HugeRTEWithVaadinSelect extends VerticalLayout {
         Button b = new Button("Set value and toggle visibility");
         b.addClickListener(e -> {
             select.setValue(Options.BAR);
-            if(tiny.isAttached()) {
+            if(rte.isAttached()) {
                 remove(select);
-                remove(tiny);
+                remove(rte);
             } else {
-                add(tiny);
+                add(rte);
                 add(select);
             }
             

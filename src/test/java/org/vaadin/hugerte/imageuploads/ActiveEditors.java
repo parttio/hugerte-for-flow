@@ -23,7 +23,7 @@ import java.util.UUID;
 @SessionScope
 public class ActiveEditors {
 
-    private Map<String,UI> idToTiny = new HashMap<>();
+    private Map<String,UI> idToUI = new HashMap<>();
 
     /**
      * Generates an id for the UI, that should be used in the REST
@@ -34,12 +34,12 @@ public class ActiveEditors {
      */
     public String register(HugeRte editor) {
         String id = UUID.randomUUID().toString();
-        idToTiny.put(id, editor.getUI().get());
+        idToUI.put(id, editor.getUI().get());
         return id;
     }
 
     private UI forId(String id) {
-        return idToTiny.get(id);
+        return idToUI.get(id);
     }
 
     /**
@@ -49,7 +49,7 @@ public class ActiveEditors {
      */
     public void deRegister(HugeRte editor) {
         UI ui = editor.getUI().get();
-        var iterator = idToTiny.entrySet().iterator();
+        var iterator = idToUI.entrySet().iterator();
         while(iterator.hasNext()) {
             if(iterator.next().getValue() == ui)
                 iterator.remove();

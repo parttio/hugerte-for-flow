@@ -20,12 +20,12 @@ import java.util.Set;
  * name.
  * <p>
  *     This version returns with the JSON format expected by
- *     the TinyMCE editor that declares the final URL of the
+ *     the HugeRTE editor that declares the final URL of the
  *     uploaded image.
  * </p>
  * <p>
  *     There is also a mechanism to talk back to the editor UI.
- *     Here the use case is rather abstract as TinyMCE will also
+ *     Here the use case is rather abstract as HugeRTE will also
  *     notify of a successful upload, but in one of my hobby apps
  *     the UI also contains a list of images associated with the
  *     edited entity, that needs to be updated after uploads.

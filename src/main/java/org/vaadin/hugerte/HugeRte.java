@@ -93,8 +93,8 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
 
     /**
      * Define the mode of value change triggering. BLUR: Value is triggered only
-     * when TinyMce loses focus, TIMEOUT: TinyMce will send value change eagerly
-     * but debounced with timeout, CHANGE: value change is sent when TinyMce
+     * when HugeRTE loses focus, TIMEOUT: HugeRTE will send value change eagerly
+     * but debounced with timeout, CHANGE: value change is sent when HugeRTE
      * emits change event (e.g. enter, tab)
      *
      * @see #setDebounceTimeout(int)
@@ -153,7 +153,7 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
             });
         }
         if (!attachEvent.isInitialAttach()) {
-            // Value after initial attach should be set via TinyMCE JavaScript
+            // Value after initial attach should be set via HugeRTE JavaScript
             // API, otherwise value is not updated upon reattach
             initialContentSent = true;
         }

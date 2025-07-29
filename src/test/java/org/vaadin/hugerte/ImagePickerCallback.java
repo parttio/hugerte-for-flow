@@ -18,8 +18,8 @@ public class ImagePickerCallback extends Div {
 
     protected HugeRte hugeRte;
 
-    public static class FileCallbackTinyMce extends HugeRte {
-        public FileCallbackTinyMce() {
+    public static class FileCallbackHugeRte extends HugeRte {
+        public FileCallbackHugeRte() {
             // This is RAW JS!! Other options are evaluated as JSON on top of this
             setConfig("""
                 {
@@ -50,7 +50,7 @@ public class ImagePickerCallback extends Div {
                     int finalI = i;
                     add(new Button("image"+i+".jpg") {{
                         addClickListener(e -> {
-                            FileCallbackTinyMce.this.getElement().executeJs("this._image_callback('http://example.com/image" + finalI + ".jpg');");
+                            FileCallbackHugeRte.this.getElement().executeJs("this._image_callback('http://example.com/image" + finalI + ".jpg');");
                             dialog.close();
                         });
                     }});
@@ -58,7 +58,7 @@ public class ImagePickerCallback extends Div {
             }});
 
             dialog.open();
-            // Make sure the Vaadin dialog is on top of the Tinymce dialog
+            // Make sure the Vaadin dialog is on top of the RTE dialog
             getElement().executeJs("""
                     document.querySelector("vaadin-dialog-overlay").style.zIndex = 1000000;
                     """);
@@ -69,7 +69,7 @@ public class ImagePickerCallback extends Div {
     ActiveEditors activeEditors;
 
     public ImagePickerCallback() {
-        hugeRte = new FileCallbackTinyMce();
+        hugeRte = new FileCallbackHugeRte();
 
         add(hugeRte);
     }
