@@ -50,6 +50,10 @@ public class FullDemoView extends Div {
 
     public FullDemoView() {
         hugeRte = new HugeRte();
+        hugeRte.setLabel("Hello Huge RTE");
+        hugeRte.setRequiredIndicatorVisible(true);
+//        hugeRte.setErrorMessage("This is just a test");
+//        hugeRte.setInvalid(true);
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");

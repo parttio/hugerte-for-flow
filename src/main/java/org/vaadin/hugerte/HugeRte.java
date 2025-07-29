@@ -15,17 +15,17 @@
  */
 package org.vaadin.hugerte;
 
-import com.vaadin.flow.component.AbstractCompositeField;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.DetachEvent;
-import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.dom.DomEventListener;
 import com.vaadin.flow.dom.DomListenerRegistration;
 import com.vaadin.flow.dom.Element;
@@ -37,20 +37,16 @@ import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 /**
  * A Rich Text editor, based on HugeRTE JS component.
  * <p>
  * @author mstahv
  */
-@Tag("div")
+//@Tag("vaadin-huge-rte")
 @JavaScript("context://frontend/hugerteConnector.js")
 @StyleSheet("context://frontend/hugerteLumo.css")
-public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
-        implements HasSize, Focusable<HugeRte> {
+public class HugeRte extends CustomField<String>
+        implements HasSize/*, Focusable<HugeRte>*/ {
 
     private final DomListenerRegistration domListenerRegistration;
     private String id;
@@ -72,6 +68,7 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
      */
     public HugeRte() {
         super("");
+        addClassName("vaadin-huge-rte");
         setHeight("500px");
         getStyle().setOverflow(Overflow.AUTO); // see https://github.com/parttio/hugerte-for-flow/issues/9
 
@@ -89,6 +86,11 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
                 });
         domListenerRegistration.addEventData("event.htmlString");
         domListenerRegistration.debounce(debounceTimeout);
+    }
+
+    @Override
+    protected String generateModelValue() {
+        return currentValue;
     }
 
     /**
@@ -206,8 +208,9 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
                 .beforeClientResponse(this, context -> command.accept(ui)));
     }
 
+    @Deprecated
     public String getCurrentValue() {
-        return currentValue;
+        return getValue();
     }
 
     /**
@@ -303,20 +306,18 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
     }
 
     @Override
-    public Registration addFocusListener(
-            ComponentEventListener<FocusEvent<HugeRte>> listener) {
+    public Registration addFocusListener(ComponentEventListener<FocusEvent<CustomField<String>>> listener) {
         DomListenerRegistration domListenerRegistration = getElement()
                 .addEventListener("tfocus", event -> listener
-                        .onComponentEvent(new FocusEvent<>(this, false)));
+                        .onComponentEvent(new FocusEvent<>(this, true)));
         return domListenerRegistration;
     }
 
     @Override
-    public Registration addBlurListener(
-            ComponentEventListener<BlurEvent<HugeRte>> listener) {
+    public Registration addBlurListener(ComponentEventListener<BlurEvent<CustomField<String>>> listener) {
         DomListenerRegistration domListenerRegistration = getElement()
                 .addEventListener("tblur", event -> listener
-                        .onComponentEvent(new BlurEvent<>(this, false)));
+                        .onComponentEvent(new BlurEvent<>(this, true)));
         return domListenerRegistration;
     }
 

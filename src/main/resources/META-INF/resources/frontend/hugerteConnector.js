@@ -149,10 +149,12 @@ window.Vaadin.Flow.hugerteConnector = {
             ed.on('blur', function(e) {
               const blurEvent = new Event("tblur");
               c.dispatchEvent(blurEvent);
+              c.removeAttribute("focused");
               syncValue();
             });
             ed.on('focus', function(e) {
               const event = new Event("tfocus");
+              c.setAttribute("focused", "");
               c.dispatchEvent(event);
             });
 

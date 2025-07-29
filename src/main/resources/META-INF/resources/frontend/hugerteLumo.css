@@ -1,3 +1,7 @@
+.vaadin-huge-rte::part(input-fields) {
+  flex-grow: 1;
+}
+
 .tox .tox-editor-header > .tox-menubar {
   background-color: var(--lumo-contrast-5pct);
   padding-left: var(--lumo-space-s);
