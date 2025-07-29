@@ -359,7 +359,7 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
         setValue("");
         this.configure("branding", false);
         this.basicEditorCreated = true;
-        this.configurePlugin(false, Plugin.ADVLIST, Plugin.AUTOLINK,
+        this.configurePlugins(false, Plugin.ADVLIST, Plugin.AUTOLINK,
                 Plugin.LISTS, Plugin.SEARCH_REPLACE);
         this.configureMenubar(false, Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
                 Menubar.FORMAT);
@@ -373,11 +373,11 @@ public class HugeRte extends AbstractCompositeField<Div, HugeRte, String>
 
     }
 
-    public HugeRte configurePlugin(Plugin... plugins) {
-        return configurePlugin(false, plugins);
+    public HugeRte configurePlugins(Plugin... plugins) {
+        return configurePlugins(false, plugins);
     }
 
-    public HugeRte configurePlugin(boolean setupBasicConfig, Plugin... plugins) {
+    public HugeRte configurePlugins(boolean setupBasicConfig, Plugin... plugins) {
         checkAlreadyInitialized();
 
         if (setupBasicConfig && !basicEditorCreated) {

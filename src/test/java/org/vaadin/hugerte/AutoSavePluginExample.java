@@ -10,7 +10,7 @@ public class AutoSavePluginExample extends VerticalLayout {
 
     public AutoSavePluginExample() {
         HugeRte hugeRte = new HugeRte();
-        hugeRte.configurePlugin(true, Plugin.AUTOSAVE)
+        hugeRte.configurePlugins(true, Plugin.AUTOSAVE)
                 // TODO add constant
                 .configure("toolbar", "restoredraft")
                 // save more eagerly for demo
