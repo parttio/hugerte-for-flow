@@ -1,5 +1,9 @@
-.vaadin-huge-rte::part(input-fields) {
-  flex-grow: 1;
+.vaadin-huge-rte {
+  display: flex; /*default for fields is inline-flex, but for a "big" component like this, a block-like behavior seems more fitting*/
+
+  &::part(input-fields) {
+    flex-grow: 1;
+  }
 }
 
 .tox .tox-editor-header > .tox-menubar {
