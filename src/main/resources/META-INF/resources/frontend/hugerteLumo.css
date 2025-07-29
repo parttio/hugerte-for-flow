@@ -156,3 +156,12 @@ div.tox-collection__item > div.tox-collection__item-icon {
 .hugerte-flow[disabled]:not([readonly]) {
   opacity: 0.5;
 }
+
+.tox .tox-pop {
+  width: max-content;
+}
+
+.tox:not([dir="rtl"]) .tox-toolbar__group:not(:last-of-type),
+.tox[dir="rtl"] .tox-toolbar__group:not(:last-of-type) {
+  border-right-color: var(--lumo-contrast-20pct);
+}
