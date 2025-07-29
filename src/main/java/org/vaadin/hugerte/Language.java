@@ -2,6 +2,9 @@ package org.vaadin.hugerte;
 
 import java.util.Objects;
 
+/**
+ * This enumeration represents all available languages for the HugeRTE.
+ */
 public enum Language {
     /**
      * Default language. Has no code, since there is no lang file for it, and is optional to be used. So we provide it
@@ -87,6 +90,11 @@ public enum Language {
         this.code = code;
     }
 
+    /**
+     * Returns the language or country code represented by this instance.
+     * Will be {@code null} for {@link #ENGLISH}.
+     * @return code
+     */
     public String getCode() {
         return code;
     }
