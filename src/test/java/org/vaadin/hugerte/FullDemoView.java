@@ -6,6 +6,7 @@ import org.vaadin.firitin.components.RichText;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.notification.Notification;
@@ -98,6 +99,19 @@ public class FullDemoView extends Div {
         blur.addClickShortcut(Key.KEY_B, KeyModifier.CONTROL);
         add(blur);
 
+        Button bDialog = new Button("Open in Dialog");
+        bDialog.addClickListener(e -> {
+            Dialog dialog = new Dialog(hugeRte);
+            dialog.open();
+
+            dialog.addOpenedChangeListener(event -> {
+                if (!event.isOpened()) {
+                    addComponentAsFirst(hugeRte);
+                }
+            });
+        });
+
+        add(bDialog);
 
 
         hugeRte.addValueChangeListener(e -> {
