@@ -89,6 +89,61 @@ public class HugeRte extends CustomField<String>
         domListenerRegistration.debounce(debounceTimeout);
     }
 
+    /**
+     * Creates a new instance with the given label.
+     * @param label label
+     */
+    public HugeRte(String label) {
+        this();
+        setLabel(label);
+    }
+
+    /**
+     * Creates a new instance with the given label and initial value. The initial value is set as it is without
+     * any further processing.
+     * @param label label
+     * @param initialValue initial value
+     */
+    public HugeRte(String label, String initialValue) {
+        this();
+        setLabel(label);
+        setValue(initialValue);
+    }
+
+    /**
+     * Creates a new instance with the given label, initial value and value change listener. The initial value is set as it is without
+     * any further processing.
+     * @param label label
+     * @param initialValue initial value
+     * @param valueChangeListener value change listener
+     */
+    public HugeRte(String label, String initialValue, ValueChangeListener<? super ComponentValueChangeEvent<CustomField<String>, String>> valueChangeListener) {
+        this();
+        setLabel(label);
+        setValue(initialValue);
+        addValueChangeListener(valueChangeListener);
+    }
+
+    /**
+     * Creates a new instance with the given label and value change listener.
+     * @param label label
+     * @param valueChangeListener value change listener
+     */
+    public HugeRte(String label, ValueChangeListener<? super ComponentValueChangeEvent<CustomField<String>, String>> valueChangeListener) {
+        this();
+        setLabel(label);
+        addValueChangeListener(valueChangeListener);
+    }
+
+    /**
+     * Creates a new instance with the given value change listener.
+     * @param valueChangeListener value change listener
+     */
+    public HugeRte(ValueChangeListener<? super ComponentValueChangeEvent<CustomField<String>, String>> valueChangeListener) {
+        this();
+        addValueChangeListener(valueChangeListener);
+    }
+
     @Override
     protected String generateModelValue() {
         return currentValue;
@@ -469,5 +524,4 @@ public class HugeRte extends CustomField<String>
                   "detach it first");
         }
     }
-
 }
