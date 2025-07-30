@@ -160,7 +160,9 @@
     opacity: 0.5;
   }
 
-  .tox-pop {
+  .tox-pop,
+  .tox-toolbar__overflow,
+  .tox-menu {
     width: max-content;
   }
 
