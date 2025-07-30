@@ -1,15 +1,15 @@
 window.Vaadin.Flow.hugerteConnector = {
     initLazy: function (customConfig, c, ta, options, initialContent, enabled) {
-		var currentValue = ta.innerHTML;
-        var readonlyTimeout;
-        var changeMode;
-        
+        let currentValue = ta.innerHTML;
+        let readonlyTimeout;
+        let changeMode;
+
         const beforeUnloadHandler = (event) => {
-          const blurEvent = new Event("tblur");
-          c.dispatchEvent(blurEvent);
-          const changeEvent = new Event("tchange");
-          changeEvent.htmlString = c.$connector.editor.getContent();
-          c.dispatchEvent(changeEvent);
+            const blurEvent = new Event("tblur");
+            c.dispatchEvent(blurEvent);
+            const changeEvent = new Event("tchange");
+            changeEvent.htmlString = c.$connector.editor.getContent();
+            c.dispatchEvent(changeEvent);
         };
 
         window.removeEventListener("beforeunload", beforeUnloadHandler);
@@ -78,8 +78,8 @@ window.Vaadin.Flow.hugerteConnector = {
           };
         }
 
-        var baseconfig = customConfig;
-        
+        const baseconfig = customConfig;
+
         Object.assign(baseconfig, options);
 
         baseconfig['suffix'] = '.min';
