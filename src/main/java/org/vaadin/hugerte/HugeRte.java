@@ -26,6 +26,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.shared.HasThemeVariant;
 import com.vaadin.flow.dom.DomEventListener;
 import com.vaadin.flow.dom.DomListenerRegistration;
 import com.vaadin.flow.dom.Element;
@@ -46,7 +47,7 @@ import elemental.json.JsonValue;
 @JavaScript("context://frontend/hugerteConnector.js")
 @StyleSheet("context://frontend/hugerteLumo.css")
 public class HugeRte extends CustomField<String>
-        implements HasSize/*, Focusable<HugeRte>*/ {
+        implements HasSize, HasThemeVariant<HugeRteVariant> {
 
     private final DomListenerRegistration domListenerRegistration;
     private String id;
