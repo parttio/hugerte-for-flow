@@ -107,10 +107,16 @@ public class FullDemoView extends Div {
         bDialog.addClickListener(e -> {
             Dialog dialog = new Dialog(hugeRte);
             dialog.open();
+            dialog.setCloseOnOutsideClick(false);
+            dialog.setResizable(true);
+            dialog.setModal(true);
+            dialog.setDraggable(true);
+            hugeRte.setWidth("750px");
 
             dialog.addOpenedChangeListener(event -> {
                 if (!event.isOpened()) {
                     addComponentAsFirst(hugeRte);
+                    hugeRte.setWidthFull();
                 }
             });
         });
@@ -122,6 +128,7 @@ public class FullDemoView extends Div {
             Notification.show("ValueChange event!");
             System.out.println(e.getValue());
         });
+
 
     }
 

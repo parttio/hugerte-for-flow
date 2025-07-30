@@ -29,19 +29,19 @@ window.Vaadin.Flow.hugerteConnector = {
           // Init connector at first visit
           changeMode = 'change';
           c.$connector = {
-          
+
             setEditorContent : function(html) {
               // Delay setting the content, otherwise there is issue during reattach
               setTimeout(() => {
                 currentValue = this.editor.setContent(html, {format : 'html'});
               }, 50);
             },
-        
+
             replaceSelectionContent : function(html) {
               this.editor.selection.setContent(html);
               syncValue();
             },
-          
+
             focus : function() {
               this.editor.focus();
             },
@@ -58,7 +58,7 @@ window.Vaadin.Flow.hugerteConnector = {
             setMode : function(newChangeMode) {
               changeMode = newChangeMode;
             },
-	
+
 			isInDialog: function() {
                 let inDialog = false;
                 let parent = c.parentElement;
@@ -71,10 +71,15 @@ window.Vaadin.Flow.hugerteConnector = {
                 }
                 return inDialog;
             },
-            
+
             saveOnClose : function() {
                 window.addEventListener("beforeunload", beforeUnloadHandler);
-            }
+            },
+              closeToolbarOverflowMenu: function () {
+                  if (this.editor.queryCommandState('ToggleToolbarDrawer')) {
+                      this.editor.execCommand('ToggleToolbarDrawer');
+                  }
+              }
           };
         }
 
@@ -133,9 +138,9 @@ window.Vaadin.Flow.hugerteConnector = {
                 // the hugerte skin css.
                 // Nevertheless, this might break in the future, so for the long term, it might be useful to create
                 // our own lumo skin at some point so that we do not have to hack around this situation.
-                let ourScripts = document.head.querySelector("[href*='hugerteLumo.css']");
-                if (ourScripts) {
-                    document.head.append(ourScripts);
+                const ourStyles = document.head.querySelector("[href*='hugerteLumo.css']");
+                if (ourStyles) {
+                    document.head.append(ourStyles);
                 } else {
                     console.error("Could not find 'hugerteLumo.css'. Has it been renamed or moved?");
                 }

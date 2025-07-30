@@ -87,6 +87,9 @@ public class HugeRte extends CustomField<String>
                 });
         domListenerRegistration.addEventData("event.htmlString");
         domListenerRegistration.debounce(debounceTimeout);
+
+        addBlurListener(e -> closeToolbarOverflowMenu());
+
     }
 
     /**
@@ -516,6 +519,11 @@ public class HugeRte extends CustomField<String>
         if (connectorInitialized) {
             throw new AlreadyInitializedException();
         }
+    }
+
+    public void closeToolbarOverflowMenu() {
+        runBeforeClientResponse(ui -> getElement()
+                .callJsFunction("$connector.closeToolbarOverflowMenu"));
     }
 
     public static class AlreadyInitializedException extends RuntimeException {
