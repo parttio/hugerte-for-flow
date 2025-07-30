@@ -23,8 +23,6 @@ public class BinderView extends VerticalLayout {
 
         HugeRte rte = new HugeRte();
         rte.setLabel("My Aweseom Rich Text Editor");
-//
-        rte.addThemeVariants(HugeRteVariant.NO_EDITOR_FOCUS_HIGHLIGHT);
 
         add(rte);
 
