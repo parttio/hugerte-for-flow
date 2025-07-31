@@ -51,6 +51,7 @@ import elemental.json.JsonValue;
 public class HugeRte extends CustomField<String>
         implements HasSize, HasThemeVariant<HugeRteVariant> {
 
+    public static final String DEFAULT_HEIGHT = "500px";
     private final DomListenerRegistration domListenerRegistration;
     private String id;
     private boolean initialContentSent;
@@ -64,6 +65,8 @@ public class HugeRte extends CustomField<String>
     private boolean basicEditorCreated;
     private boolean enabled = true;
     private boolean readOnly = false;
+    private ResizeDirection resizeDirection = ResizeDirection.NONE;
+    private Plugin[] activePlugins = {};
 
     /**
      * Creates a new instance. Use the different `configure` methods to apply any necessary configuration before
@@ -72,11 +75,13 @@ public class HugeRte extends CustomField<String>
     public HugeRte() {
         super("");
         addClassName("vaadin-huge-rte");
-        setHeight("500px");
+        setHeight(DEFAULT_HEIGHT);
         getStyle().setOverflow(Overflow.AUTO); // see https://github.com/parttio/hugerte-for-flow/issues/9
 
         editorContainer.getStyle().set("height", "100%");
         getElement().appendChild(editorContainer);
+
+        configureResize(ResizeDirection.NONE); // by default no resizing
 
         domListenerRegistration = getElement().addEventListener("tchange",
                 (DomEventListener) event -> {
@@ -442,6 +447,10 @@ public class HugeRte extends CustomField<String>
     public HugeRte configurePlugins(boolean setupBasicConfig, Plugin... plugins) {
         checkAlreadyInitialized();
 
+        this.activePlugins = plugins;
+
+        checkForResizeConflicts();
+
         if (setupBasicConfig && !basicEditorCreated) {
             initBasicEditorConfiguration();
         }
@@ -495,7 +504,7 @@ public class HugeRte extends CustomField<String>
     }
 
     public HugeRte configureToolbar(Toolbar... toolbars) {
-        return  configureToolbar(false, toolbars);
+        return configureToolbar(false, toolbars);
     }
 
     public HugeRte configureToolbar(boolean setupBasicConfig, Toolbar... toolbars) {
@@ -521,6 +530,41 @@ public class HugeRte extends CustomField<String>
         return this;
     }
 
+    /**
+     * Configures the resize option for the editor. Please note, that there are additional settings to this instance
+     * necessary, so it is not recommended to call directly {@code configure("resize", ...)}.
+     * @param direction direction
+     * @return this instance
+     */
+    public HugeRte configureResize(ResizeDirection direction) {
+        this.resizeDirection = Objects.requireNonNull(direction);
+        checkForResizeConflicts();
+
+        if (direction != ResizeDirection.NONE) {
+            setHeight(null); // otherwise resize will not work as expected
+
+            if (direction == ResizeDirection.VERTICALLY) {
+                return configure("resize", true);
+            }
+
+            return configure("resize", "both");
+        }
+
+        // fallback, if configure resize is used multiple times
+        setHeight(DEFAULT_HEIGHT);
+        return configure("resize", false);
+    }
+
+    /**
+     * Ensures, that resize and autoresize are not enabled at the same time.
+     */
+    private void checkForResizeConflicts() {
+        if (resizeDirection != ResizeDirection.NONE && Set.of(activePlugins).contains(Plugin.AUTORESIZE)) {
+            throw new ConfigurationConflictException("The \"resize\" configuration and the \"autoresize\" plugin are" +
+                                                     " not compatible. Please check you configuration.");
+        }
+    }
+
     private void checkAlreadyInitialized() {
         if (connectorInitialized) {
             throw new AlreadyInitializedException();
@@ -532,10 +576,47 @@ public class HugeRte extends CustomField<String>
                 .callJsFunction("$connector.closeToolbarOverflowMenu"));
     }
 
+    /**
+     * Thrown, when the editor already has been initialized. For instance, the configuration must not be changed
+     * afterwards and is a typical source for this exception.
+     */
     public static class AlreadyInitializedException extends RuntimeException {
         public AlreadyInitializedException() {
             super("Cannot apply configuration to the editor, it already has been initialized. You need to " +
                   "detach it first");
         }
+    }
+
+    /**
+     * Thrown, when a conflict in the configuration has been detected. This is for instance the case, when
+     * a plugin and another configuration should not be used in combination (e.g. config "resize" and plugin "autoresize").
+     */
+    public static class ConfigurationConflictException extends RuntimeException {
+        public ConfigurationConflictException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Directions, that can be set for the editor to be resizable. Please note, that "only horizonzal" resizing is
+     * not supported.
+     *
+     * @see <a href="https://www.tiny.cloud/docs/tinymce/latest/editor-size-options/#resize">Official TinyMCE docs</a>
+     */
+    public enum ResizeDirection {
+        /**
+         * Resizing is disabled.
+         */
+        NONE,
+
+        /**
+         * Enables vertical resizing.
+         */
+        VERTICALLY,
+
+        /**
+         * Enables vertical and horizontal resizing.
+         */
+        BOTH;
     }
 }
