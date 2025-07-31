@@ -14,6 +14,13 @@
   .tox-editor-container .tox-editor-header .tox-toolbar-overlord > .tox-toolbar__primary {
     background-color: var(--lumo-contrast-5pct);
     border-top: unset;
+
+    /*
+    when shown in a vaadin dialog, shrinking the dialog via resizing lets the toolbar's height "jump" for
+    tiny moments, which makes the whole dialog "flickering". The max height settings prevents that. The 39px
+    are taken from the used hugerte skin and might change in future.
+    */
+    max-height: var(--vaadin-huge-rte-primary-toolbar-max-height, 39px);
   }
 
   .tox-editor-container .tox-editor-header:not(.tox-hugerte-inline) {
