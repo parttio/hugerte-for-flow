@@ -1,6 +1,5 @@
 package org.vaadin.hugerte;
 
-import org.vaadin.hugerte.HugeRte.ResizeDirection;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
