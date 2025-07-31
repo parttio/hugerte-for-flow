@@ -3,6 +3,7 @@ package org.vaadin.hugerte;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import org.vaadin.firitin.components.RichText;
+import org.vaadin.hugerte.HugeRte.ResizeDirection;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
@@ -58,8 +59,9 @@ public class FullDemoView extends Div {
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");
 
-        hugeRte.configurePlugins(false, ALL_PLUGINS_WITHOUT_AUTO_RESIZE);
-        hugeRte.configureToolbar(false, FULL_TOOLBAR);
+        hugeRte.configurePlugins(ALL_PLUGINS_WITHOUT_AUTO_RESIZE);
+        hugeRte.configureToolbar(FULL_TOOLBAR);
+        hugeRte.configureResize(ResizeDirection.BOTH);
 
         add(hugeRte);
 
