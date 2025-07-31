@@ -3,6 +3,12 @@
 
   &::part(input-fields) {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tox {
+    flex-grow: 1;
   }
 
   .tox-editor-header > .tox-menubar {
@@ -20,7 +26,7 @@
     tiny moments, which makes the whole dialog "flickering". The max height settings prevents that. The 39px
     are taken from the used hugerte skin and might change in future.
     */
-    max-height: var(--vaadin-huge-rte-primary-toolbar-max-height, 39px);
+    max-height: var(--vaadin-huge-rte-toolbar-height, 39px);
   }
 
   .tox-editor-container .tox-editor-header:not(.tox-hugerte-inline) {
