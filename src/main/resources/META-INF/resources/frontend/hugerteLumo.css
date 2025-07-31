@@ -13,8 +13,6 @@
 
   .tox-editor-container .tox-editor-header .tox-toolbar-overlord > .tox-toolbar__primary {
     background-color: var(--lumo-contrast-5pct);
-    padding-left: var(--lumo-space-s);
-    padding-right: var(--lumo-space-s);
     border-top: unset;
   }
 
