@@ -111,12 +111,11 @@ public class FullDemoView extends Div {
             dialog.setResizable(true);
             dialog.setModal(true);
             dialog.setDraggable(true);
-            hugeRte.setWidth("750px");
+            dialog.setWidth("700px");
 
             dialog.addOpenedChangeListener(event -> {
                 if (!event.isOpened()) {
                     addComponentAsFirst(hugeRte);
-                    hugeRte.setWidthFull();
                 }
             });
         });
