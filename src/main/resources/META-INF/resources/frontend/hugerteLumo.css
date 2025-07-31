@@ -197,6 +197,16 @@
   &[theme*="no-editor-focus-highlight"] .tox-edit-area::before{
     border: 0 none;
   }
+
+  /* EXPERIMENTAL, NOT YET WORKING */
+  /*&.auto-resize {*/
+  /*  .tox-edit-area__iframe {*/
+  /*    !* Essential: Apply max-height and overflow to the iframe *!*/
+  /*    max-height: calc(600px - (2 * var(--vaadin-huge-rte-toolbar-height, 39px))) !important; !* This should match your autoresize_max_height *!*/
+  /*    overflow-y: auto !important;*/
+  /*    box-sizing: border-box; !* Include padding/border in the height calculation *!*/
+  /*  }*/
+  /*}*/
 }
 
 
