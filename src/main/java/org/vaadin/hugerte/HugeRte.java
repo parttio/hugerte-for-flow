@@ -419,11 +419,11 @@ public class HugeRte extends CustomField<String>
         setValue("");
         this.configure("branding", false);
         this.basicEditorCreated = true;
-        this.configurePlugins(false, Plugin.ADVLIST, Plugin.AUTOLINK,
+        this.configurePlugins(Plugin.ADVLIST, Plugin.AUTOLINK,
                 Plugin.LISTS, Plugin.SEARCH_REPLACE);
-        this.configureMenubar(false, Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
+        this.configureMenubar(Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
                 Menubar.FORMAT);
-        this.configureToolbar(false, Toolbar.UNDO, Toolbar.REDO,
+        this.configureToolbar(Toolbar.UNDO, Toolbar.REDO,
                 Toolbar.SEPARATOR, Toolbar.BLOCKS, Toolbar.SEPARATOR,
                 Toolbar.BOLD, Toolbar.ITALIC, Toolbar.SEPARATOR,
                 Toolbar.ALIGN_LEFT, Toolbar.ALIGN_CENTER, Toolbar.ALIGN_RIGHT,
@@ -442,6 +442,10 @@ public class HugeRte extends CustomField<String>
 
         if (setupBasicConfig && !basicEditorCreated) {
             initBasicEditorConfiguration();
+        }
+
+        if (Set.of(plugins).contains(Plugin.AUTORESIZE)) {
+            setHeight(null);
         }
 
         JsonArray jsonArray = config.get("plugins");

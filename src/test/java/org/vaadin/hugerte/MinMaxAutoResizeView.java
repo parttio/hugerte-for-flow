@@ -1,7 +1,7 @@
 package org.vaadin.hugerte;
 
+import org.vaadin.hugerte.HugeRte.ResizeDirection;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.dom.Style.Overflow;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
@@ -10,20 +10,11 @@ import com.vaadin.flow.router.Route;
 public class MinMaxAutoResizeView extends VerticalLayout {
 
     public MinMaxAutoResizeView() {
-        HugeRte rte = new HugeRte();
+        HugeRte rte = new HugeRte("Autoresize with a range of 200-600px");
 
-        rte.addClassName("auto-resize");
         rte.configurePlugins(Plugin.AUTORESIZE);
-        rte.configure("content_style", """
-                body {
-                  overflow-y: auto !important; /* Force scrollbars on the body */
-                  overflow-x: hidden !important; /* Prevent horizontal scroll if not needed */
-                }""");
-
-        rte.setSizeUndefined();
+        rte.configure("max_height", 600);
         rte.setMinHeight("200px");
-        rte.setMaxHeight("600px");
-        rte.getStyle().setOverflow(Overflow.HIDDEN);
 
         add(rte);
     }
