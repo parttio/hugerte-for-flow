@@ -142,7 +142,6 @@ public class HugeRte extends AbstractField<HugeRte, String>
 //                    boolean value = event.getEventData().hasKey("event.htmlString");
                     String htmlString = event.getEventData().getString("event.htmlString");
                     setModelValue(htmlString, true);
-//                    this.value = htmlString;
                 });
         domListenerRegistration.addEventData("event.htmlString");
         domListenerRegistration.debounce(debounceTimeout);
@@ -222,11 +221,11 @@ public class HugeRte extends AbstractField<HugeRte, String>
     @Override
     protected void onDetach(DetachEvent detachEvent) {
         // See https://github.com/parttio/tinymce-for-flow/issues/33
-        if (isVisible()) {
-            detachEvent.getUI().getPage().executeJs("""
-                    hugerte.get($0).remove();
-                    """, getId().orElse(""));
-        }
+//        if (isVisible()) {
+//            detachEvent.getUI().getPage().executeJs("""
+//                    hugerte.get($0).remove();
+//                    """, getId().orElse(""));
+//        }
         super.onDetach(detachEvent);
         connectorInitialized = false;
         // save the current value to the dom element in case the component gets

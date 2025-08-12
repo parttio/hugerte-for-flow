@@ -15,6 +15,10 @@
     flex-grow: 1;
   }
 
+    .tox-editor-header {
+        z-index: 1;
+    }
+
   .tox-editor-header > .tox-menubar {
     background-color: var(--lumo-contrast-5pct);
     padding-left: var(--lumo-space-s);

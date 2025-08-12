@@ -9,11 +9,11 @@ import {defineCustomElement} from '@vaadin/component-base/src/define.js';
 import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import { FieldMixin } from '@vaadin/field-base/src/field-mixin.js';
+import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 // import "./hugerte_addon/hugerte/hugerte.min.js";
-import { FocusMixin } from '@vaadin/a11y-base/src/focus-mixin.js';
-import { KeyboardMixin } from '@vaadin/a11y-base/src/keyboard-mixin.js';
-import { TooltipController } from '@vaadin/component-base/src/tooltip-controller.js';
+import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
+import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
+import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
 
 
 // import { CustomFieldMixin } from './vaadin-custom-field-mixin.js';
@@ -87,7 +87,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             this.editor.remove();
         }
 
-        if(this.beforeUnloadHandler) {
+        if (this.beforeUnloadHandler) {
             window.removeEventListener('beforeunload', this.beforeUnloadHandler);
         }
 
@@ -110,6 +110,8 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                 this.editor = ed;
 
                 ed.on('init', () => {
+                    this.editorInitialized = true;
+
                     if (this.isInDialog()) {
                         // This is inside a shadowroot (Dialog in Vaadin)
                         // and needs some hacks to make this nagigateable with keyboard
@@ -150,6 +152,10 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                     } else {
                         console.error("Could not find 'hugerteLumo.css'. Has it been renamed or moved?");
                     }
+
+                    if (this.lastSyncedValue) {
+                        this.setEditorContent(this.lastSyncedValue);
+                    }
                 });
 
                 ed.on('change', () => {
@@ -178,12 +184,11 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             }
         };
 
-        target.innerHTML = "";
-
         hugerte.init(config);
+
     }
 
-    syncValue(){
+    syncValue() {
         const event = new Event("tchange");
         event.htmlString = this.editor.getContent();
 
@@ -193,11 +198,18 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         }
     }
 
-    setEditorContent(html) {
+    setEditorContent(value) {
         // Delay setting the content, otherwise there is issue during reattach
-        setTimeout(() => {
-            this.lastSyncedValue = this.editor.setContent(html, {format: 'html'});
-        }, 50);
+        // setTimeout(() => {
+        if (this.editorInitialized) {
+            this.lastSyncedValue = this.editor.setContent(value);
+            if (this.lastSyncedValue !== value) { // ensure, that the server also has the latest version of the client
+                this.syncValue();
+            }
+        } else {
+            this.lastSyncedValue = value;
+        }
+        // }, 50);
     }
 
     replaceSelectionContent(html) {
