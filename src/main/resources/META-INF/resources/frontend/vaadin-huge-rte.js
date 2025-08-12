@@ -1,6 +1,7 @@
 /**
  * @license
- * Copyright (c) 2019 - 2025 Vaadin Ltd.
+ * Copyright (c) 2025 Team Parttio and Vaadin Ltd.
+ * https://github.com/parttio/hugerte-for-flow/
  * This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
  */
 import {html, LitElement} from 'lit';
@@ -9,7 +10,11 @@ import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 import { FieldMixin } from '@vaadin/field-base/src/field-mixin.js';
-import "./hugerte_addon/hugerte/hugerte.min.js";
+// import "./hugerte_addon/hugerte/hugerte.min.js";
+import { FocusMixin } from '@vaadin/a11y-base/src/focus-mixin.js';
+import { KeyboardMixin } from '@vaadin/a11y-base/src/keyboard-mixin.js';
+import { TooltipController } from '@vaadin/component-base/src/tooltip-controller.js';
+
 
 // import { CustomFieldMixin } from './vaadin-custom-field-mixin.js';
 // import { customFieldStyles } from './vaadin-custom-field-styles.js';
@@ -30,9 +35,9 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         return 'vaadin-huge-rte';
     }
 
-    static get styles() {
-        return customFieldStyles;
-    }
+    // static get styles() {
+    // return customFieldStyles;
+    // }
 
     /** @protected */
     render() {
@@ -63,7 +68,6 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     ready() {
         super.ready();
 
-        this._initEditor();
 
         this._tooltipController = new TooltipController(this);
         this.addController(this._tooltipController);
@@ -74,7 +78,15 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         });
     }
 
+    firstUpdated() {
+        this._initEditor();
+    }
+
     disconnectedCallback() {
+        if (this.editor) {
+            this.editor.remove();
+        }
+
         if(this.beforeUnloadHandler) {
             window.removeEventListener('beforeunload', this.beforeUnloadHandler);
         }
@@ -93,7 +105,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             suffix: '.min',
             promotion: false,
             target,
-            readonly: !this.enabled, // comes form the field mixin
+            // readonly: !this.enabled, // comes form the field mixin
             setup: (ed) => {
                 this.editor = ed;
 
@@ -147,14 +159,14 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                 });
                 ed.on('blur', () => {
                     const blurEvent = new Event("tblur");
-                    c.dispatchEvent(blurEvent);
-                    c.removeAttribute("focused");
+                    this.dispatchEvent(blurEvent);
+                    this.removeAttribute("focused");
                     this.syncValue();
                 });
                 ed.on('focus', () => {
                     const event = new Event("tfocus");
-                    c.setAttribute("focused", "");
-                    c.dispatchEvent(event);
+                    this.setAttribute("focused", "");
+                    this.dispatchEvent(event);
                 });
 
                 ed.on('input', () => {
@@ -166,7 +178,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             }
         };
 
-        ta.innerHTML = initialContent;
+        target.innerHTML = "";
 
         hugerte.init(config);
     }
@@ -219,7 +231,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
     isInDialog() {
         let inDialog = false;
-        let parent = c.parentElement;
+        let parent = this.parentElement;
         while (parent != null) {
             if (parent.tagName.indexOf("VAADIN-DIALOG") === 0) {
                 inDialog = true;
