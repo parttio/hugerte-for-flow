@@ -36,7 +36,7 @@ public class DemoView extends Div {
             var n = new Notification("", 3000);
             n.add(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getCurrentValue())
+                    new RichText(hugeRte.getValue())
                     )
             );
             n.open();

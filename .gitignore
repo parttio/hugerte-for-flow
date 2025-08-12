@@ -14,3 +14,5 @@ src/main/frontend/generated
 /vite.generated.ts
 /.flattened-pom.xml
 /src/main/bundles/prod.bundle
+/src/main/bundles/dev.bundle
+/src/main/bundles/README.md
