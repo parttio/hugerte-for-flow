@@ -1,3 +1,5 @@
+import { diff_match_patch } from 'diff-match-patch';
+
 window.Vaadin.Flow.hugerteConnector = {
     initLazy: function (customConfig, c, ta, options, initialContent, enabled) {
         let currentValue = ta.innerHTML;
