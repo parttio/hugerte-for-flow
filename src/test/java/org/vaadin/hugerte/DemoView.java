@@ -1,26 +1,29 @@
 package org.vaadin.hugerte;
 
+import org.vaadin.firitin.components.RichText;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-import org.vaadin.firitin.components.RichText;
 
 @Route
 @Menu(order = 0)
 public class DemoView extends Div {
 
-    protected HugeRte hugeRte;
+    protected HugeRteWebComponent hugeRte;
 
     public DemoView() {
-        hugeRte = new HugeRte();
+        hugeRte = new HugeRteWebComponent();
+        hugeRte.setValueChangeMode(ValueChangeMode.ON_BLUR);
 
+        hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");
         
@@ -32,13 +35,10 @@ public class DemoView extends Div {
         add(b);
 
         Button b2 = new Button("Show content", e -> {
-
-            var n = new Notification("", 3000);
-            n.add(new VerticalLayout(
+            var n = new Dialog(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getCurrentValue())
-                    )
-            );
+                    new RichText(hugeRte.getValue())
+            ));
             n.open();
         });
         add(b2);
@@ -68,6 +68,8 @@ public class DemoView extends Div {
 
         hugeRte.addValueChangeListener(e -> {
             Notification.show("ValueChange event!");
+            System.out.println();
+            System.out.println("### value change event###");
             System.out.println(e.getValue());
         });
 
