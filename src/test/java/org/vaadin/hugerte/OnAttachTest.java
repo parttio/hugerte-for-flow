@@ -49,7 +49,7 @@ public class OnAttachTest extends VerticalLayout {
             this.value = value;
             getContent().setWidth("600px");
             getContent().configureLanguage(Language.FINNISH);
-            getContent().setValueChangeMode(ValueChangeMode.BLUR);
+            getContent().setValueChangeMode(ValueChangeMode.ON_BLUR);
             getContent().configurePlugins(true, Plugin.TABLE)
                     .configureToolbar(true, Toolbar.TABLE);
             getContent().addValueChangeListener(e -> {
