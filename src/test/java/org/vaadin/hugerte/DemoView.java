@@ -21,12 +21,11 @@ public class DemoView extends Div {
 
     public DemoView() {
         hugeRte = new HugeRteWebComponent();
-        hugeRte.setValueChangeMode(ValueChangeMode.ON_BLUR);
+//        hugeRte.setValueChangeMode(ValueChangeMode.ON_BLUR);
 
         hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");
-        
         add(hugeRte);
 
         Button b = new Button("Set content dynamically", e -> {
