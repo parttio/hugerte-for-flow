@@ -277,7 +277,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             console.info("fire delta change", delta);
             this.dispatchEvent(new CustomEvent("_value-delta", {
                 detail: {
-                    delta // TODO implement delta
+                    delta
                 }
             }));
         }
@@ -308,10 +308,6 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     //     this.readonlyTimeout = setTimeout(() => {
     //         this.editor.mode.set(enabled ? 'design' : 'readonly');
     //     }, 20);
-    // }
-
-    // setMode(newChangeMode) {
-    //     this.changeMode = newChangeMode;
     // }
 
     isInDialog() {

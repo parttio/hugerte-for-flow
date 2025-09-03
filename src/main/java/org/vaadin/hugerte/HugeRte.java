@@ -170,7 +170,7 @@ public class HugeRte extends CustomField<String>
      *            The mode.
      */
     public void setValueChangeMode(ValueChangeMode mode) {
-        if (mode == ValueChangeMode.BLUR) {
+        if (mode == ValueChangeMode.ON_BLUR) {
             runBeforeClientResponse(ui -> {
                 getElement().callJsFunction("$connector.setMode", "blur");
             });
@@ -178,7 +178,7 @@ public class HugeRte extends CustomField<String>
             runBeforeClientResponse(ui -> {
                 getElement().callJsFunction("$connector.setMode", "timeout");
             });
-        } else if (mode == ValueChangeMode.CHANGE) {
+        } else if (mode == ValueChangeMode.ON_CHANGE) {
             runBeforeClientResponse(ui -> {
                 getElement().callJsFunction("$connector.setMode", "change");
             });
