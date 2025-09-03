@@ -14,11 +14,11 @@ import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
 import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
 import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
 
-// frontend/huge-rte.ts
-// --- HugeRTE Kern zuerst importieren ---
+// --- HugeRTE core ---
 import hugerte from 'hugerte';
 
 // --- Required Runtime Imports (Theme, Skin, Content CSS) ---
+// TODO review
 import 'hugerte/models/dom';
 import 'hugerte/icons/default';
 import 'hugerte/themes/silver';
@@ -26,7 +26,7 @@ import 'hugerte/skins/ui/oxide/skin.js';
 import 'hugerte/skins/ui/oxide/content.js';
 import 'hugerte/skins/content/default/content.js';
 
-// --- Plugins (häufig genutzt; nach Bedarf kürzen/erweitern) ---
+// TODO review plugins
 import 'hugerte/plugins/advlist';
 import 'hugerte/plugins/autolink';
 import 'hugerte/plugins/autoresize';
@@ -38,13 +38,13 @@ import 'hugerte/plugins/preview';
 import 'hugerte/plugins/searchreplace';
 import 'hugerte/plugins/wordcount';
 
+import {diff_match_patch} from 'diff-match-patch';
+
 
 // import { CustomFieldMixin } from './vaadin-custom-field-mixin.js';
 // import { customFieldStyles } from './vaadin-custom-field-styles.js';
 
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
-
-
 
     // can be overridden by the server using #setConfig
     baseConfig = {};
@@ -52,7 +52,8 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     // will be overridden by the server on attachment time
     config = {};
 
-    _value = "";
+    _lastSyncedValue = "";
+    valueChangeMode = "change";
 
     static get is() {
         return 'vaadin-huge-rte';
@@ -177,27 +178,26 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                         console.error("Could not find 'hugerteLumo.css'. Has it been renamed or moved?");
                     }
 
-                    if (this._value) {
-                        editor.setContent(this._value);
+                    if (this._lastSyncedValue) {
+                        editor.setContent(this._lastSyncedValue);
                     }
                 });
 
-                editor.on('change', () => {
-                    this.dispatchEvent(new Event('change'));
+                editor.on('change', e => {
+                    console.info("change");
+                    this.onValueChangeIfMode("change");
                 });
-                editor.on('blur', () => {
-                    this.dispatchEvent(new Event("blur"));
+                editor.on('blur', e => {
+                    this.dispatchEvent(new CustomEvent("_blur"));
+                    this.onValueChangeIfMode("blur");
                 });
-                editor.on('focus', () => {
-                    this.dispatchEvent(new Event("focus"));
-                });
+                editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));
 
-                editor.on('input', e => {
-                    this.dispatchEvent(new Event('input'));
-                });
-
+                editor.on('input', e => this.dispatchEvent(new Event('input')));
             }
         };
+
+        // TODO VCM: LAZY / TIMEOUT
 
         await hugerte.init(config);
 
@@ -235,15 +235,52 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     // }
 
     set value(value) {
+        console.info("set value", value);
+        this._lastSyncedValue = value ?? "";
+
         if (this.editor) {
-            this.editor.setContent(value);
-        } else {
-            this._value = value;
+            this.editor.setContent(this._lastSyncedValue);
         }
+
     }
 
     get value() {
-        return this.editor?.getContent() ?? this._value;
+        console.info("get full value");
+        return this.editor?.getContent() ?? this._lastSyncedValue;
+    }
+
+    /**
+     * Calls #onValueChange(), if the given string matches the current value change mode.
+     * @param expectedValueChangeMode expected value change mode
+     */
+    onValueChangeIfMode(expectedValueChangeMode) {
+        if (this.valueChangeMode === expectedValueChangeMode) {
+            this.onValueChange();
+        }
+    }
+
+    /**
+     * This method is to be called when ever a value change should be triggered. It will calculate the current value
+     * delta, update the "old value" property and send an event to the server.
+     */
+    onValueChange() {
+        const currentValue = this.editor?.getContent() ?? this._lastSyncedValue;
+
+        // init lib
+        const dmp = new diff_match_patch();
+        const patch = dmp.patch_make(this._lastSyncedValue, currentValue);
+        const delta = dmp.patch_toText(patch);
+
+        this._lastSyncedValue = currentValue;
+
+        if (delta) {
+            console.info("fire delta change", delta);
+            this.dispatchEvent(new CustomEvent("_value-delta", {
+                detail: {
+                    delta // TODO implement delta
+                }
+            }));
+        }
     }
 
     replaceSelectionContent(html) {
@@ -253,6 +290,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     }
 
     focus() {
+        console.warn("focus()");
         if (this.isInDialog()) {
             setTimeout(() => this.editor.focus(), 150)
         } else {
