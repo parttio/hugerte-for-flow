@@ -40,7 +40,6 @@ import 'hugerte/plugins/wordcount';
 
 import {diff_match_patch} from 'diff-match-patch';
 
-
 // import { CustomFieldMixin } from './vaadin-custom-field-mixin.js';
 // import { customFieldStyles } from './vaadin-custom-field-styles.js';
 
@@ -53,7 +52,8 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     config = {};
 
     _lastSyncedValue = "";
-    valueChangeMode = "change";
+    _valueChangeMode = "change";
+    _valueChangeTimeout = 2000;
 
     static get is() {
         return 'vaadin-huge-rte';
@@ -180,20 +180,32 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
                     if (this._lastSyncedValue) {
                         editor.setContent(this._lastSyncedValue);
+                        this.onValueChange(); // flush updated value - needed, if the initial value is not original hugerte html
                     }
                 });
 
                 editor.on('change', e => {
-                    console.info("change");
                     this.onValueChangeIfMode("change");
                 });
+
                 editor.on('blur', e => {
                     this.dispatchEvent(new CustomEvent("_blur"));
                     this.onValueChangeIfMode("blur");
+                    if (this._timeoutValueChangeDebouncer) {
+                        this._timeoutValueChangeDebouncer.flush();
+                    }
                 });
+
                 editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));
 
-                editor.on('input', e => this.dispatchEvent(new Event('input')));
+                editor.on('input', e => {
+                    if (this.valueChangeMode === "timeout") {
+                        clearTimeout(this._timeoutValueChangeHandle);
+                        this._timeoutValueChangeHandle = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
+                    }
+
+                    return this.dispatchEvent(new Event('input'));
+                });
             }
         };
 
@@ -235,17 +247,14 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     // }
 
     set value(value) {
-        console.info("set value", value);
         this._lastSyncedValue = value ?? "";
 
         if (this.editor) {
             this.editor.setContent(this._lastSyncedValue);
         }
-
     }
 
     get value() {
-        console.info("get full value");
         return this.editor?.getContent() ?? this._lastSyncedValue;
     }
 
@@ -274,13 +283,77 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         this._lastSyncedValue = currentValue;
 
         if (delta) {
-            console.info("fire delta change", delta);
             this.dispatchEvent(new CustomEvent("_value-delta", {
                 detail: {
                     delta
                 }
             }));
         }
+    }
+
+    set valueChangeMode(newValueChangeMode) {
+        if(!newValueChangeMode) {
+            newValueChangeMode = "change";
+        }
+        if(this._valueChangeMode !== newValueChangeMode) {
+            this._valueChangeMode = newValueChangeMode;
+
+            if (this._valueChangeMode !== "timeout" && this._timeoutValueChangeHandle) {
+                this.stopValueChangeTimeout();
+            }
+
+            if(this._valueChangeMode === "interval") {
+                this.startValueChangInterval();
+            } else if(this._intervalValueChangeHandle) {
+                this.stopValueChangeInterval();
+            }
+
+        }
+    }
+
+    get valueChangeMode() {
+        return this._valueChangeMode;
+    }
+
+    set valueChangeTimeout(newTimeout) {
+        if (!newTimeout || newTimeout < 0) {
+            throw new Error("valueChangeTimeout must be greater than 0");
+        }
+
+        if(this._valueChangeTimeout !== newTimeout) {
+            this._valueChangeTimeout = newTimeout;
+
+            if(this._timeoutValueChangeHandle) {
+                this.stopValueChangeTimeout();
+            } else if(this._intervalValueChangeHandle) {
+                this.startValueChangInterval(); // also stops the current interval
+            }
+
+        }
+    }
+
+    get valueChangeTimeout() {
+        return this._valueChangeTimeout;
+    }
+
+    stopValueChangeTimeout() {
+        this.onValueChange(); // flush value to server
+        clearTimeout(this._timeoutValueChangeHandle);
+        delete this._timeoutValueChangeHandle;
+    }
+
+    stopValueChangeInterval() {
+        this.onValueChange(); // flush value to server
+        window.clearInterval(this._intervalValueChangeHandle);
+        delete this._intervalValueChangeHandle;
+    }
+
+    startValueChangInterval() {
+        if(this._intervalValueChangeHandle) {
+            this.stopValueChangeInterval();
+        }
+
+        this._intervalValueChangeHandle = setInterval(this.onValueChange.bind(this), this.valueChangeTimeout);
     }
 
     replaceSelectionContent(html) {
@@ -290,7 +363,6 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     }
 
     focus() {
-        console.warn("focus()");
         if (this.isInDialog()) {
             setTimeout(() => this.editor.focus(), 150)
         } else {
