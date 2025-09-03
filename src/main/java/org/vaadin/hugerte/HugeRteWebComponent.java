@@ -30,7 +30,6 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRteWebComponent>, HasLabel {
 
-    // TODO finalize value change mode on client side
     // TODO configuration general
     // TODO config plugins
     // TODO config toolbar
@@ -51,27 +50,6 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
     public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
-
-    /**
-     * Creates a new instance.
-     */
-    public HugeRteWebComponent() {
-        super("value", "", true);
-
-        setValueChangeMode(DEFAULT_VALUE_CHANGE_MODE);
-        setValueChangeTimeout(DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
-
-        Element element = getElement();
-        element.addEventListener("_blur", event -> fireEvent(new BlurEvent<>(this, true)));
-        element.addEventListener("_focus", event -> fireEvent(new FocusEvent<>(this, true)));
-
-        element.addEventListener("_value-delta", event -> {
-            String delta = event.getEventData().getString("event.detail.delta");
-            String oldValue = getValue();
-            String newValue = applyDelta(oldValue, delta);
-            setModelValue(newValue, true);
-        }).addEventData("event.detail.delta");
-    }
 
     /**
      * Creates a new instance with the given label.
@@ -129,6 +107,48 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     }
 
     /**
+     * Creates a new instance.
+     */
+    public HugeRteWebComponent() {
+        super("value", "", true);
+
+        setValueChangeMode(DEFAULT_VALUE_CHANGE_MODE);
+        setValueChangeTimeout(DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
+
+        Element element = getElement();
+        element.addEventListener("_blur", event -> fireEvent(new BlurEvent<>(this, true)));
+        element.addEventListener("_focus", event -> fireEvent(new FocusEvent<>(this, true)));
+
+        element.addEventListener("_value-delta", event -> {
+            String delta = event.getEventData().getString("event.detail.delta");
+            String oldValue = getValue();
+            String newValue = applyDelta(oldValue, delta);
+            setModelValue(newValue, true);
+        }).addEventData("event.detail.delta");
+    }
+
+    /**
+     * Applies the given delta onto the "old" value. Returns the "new", resulting value
+     * @param oldValue old value
+     * @param delta delta to apply
+     * @return new value
+     */
+    public static String applyDelta(String oldValue, String delta) {
+        // convert string to patch object
+        List<Patch> patches = DIFF_MATCH_PATCH.patchFromText(delta);
+
+        // apply patch object
+        Object[] results = DIFF_MATCH_PATCH.patchApply(
+                patches instanceof LinkedList<Patch> alreadyLinkedList
+                        ? alreadyLinkedList
+                        : new LinkedList<>(patches),
+                oldValue);
+
+        // extract the resulting string
+        return (String) results[0];
+    }
+
+    /**
      * Sets the value change mode of this instance. By default the editor uses {@link ValueChangeMode#ON_CHANGE}. Null
      * resets the mode to the default.
      * @param valueChangeMode new value change mode
@@ -175,24 +195,4 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
         return getElement().getProperty("valueChangeTimeout", DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
     }
 
-    /**
-     * Applies the given delta onto the "old" value. Returns the "new", resulting value
-     * @param oldValue old value
-     * @param delta delta to apply
-     * @return new value
-     */
-    private String applyDelta(String oldValue, String delta) {
-        // convert string to patch object
-        List<Patch> patches = DIFF_MATCH_PATCH.patchFromText(delta);
-
-        // apply patch object
-        Object[] results = DIFF_MATCH_PATCH.patchApply(
-                patches instanceof LinkedList<Patch> alreadyLinkedList
-                        ? alreadyLinkedList
-                        : new LinkedList<>(patches),
-                oldValue);
-
-        // extract the resulting string
-        return (String) results[0];
-    }
 }
