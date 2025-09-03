@@ -24,7 +24,7 @@ public class DemoView extends Div {
 
         hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
-        hugeRte.setHeight("700px");
+//        hugeRte.setHeight("700px");
         add(hugeRte);
 
         Button b = new Button("Set content dynamically", e -> {

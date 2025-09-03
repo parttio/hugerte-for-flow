@@ -66,6 +66,12 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     /** @protected */
     render() {
         return html`
+            <style>
+                .vaadin-huge-rte-container {
+                    align-self: stretch;
+                    flex-grow: 1;
+                }
+            </style>
             <div class="vaadin-huge-rte-container">
                 <div part="label" @click="${this.focus}">
                     <slot name="label"></slot>
