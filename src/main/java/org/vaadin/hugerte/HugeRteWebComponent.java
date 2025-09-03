@@ -11,6 +11,7 @@ import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.InputNotifier;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.shared.HasValidationProperties;
@@ -26,6 +27,7 @@ import com.vaadin.flow.dom.Element;
 @NpmPackage(value = "diff-match-patch", version = "1.0.5")
 @Tag("vaadin-huge-rte")
 @JsModule("./vaadin-huge-rte.js")
+@CssImport("./vaadin-huge-rte.css")
 public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebComponent, String> implements
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRteWebComponent>, HasLabel {
@@ -35,6 +37,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     // TODO config toolbar
     // TODO config menubar
     // TODO config resize
+    // TODO autoresize issues
     // TODO binder
     // TODO enable / readonly
     // TODO check client side imports,
