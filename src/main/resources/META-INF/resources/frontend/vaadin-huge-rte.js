@@ -14,34 +14,25 @@ import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
 import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
 import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
 
+import {diff_match_patch} from 'diff-match-patch';
+
+
+// > Part of the npm integration (not yet working, therefore commented out)
 // --- HugeRTE core ---
 // @see https://github.com/hugerte/hugerte-docs
 // import basic scripts
-import hugerte from 'hugerte';
-import 'hugerte/models/dom';
-import 'hugerte/icons/default';
-import 'hugerte/themes/silver';
-import 'hugerte/skins/content/default/content.js';
-
+// import hugerte from 'hugerte';
+// import 'hugerte/models/dom';
+// import 'hugerte/icons/default';
+// import 'hugerte/themes/silver';
+// import 'hugerte/skins/content/default/content.js';
 // import skin and content css to prevent 404 issues
 // to be checked later, if this can be improved
-import 'hugerte/skins/ui/oxide/skin.min.css';
-import oxideContentCss from 'hugerte/skins/ui/oxide/content.min.css?raw';
-import defaultContentCss from 'hugerte/skins/content/default/content.min.css?raw';
-
-// TODO review plugins
-// import 'hugerte/plugins/advlist';
-// import 'hugerte/plugins/autolink';
-// import 'hugerte/plugins/autoresize';
-// import 'hugerte/plugins/link';
-// import 'hugerte/plugins/lists';
-// import 'hugerte/plugins/code';
-// import 'hugerte/plugins/table';
-// import 'hugerte/plugins/preview';
-// import 'hugerte/plugins/searchreplace';
-// import 'hugerte/plugins/wordcount';
-
-import {diff_match_patch} from 'diff-match-patch';
+// import 'hugerte/skins/ui/oxide/skin.min.css';
+// import oxideContentCss from 'hugerte/skins/ui/oxide/content.min.css?raw';
+// import defaultContentCss from 'hugerte/skins/content/default/content.min.css?raw';
+// import { loadHugeRtePlugins } from './vaadin-huge-rte-plugins.js';
+// < Part of the npm integration (not yet working, therefore commented out)
 
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
 
@@ -126,9 +117,14 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             ...this.initialConfig,
             suffix: '.min',
             promotion: false,
-            skin: false,
-            content_css: false, // due to the postcss lit plugin we cannot pass in the min css files directly
-            content_style: [oxideContentCss, defaultContentCss].join('\n'),
+            branding: false, // hides the hugerte branding in the editor
+
+            // > Part of the npm integration (not yet working, therefore commented out)
+            // skin: false,
+            // content_css: false, // due to the postcss lit plugin we cannot pass in the min css files directly
+            // content_style: [oxideContentCss, defaultContentCss].join('\n'),
+            // < Part of the npm integration (not yet working, therefore commented out)
+
             target,
             // readonly: !this.enabled, // comes form the field mixin
             setup: (editor) => {
@@ -211,14 +207,18 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             }
         };
 
-        // TODO VCM: LAZY / TIMEOUT
+        // > Part of the npm integration (not yet working, therefore commented out)
+        // load all configured plugins dynamically
+        // if (config.plugins?.length) {
+        //     await loadHugeRtePlugins(config.plugins);
+        // }
+        // < Part of the npm integration (not yet working, therefore commented out)
 
         await hugerte.init(config);
 
         if (this.disabled) {
             this.editor.setMode('readonly');
         }
-
     }
 
     // syncValue() {

@@ -29,27 +29,20 @@ import elemental.json.JsonObject;
  *
  * @author mstahv, Stefan Uebe
  */
-@NpmPackage(value = "hugerte", version = "1.0.9")
-@NpmPackage(value = "diff-match-patch", version = "1.0.5")
 @Tag("vaadin-huge-rte")
+//@NpmPackage(value = "hugerte", version = "1.0.9") // > Part of the npm integration (not yet working, therefore commented out)
+@NpmPackage(value = "diff-match-patch", version = "1.0.5")
 @JsModule("./vaadin-huge-rte.js")
 @CssImport("./vaadin-huge-rte.css")
-//@StyleSheet("context://frontend/vaadin-huge-rte.css") // to add a "link" instead of an inline "style". Necessary to move the import manually behind the huge styles
 public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebComponent, String> implements
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRteWebComponent>, HasLabel {
 
-    // TODO configuration general
-    // TODO config plugins
-    // TODO import only necessary plugins
-    // TODO config toolbar
-    // TODO config menubar
-    // TODO config resize
-    // TODO autoresize issues
     // TODO binder
     // TODO enable / readonly
     // TODO check client side imports,
     // TODO stylings / lumo integration
+    // TODO field styling (e.g. label)
     // TODO theme variants
     // TODO replace selection
     // TODO static "createInstanceWithDefaultConfig()"
@@ -152,6 +145,13 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
             String newValue = applyDelta(oldValue, delta);
             setModelValue(newValue, true);
         }).addEventData("event.detail.delta");
+
+
+        addAttachListener(event -> {
+            // remove this call once the import is done via npm
+            getUI().orElseThrow().getPage().addJavaScript(
+                    "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
+        });
 
     }
 
