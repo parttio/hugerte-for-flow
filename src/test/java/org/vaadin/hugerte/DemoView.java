@@ -21,6 +21,7 @@ public class DemoView extends Div {
     public DemoView() {
         hugeRte = new HugeRteWebComponent();
         hugeRte.setValueChangeMode(ValueChangeMode.ON_BLUR);
+        hugeRte.configureResize(ResizeDirection.BOTH);
 
         hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");

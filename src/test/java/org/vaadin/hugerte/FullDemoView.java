@@ -3,7 +3,6 @@ package org.vaadin.hugerte;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import org.vaadin.firitin.components.RichText;
-import org.vaadin.hugerte.HugeRte.ResizeDirection;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
@@ -47,10 +46,10 @@ public class FullDemoView extends Div {
             .filter(Predicate.not(Plugin.AUTORESIZE::equals))
             .toArray(Plugin[]::new);
 
-    protected HugeRte hugeRte;
+    protected HugeRteWebComponent hugeRte;
 
     public FullDemoView() {
-        hugeRte = new HugeRte();
+        hugeRte = new HugeRteWebComponent();
         hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setRequiredIndicatorVisible(true);
 //        hugeRte.setErrorMessage("This is just a test");
@@ -75,7 +74,7 @@ public class FullDemoView extends Div {
             var n = new Notification("", 3000);
             n.add(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getCurrentValue())
+                    new RichText(hugeRte.getValue())
                     )
             );
             n.open();

@@ -3,7 +3,7 @@ package org.vaadin.hugerte;
 /**
  * Enumeration of value change modes for the HugeRTE.
  */
-public enum ValueChangeMode {
+public enum ValueChangeMode implements ClientSideReference {
 
 
     /**
@@ -36,18 +36,16 @@ public enum ValueChangeMode {
      */
     INTERVAL("interval");
 
-    private final String clientSide;
+    private final String clientSideRepresentation;
 
-    ValueChangeMode(String clientSide) {
-        this.clientSide = clientSide;
+    ValueChangeMode(String clientSideRepresentation) {
+        this.clientSideRepresentation = clientSideRepresentation;
     }
 
-    /**
-     * Returns the client side representation of this instance.
-     * @return client side representation
-     */
-    public String getClientSide() {
-        return clientSide;
+
+    @Override
+    public String getClientSideRepresentation() {
+        return clientSideRepresentation;
     }
 
     /**
@@ -58,7 +56,7 @@ public enum ValueChangeMode {
      */
     public static ValueChangeMode fromClientSide(String clientSide) {
         for (ValueChangeMode mode : values()) {
-            if (mode.clientSide.equals(clientSide)) {
+            if (mode.clientSideRepresentation.equals(clientSide)) {
                 return mode;
             }
         }

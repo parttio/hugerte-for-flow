@@ -2566,8 +2566,8 @@
         list: all,
         data: map$1(validated, optBlobThunk => {
           const output = optBlobThunk.map(blob => ({
-            config: blob.config,
-            state: blob.state.init(blob.config)
+            config: blob.initialConfig,
+            state: blob.state.init(blob.initialConfig)
           }));
           return constant$1(output);
         })
@@ -3624,13 +3624,13 @@
     const wrapApi = (bName, apiFunction, apiName) => {
       const f = (component, ...rest) => {
         const args = [component].concat(rest);
-        return component.config({ name: constant$1(bName) }).fold(() => {
+        return component.initialConfig({ name: constant$1(bName) }).fold(() => {
           throw new Error('We could not find any behaviour configuration for: ' + bName + '. Using API: ' + apiName);
         }, info => {
           const rest = Array.prototype.slice.call(args, 1);
           return apiFunction.apply(undefined, [
             component,
-            info.config,
+            info.initialConfig,
             info.state
           ].concat(rest));
         });
@@ -3665,14 +3665,14 @@
         schema: constant$1(schemaSchema),
         exhibit: (info, base) => {
           return lift2(getConfig(info), get$g(active, 'exhibit'), (behaviourInfo, exhibitor) => {
-            return exhibitor(base, behaviourInfo.config, behaviourInfo.state);
+            return exhibitor(base, behaviourInfo.initialConfig, behaviourInfo.state);
           }).getOrThunk(() => nu$7({}));
         },
         name: constant$1(name),
         handlers: info => {
           return getConfig(info).map(behaviourInfo => {
             const getEvents = get$g(active, 'events').getOr(() => ({}));
-            return getEvents(behaviourInfo.config, behaviourInfo.state);
+            return getEvents(behaviourInfo.initialConfig, behaviourInfo.state);
           }).getOr({});
         }
       };
@@ -5502,7 +5502,7 @@
     const substitute = (owner, detail, compSpec, placeholders) => {
       const base = scan(owner, detail, compSpec, placeholders);
       return base.fold((req, valueThunk) => {
-        const value = isSubstituted(compSpec) ? valueThunk(detail, compSpec.config, compSpec.validated) : valueThunk(detail);
+        const value = isSubstituted(compSpec) ? valueThunk(detail, compSpec.initialConfig, compSpec.validated) : valueThunk(detail);
         const childSpecs = get$g(value, 'components').getOr([]);
         const substituted = bind$3(childSpecs, c => substitute(owner, detail, c, placeholders));
         return [{
@@ -5511,7 +5511,7 @@
           }];
       }, (req, valuesThunk) => {
         if (isSubstituted(compSpec)) {
-          const values = valuesThunk(detail, compSpec.config, compSpec.validated);
+          const values = valuesThunk(detail, compSpec.initialConfig, compSpec.validated);
           const preprocessor = compSpec.validated.preprocess.getOr(identity);
           return preprocessor(values);
         } else {
@@ -7040,16 +7040,16 @@
         }
       },
       behaviours: SketchBehaviours.augment(detail.itemBehaviours, [
-        detail.toggling.fold(Toggling.revoke, tConfig => Toggling.config(getTogglingSpec(tConfig))),
-        Focusing.config({
+        detail.toggling.fold(Toggling.revoke, tConfig => Toggling.initialConfig(getTogglingSpec(tConfig))),
+        Focusing.initialConfig({
           ignore: detail.ignoreFocus,
           stopMousedown: detail.ignoreFocus,
           onFocus: component => {
             onFocus$1(component);
           }
         }),
-        Keying.config({ mode: 'execution' }),
-        Representing.config({
+        Keying.initialConfig({ mode: 'execution' }),
+        Representing.initialConfig({
           store: {
             mode: 'memory',
             initialValue: detail.data
@@ -7098,7 +7098,7 @@
         name: 'widget',
         overrides: detail => {
           return {
-            behaviours: derive$1([Representing.config({
+            behaviours: derive$1([Representing.initialConfig({
                 store: {
                   mode: 'manual',
                   getValue: _component => {
@@ -7146,19 +7146,19 @@
           })
         ]),
         behaviours: SketchBehaviours.augment(detail.widgetBehaviours, [
-          Representing.config({
+          Representing.initialConfig({
             store: {
               mode: 'memory',
               initialValue: detail.data
             }
           }),
-          Focusing.config({
+          Focusing.initialConfig({
             ignore: detail.ignoreFocus,
             onFocus: component => {
               onFocus$1(component);
             }
           }),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             focusIn: detail.autofocus ? component => {
               focusWidget(component);
@@ -7303,20 +7303,20 @@
       dom: detail.dom,
       markers: detail.markers,
       behaviours: augment(detail.menuBehaviours, [
-        Highlighting.config({
+        Highlighting.initialConfig({
           highlightClass: detail.markers.selectedItem,
           itemClass: detail.markers.item,
           onHighlight: detail.onHighlight,
           onDehighlight: detail.onDehighlight
         }),
-        Representing.config({
+        Representing.initialConfig({
           store: {
             mode: 'memory',
             initialValue: detail.value
           }
         }),
-        Composing.config({ find: Optional.some }),
-        Keying.config(detail.movement.config(detail, detail.movement))
+        Composing.initialConfig({ find: Optional.some }),
+        Keying.initialConfig(detail.movement.initialConfig(detail, detail.movement))
       ]),
       events: derive$2([
         run$1(focus$1(), (menu, simulatedEvent) => {
@@ -7719,7 +7719,7 @@
         dom: detail.dom,
         markers: detail.markers,
         behaviours: augment(detail.tmenuBehaviours, [
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onRight: keyOnItem(onRight),
             onLeft: keyOnItem(onLeft),
@@ -7730,16 +7730,16 @@
               });
             }
           }),
-          Highlighting.config({
+          Highlighting.initialConfig({
             highlightClass: detail.markers.selectedMenu,
             itemClass: detail.markers.menu
           }),
-          Composing.config({
+          Composing.initialConfig({
             find: container => {
               return Highlighting.getHighlighted(container);
             }
           }),
-          Replacing.config({})
+          Replacing.initialConfig({})
         ]),
         eventOrder: detail.eventOrder,
         apis,
@@ -7913,7 +7913,7 @@
               break;
             case 'position':
               const sink = detail.lazySink(sandbox).getOrDie();
-              Positioning.positionWithinBounds(sink, sandbox, state.config, state.getBounds());
+              Positioning.positionWithinBounds(sink, sandbox, state.initialConfig, state.getBounds());
               break;
             }
           });
@@ -7934,7 +7934,7 @@
         uid: detail.uid,
         dom: detail.dom,
         behaviours: augment(detail.inlineBehaviours, [
-          Sandboxing.config({
+          Sandboxing.initialConfig({
             isPartOf: (sandbox, data, queryElem) => {
               return isPartOf$1(data, queryElem) || isPartOfRelated(sandbox, queryElem);
             },
@@ -7948,13 +7948,13 @@
               detail.onHide(sandbox);
             }
           }),
-          Representing.config({
+          Representing.initialConfig({
             store: {
               mode: 'memory',
               initialValue: Optional.none()
             }
           }),
-          Receiving.config({
+          Receiving.initialConfig({
             channels: {
               ...receivingChannel$1({
                 isExtraPart: spec.isExtraPart,
@@ -8042,8 +8042,8 @@
         components: detail.components,
         events,
         behaviours: SketchBehaviours.augment(detail.buttonBehaviours, [
-          Focusing.config({}),
-          Keying.config({
+          Focusing.initialConfig({}),
+          Keying.initialConfig({
             mode: 'execution',
             useSpace: true,
             useEnter: true
@@ -9527,7 +9527,7 @@
     const factory$m = detail => {
       const memBannerText = record({
         dom: fromHtml(`<p>${ sanitizeHtmlString(detail.translationProvider(detail.text)) }</p>`),
-        behaviours: derive$1([Replacing.config({})])
+        behaviours: derive$1([Replacing.initialConfig({})])
       });
       const renderPercentBar = percent => ({
         dom: {
@@ -9561,7 +9561,7 @@
           },
           renderPercentText(0)
         ],
-        behaviours: derive$1([Replacing.config({})])
+        behaviours: derive$1([Replacing.initialConfig({})])
       });
       const updateProgress = (comp, percent) => {
         if (comp.getSystem().isConnected()) {
@@ -9623,7 +9623,7 @@
           classes: ['tox-notification__body']
         },
         components: [memBannerText.asSpec()],
-        behaviours: derive$1([Replacing.config({})])
+        behaviours: derive$1([Replacing.initialConfig({})])
       };
       const components = [
         notificationIconSpec,
@@ -9644,7 +9644,7 @@
           ])
         },
         behaviours: derive$1([
-          Focusing.config({}),
+          Focusing.initialConfig({}),
           config('notification-events', [run$1(focusin(), comp => {
               memButton.getOpt(comp).each(Focusing.focus);
             })])
@@ -10266,7 +10266,7 @@
       ]),
       defaulted('selectOnFocus', true)
     ]);
-    const focusBehaviours = detail => derive$1([Focusing.config({
+    const focusBehaviours = detail => derive$1([Focusing.initialConfig({
         onFocus: !detail.selectOnFocus ? noop : component => {
           const input = component.element;
           const value = get$6(input);
@@ -10275,7 +10275,7 @@
       })]);
     const behaviours = detail => ({
       ...focusBehaviours(detail),
-      ...augment(detail.inputBehaviours, [Representing.config({
+      ...augment(detail.inputBehaviours, [Representing.initialConfig({
           store: {
             mode: 'manual',
             ...detail.data.map(data => ({ initialValue: data })).getOr({}),
@@ -10381,7 +10381,7 @@
                   }
                 })
               ]),
-              Keying.config({
+              Keying.initialConfig({
                 mode: 'special',
                 onLeft: handleByBrowser,
                 onRight: handleByBrowser,
@@ -10929,7 +10929,7 @@
                 emit(comp, HideTooltipEvent);
               })
             ] : []),
-            behaviours: derive$1([Replacing.config({})])
+            behaviours: derive$1([Replacing.initialConfig({})])
           });
           state.setTooltip(popup);
           attach(sink, popup);
@@ -11181,7 +11181,7 @@
         editor.mode.set('readonly');
       }
     };
-    const receivingConfig = () => Receiving.config({
+    const receivingConfig = () => Receiving.initialConfig({
       channels: {
         [ReadOnlyChannel]: {
           schema: ReadOnlyDataSchema,
@@ -11192,16 +11192,16 @@
       }
     });
 
-    const item = disabled => Disabling.config({
+    const item = disabled => Disabling.initialConfig({
       disabled,
       disableClass: 'tox-collection__item--state-disabled'
     });
-    const button = disabled => Disabling.config({ disabled });
-    const splitButton = disabled => Disabling.config({
+    const button = disabled => Disabling.initialConfig({ disabled });
+    const splitButton = disabled => Disabling.initialConfig({
       disabled,
       disableClass: 'tox-tbtn--disabled'
     });
-    const toolbarButton = disabled => Disabling.config({
+    const toolbarButton = disabled => Disabling.initialConfig({
       disabled,
       disableClass: 'tox-tbtn--disabled',
       useNative: false
@@ -11266,7 +11266,7 @@
           ]),
           DisablingConfigs.item(() => !spec.enabled || providersBackstage.isDisabled()),
           receivingConfig(),
-          Replacing.config({})
+          Replacing.initialConfig({})
         ].concat(spec.itemBehaviours))
       };
     };
@@ -11480,7 +11480,7 @@
       }
     };
 
-    const tooltipBehaviour = (meta, sharedBackstage, tooltipText) => get$g(meta, 'tooltipWorker').map(tooltipWorker => [Tooltipping.config({
+    const tooltipBehaviour = (meta, sharedBackstage, tooltipText) => get$g(meta, 'tooltipWorker').map(tooltipWorker => [Tooltipping.initialConfig({
         lazySink: sharedBackstage.getSink,
         tooltipDom: {
           tag: 'div',
@@ -11499,7 +11499,7 @@
           });
         }
       })]).getOrThunk(() => {
-      return tooltipText.map(text => [Tooltipping.config({
+      return tooltipText.map(text => [Tooltipping.initialConfig({
           ...sharedBackstage.providers.tooltips.getConfig({ tooltipText: text }),
           mode: 'follow-highlight'
         })]).getOr([]);
@@ -11612,7 +11612,7 @@
         caret: Optional.none(),
         value: spec.value
       }, providersBackstage, renderIcons);
-      const optTooltipping = spec.text.filter(constant$1(!useText)).map(t => Tooltipping.config(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate(t) })));
+      const optTooltipping = spec.text.filter(constant$1(!useText)).map(t => Tooltipping.initialConfig(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate(t) })));
       return deepMerge(renderCommonItem({
         data: buildData(spec),
         enabled: spec.enabled,
@@ -12474,11 +12474,11 @@
             run$1(click(), onClick),
             run$1(tap(), onClick)
           ]),
-          Toggling.config({
+          Toggling.initialConfig({
             toggleClass: 'tox-insert-table-picker__selected',
             toggleOnExecute: false
           }),
-          Focusing.config({ onFocus: emitCellOver })
+          Focusing.initialConfig({ onFocus: emitCellOver })
         ])
       });
     };
@@ -12515,7 +12515,7 @@
           classes: ['tox-insert-table-picker__label']
         },
         components: [emptyLabelText],
-        behaviours: derive$1([Replacing.config({})])
+        behaviours: derive$1([Replacing.initialConfig({})])
       });
       return {
         type: 'widget',
@@ -12550,7 +12550,7 @@
                   emit(c, sandboxClose());
                 })
               ]),
-              Keying.config({
+              Keying.initialConfig({
                 initSize: {
                   numRows,
                   numColumns
@@ -12849,7 +12849,7 @@
       name: suffix(),
       overrides: constant$1({
         dom: { tag: 'div' },
-        behaviours: derive$1([Positioning.config({ useFixed: always })]),
+        behaviours: derive$1([Positioning.initialConfig({ useFixed: always })]),
         events: derive$2([
           cutter(keydown()),
           cutter(mousedown()),
@@ -12991,13 +12991,13 @@
           }
         },
         behaviours: SketchBehaviours.augment(detail.sandboxBehaviours, [
-          Representing.config({
+          Representing.initialConfig({
             store: {
               mode: 'memory',
               initialValue: hotspot
             }
           }),
-          Sandboxing.config({
+          Sandboxing.initialConfig({
             onOpen,
             onClose,
             isPartOf: (container, data, queryElem) => {
@@ -13007,12 +13007,12 @@
               return lazySink().getOrDie();
             }
           }),
-          Composing.config({
+          Composing.initialConfig({
             find: sandbox => {
               return Sandboxing.getState(sandbox).bind(menu => Composing.getCurrent(menu));
             }
           }),
-          Receiving.config({
+          Receiving.initialConfig({
             channels: {
               ...receivingChannel$1({ isExtraPart: never }),
               ...receivingChannel({ doReposition: doRepositionMenus })
@@ -13125,11 +13125,11 @@
         dom: detail.dom,
         components,
         behaviours: augment(detail.dropdownBehaviours, [
-          Toggling.config({
+          Toggling.initialConfig({
             toggleClass: detail.toggleClass,
             aria: { mode: 'expanded' }
           }),
-          Coupling.config({
+          Coupling.initialConfig({
             others: {
               sandbox: hotspot => {
                 return makeSandbox$1(detail, hotspot, {
@@ -13139,7 +13139,7 @@
               }
             }
           }),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onSpace: triggerExecute,
             onEnter: triggerExecute,
@@ -13161,7 +13161,7 @@
               }
             }
           }),
-          Focusing.config({})
+          Focusing.initialConfig({})
         ]),
         events: events$a(Optional.some(action)),
         eventOrder: {
@@ -14101,12 +14101,12 @@
 
     const factory$i = (detail, components, _spec, _externals) => {
       const behaviours = augment(detail.fieldBehaviours, [
-        Composing.config({
+        Composing.initialConfig({
           find: container => {
             return getPart(container, detail, 'field');
           }
         }),
-        Representing.config({
+        Representing.initialConfig({
           store: {
             mode: 'manual',
             getValue: field => {
@@ -14291,7 +14291,7 @@
         components: [],
         factory: { sketch: identity },
         behaviours: derive$1([
-          Disabling.config({
+          Disabling.initialConfig({
             disabled: providersBackstage.isDisabled,
             onDisabled: comp => {
               iterCollectionItems(comp, childElm => {
@@ -14307,8 +14307,8 @@
             }
           }),
           receivingConfig(),
-          Replacing.config({}),
-          Tooltipping.config({
+          Replacing.initialConfig({}),
+          Tooltipping.initialConfig({
             ...providersBackstage.tooltips.getConfig({
               tooltipText: '',
               onShow: comp => {
@@ -14345,7 +14345,7 @@
               bubble: nu$5(0, -2, {})
             })
           }),
-          Representing.config({
+          Representing.initialConfig({
             store: {
               mode: 'memory',
               initialValue: initialData.getOr([])
@@ -14360,8 +14360,8 @@
               emit(comp, formResizeEvent);
             }
           }),
-          Tabstopping.config({}),
-          Keying.config(deriveCollectionMovement(spec.columns, 'normal')),
+          Tabstopping.initialConfig({}),
+          Keying.initialConfig(deriveCollectionMovement(spec.columns, 'normal')),
           config('collection-events', collectionEvents)
         ]),
         eventOrder: {
@@ -14521,8 +14521,8 @@
       dropdownBehaviours: derive$1([
         DisablingConfigs.button(sharedBackstage.providers.isDisabled),
         receivingConfig(),
-        Unselecting.config({}),
-        Tabstopping.config({})
+        Unselecting.initialConfig({}),
+        Tabstopping.initialConfig({})
       ]),
       layouts: spec.layouts,
       sandboxClasses: ['tox-dialog__popups'],
@@ -14543,10 +14543,10 @@
         data: initialData,
         onSetValue: c => Invalidating.run(c).get(noop),
         inputBehaviours: derive$1([
-          Disabling.config({ disabled: sharedBackstage.providers.isDisabled }),
+          Disabling.initialConfig({ disabled: sharedBackstage.providers.isDisabled }),
           receivingConfig(),
-          Tabstopping.config({}),
-          Invalidating.config({
+          Tabstopping.initialConfig({}),
+          Invalidating.initialConfig({
             invalidClass: 'tox-textbox-field-invalid',
             getRoot: comp => parentElement(comp.element),
             notify: {
@@ -14708,15 +14708,15 @@
         const setValueFrom = (component, simulatedEvent) => model.getValueFromEvent(simulatedEvent).map(value => model.setValueFrom(component, detail, value));
         return {
           behaviours: derive$1([
-            Keying.config({
+            Keying.initialConfig({
               mode: 'special',
               onLeft: (spectrum, event) => model.onLeft(spectrum, detail, isShift(event)),
               onRight: (spectrum, event) => model.onRight(spectrum, detail, isShift(event)),
               onUp: (spectrum, event) => model.onUp(spectrum, detail, isShift(event)),
               onDown: (spectrum, event) => model.onDown(spectrum, detail, isShift(event))
             }),
-            Tabstopping.config({}),
-            Focusing.config({})
+            Tabstopping.initialConfig({}),
+            Focusing.initialConfig({})
           ]),
           events: derive$2([
             run$1(touchstart(), setValueFrom),
@@ -15342,11 +15342,11 @@
         dom: detail.dom,
         components,
         behaviours: augment(detail.sliderBehaviours, [
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             focusIn: focusWidget
           }),
-          Representing.config({
+          Representing.initialConfig({
             store: {
               mode: 'manual',
               getValue: _ => {
@@ -15355,7 +15355,7 @@
               setValue
             }
           }),
-          Receiving.config({ channels: { [mouseReleased()]: { onReceive: choose } } })
+          Receiving.initialConfig({ channels: { [mouseReleased()]: { onReceive: choose } } })
         ]),
         events: derive$2([
           run$1(sliderChangeEvent(), (slider, simulatedEvent) => {
@@ -15447,7 +15447,7 @@
           spectrum,
           thumb
         ],
-        sliderBehaviours: derive$1([Focusing.config({})]),
+        sliderBehaviours: derive$1([Focusing.initialConfig({})]),
         onChange: (slider, _thumb, value) => {
           set$9(slider.element, 'aria-valuenow', Math.floor(360 - value * 3.6));
           emitWith(slider, sliderUpdate, { value });
@@ -15483,7 +15483,7 @@
       uid: detail.uid,
       dom: detail.dom,
       components,
-      behaviours: augment(detail.formBehaviours, [Representing.config({
+      behaviours: augment(detail.formBehaviours, [Representing.initialConfig({
           store: {
             mode: 'manual',
             getValue: form => {
@@ -15520,7 +15520,7 @@
     const validatingInput = generate$6('validating-input');
     const translatePrefix = 'colorcustom.rgb.';
     const rgbFormFactory = (translate, getClass, onValidHexx, onInvalidHexx) => {
-      const invalidation = (label, isValid) => Invalidating.config({
+      const invalidation = (label, isValid) => Invalidating.initialConfig({
         invalidClass: getClass('invalid'),
         notify: {
           onValidate: comp => {
@@ -15567,7 +15567,7 @@
           inputClasses: [getClass('textfield')],
           inputBehaviours: derive$1([
             invalidation(name, isValid),
-            Tabstopping.config({})
+            Tabstopping.initialConfig({})
           ]),
           onSetValue: input => {
             if (Invalidating.isInvalid(input)) {
@@ -15705,7 +15705,7 @@
             memPreview.asSpec()
           ],
           formBehaviours: derive$1([
-            Invalidating.config({ invalidClass: getClass('form-invalid') }),
+            Invalidating.initialConfig({ invalidClass: getClass('form-invalid') }),
             config('rgb-form-events', [
               run$1(validInput, onValidInput),
               run$1(invalidInput, onInvalidInput),
@@ -15808,8 +15808,8 @@
           setColour(spectrum.element.dom, toString(red));
         };
         const sliderBehaviours = derive$1([
-          Composing.config({ find: Optional.some }),
-          Focusing.config({})
+          Composing.initialConfig({ find: Optional.some }),
+          Focusing.initialConfig({})
         ]);
         return Slider.sketch({
           dom: {
@@ -15949,8 +15949,8 @@
               run$1(paletteUpdate, onPaletteUpdate()),
               run$1(sliderUpdate, onSliderUpdate())
             ]),
-            Composing.config({ find: comp => memRgb.getOpt(comp) }),
-            Keying.config({ mode: 'acyclic' })
+            Composing.initialConfig({ find: comp => memRgb.getOpt(comp) }),
+            Keying.initialConfig({ mode: 'acyclic' })
           ])
         };
       };
@@ -15966,9 +15966,9 @@
       return colourPickerSketcher;
     };
 
-    const self = () => Composing.config({ find: Optional.some });
-    const memento$1 = mem => Composing.config({ find: mem.getOpt });
-    const childAt = index => Composing.config({ find: comp => child$2(comp.element, index).bind(element => comp.getSystem().getByDom(element).toOptional()) });
+    const self = () => Composing.initialConfig({ find: Optional.some });
+    const memento$1 = mem => Composing.initialConfig({ find: mem.getOpt });
+    const childAt = index => Composing.initialConfig({ find: comp => child$2(comp.element, index).bind(element => comp.getSystem().getByDom(element).toOptional()) });
     const ComposingConfigs = {
       self,
       memento: memento$1,
@@ -15981,7 +15981,7 @@
     ]);
     const memento = (mem, rawProcessors) => {
       const ps = asRawOrDie$1('RepresentingConfigs.memento processors', processors, rawProcessors);
-      return Representing.config({
+      return Representing.initialConfig({
         store: {
           mode: 'manual',
           getValue: comp => {
@@ -15997,7 +15997,7 @@
         }
       });
     };
-    const withComp = (optInitialValue, getter, setter) => Representing.config({
+    const withComp = (optInitialValue, getter, setter) => Representing.initialConfig({
       store: {
         mode: 'manual',
         ...optInitialValue.map(initialValue => ({ initialValue })).getOr({}),
@@ -16007,7 +16007,7 @@
     });
     const withElement = (initialValue, getter, setter) => withComp(initialValue, c => getter(c.element), (c, v) => setter(c.element, v));
     const domHtml = optInitialValue => withElement(optInitialValue, get$9, set$6);
-    const memory = initialValue => Representing.config({
+    const memory = initialValue => Representing.initialConfig({
       store: {
         mode: 'memory',
         initialValue
@@ -16097,14 +16097,14 @@
       const memReplaced = record({ dom: { tag: spec.tag } });
       const initialValue = value$2();
       const focusBehaviour = !isOldCustomEditor(spec) && spec.onFocus.isSome() ? [
-        Focusing.config({
+        Focusing.initialConfig({
           onFocus: comp => {
             spec.onFocus.each(onFocusFn => {
               onFocusFn(comp.element.dom);
             });
           }
         }),
-        Tabstopping.config({})
+        Tabstopping.initialConfig({})
       ] : [];
       return {
         dom: {
@@ -16188,8 +16188,8 @@
         behaviours: derive$1([
           memory(initialData.getOr([])),
           ComposingConfigs.self(),
-          Disabling.config({}),
-          Toggling.config({
+          Disabling.initialConfig({}),
+          Toggling.initialConfig({
             toggleClass: 'dragenter',
             toggleOnExecute: false
           }),
@@ -16239,7 +16239,7 @@
                   inputComp.element.dom.click();
                 },
                 buttonBehaviours: derive$1([
-                  Tabstopping.config({}),
+                  Tabstopping.initialConfig({}),
                   DisablingConfigs.button(providersBackstage.isDisabled),
                   receivingConfig()
                 ])
@@ -16346,8 +16346,8 @@
           classes
         },
         behaviours: derive$1([
-          Focusing.config({ ignore: true }),
-          Tabstopping.config({})
+          Focusing.initialConfig({ ignore: true }),
+          Tabstopping.initialConfig({})
         ])
       };
     };
@@ -16480,10 +16480,10 @@
           ]
         },
         behaviours: derive$1([
-          Tabstopping.config({}),
-          Focusing.config({}),
+          Tabstopping.initialConfig({}),
+          Focusing.initialConfig({}),
           withComp(initialData, sourcing.getValue, sourcing.setValue),
-          Receiving.config({
+          Receiving.initialConfig({
             channels: {
               [dialogFocusShiftedChannel]: {
                 onReceive: (comp, message) => {
@@ -16641,9 +16641,9 @@
         ],
         behaviours: derive$1([
           ComposingConfigs.self(),
-          Replacing.config({}),
+          Replacing.initialConfig({}),
           domHtml(Optional.none()),
-          Keying.config({ mode: 'acyclic' })
+          Keying.initialConfig({ mode: 'acyclic' })
         ])
       };
     };
@@ -16691,14 +16691,14 @@
       behaviours
     }, iconsProvider);
     const renderIconFromPack$1 = (iconName, iconsProvider) => renderIcon$1(iconName, iconsProvider, []);
-    const renderReplaceableIconFromPack = (iconName, iconsProvider) => renderIcon$1(iconName, iconsProvider, [Replacing.config({})]);
+    const renderReplaceableIconFromPack = (iconName, iconsProvider) => renderIcon$1(iconName, iconsProvider, [Replacing.initialConfig({})]);
     const renderLabel$1 = (text, prefix, providersBackstage) => ({
       dom: {
         tag: 'span',
         classes: [`${ prefix }__select-label`]
       },
       components: [text$2(providersBackstage.translate(text))],
-      behaviours: derive$1([Replacing.config({})])
+      behaviours: derive$1([Replacing.initialConfig({})])
     });
 
     const updateMenuText = generate$6('update-menu-text');
@@ -16755,9 +16755,9 @@
           ...spec.dropdownBehaviours,
           DisablingConfigs.button(() => spec.disabled || sharedBackstage.providers.isDisabled()),
           receivingConfig(),
-          Unselecting.config({}),
-          Replacing.config({}),
-          ...spec.tooltip.map(t => Tooltipping.config(sharedBackstage.providers.tooltips.getConfig({ tooltipText: sharedBackstage.providers.translate(t) }))).toArray(),
+          Unselecting.initialConfig({}),
+          Replacing.initialConfig({}),
+          ...spec.tooltip.map(t => Tooltipping.initialConfig(sharedBackstage.providers.tooltips.getConfig({ tooltipText: sharedBackstage.providers.translate(t) }))).toArray(),
           config(customEventsName, [
             onControlAttached(spec, editorOffCell),
             onControlDetached(spec, editorOffCell)
@@ -16791,7 +16791,7 @@
           ]
         }),
         sandboxBehaviours: derive$1([
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onLeft: onLeftOrRightInMenu,
             onRight: onLeftOrRightInMenu
@@ -16984,7 +16984,7 @@
             presets: 'normal',
             classes: [],
             dropdownBehaviours: [
-              Tabstopping.config({}),
+              Tabstopping.initialConfig({}),
               withComp(initialItem.map(item => item.value), comp => get$f(comp.element, dataAttribute), (comp, data) => {
                 findItemByValue(spec.items, data).each(item => {
                   set$9(comp.element, dataAttribute, item.value);
@@ -17011,7 +17011,7 @@
           pLabel.toArray(),
           [listBoxWrap]
         ]),
-        fieldBehaviours: derive$1([Disabling.config({
+        fieldBehaviours: derive$1([Disabling.initialConfig({
             disabled: constant$1(!spec.enabled),
             onDisabled: comp => {
               FormField.getField(comp).each(Disabling.disable);
@@ -17049,8 +17049,8 @@
         },
         components: options,
         behaviours: augment(detail.selectBehaviours, [
-          Focusing.config({}),
-          Representing.config({
+          Focusing.initialConfig({}),
+          Representing.initialConfig({
             store: {
               mode: 'manual',
               getValue: select => {
@@ -17099,8 +17099,8 @@
         options: translatedOptions,
         factory: HtmlSelect,
         selectBehaviours: derive$1([
-          Disabling.config({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
-          Tabstopping.config({}),
+          Disabling.initialConfig({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
+          Tabstopping.initialConfig({}),
           config('selectbox-change', [run$1(change(), (component, _) => {
               emitWith(component, formChangeEvent, { name: spec.name });
             })])
@@ -17130,7 +17130,7 @@
           [selectWrap]
         ]),
         fieldBehaviours: derive$1([
-          Disabling.config({
+          Disabling.initialConfig({
             disabled: () => !spec.enabled || providersBackstage.isDisabled(),
             onDisabled: comp => {
               FormField.getField(comp).each(Disabling.disable);
@@ -17182,7 +17182,7 @@
         name: 'lock',
         overrides: detail => {
           return {
-            buttonBehaviours: derive$1([Toggling.config({
+            buttonBehaviours: derive$1([Toggling.initialConfig({
                 selected: detail.locked,
                 toggleClass: detail.markers.lockClass,
                 aria: { mode: 'pressed' }
@@ -17197,8 +17197,8 @@
       dom: detail.dom,
       components,
       behaviours: SketchBehaviours.augment(detail.coupledFieldBehaviours, [
-        Composing.config({ find: Optional.some }),
-        Representing.config({
+        Composing.initialConfig({ find: Optional.some }),
+        Representing.initialConfig({
           store: {
             mode: 'manual',
             getValue: comp => {
@@ -17345,10 +17345,10 @@
           makeIcon('unlock')
         ],
         buttonBehaviours: derive$1([
-          Disabling.config({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
+          Disabling.initialConfig({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
           receivingConfig(),
-          Tabstopping.config({}),
-          Tooltipping.config(providersBackstage.tooltips.getConfig({ tooltipText: translatedLabel }))
+          Tabstopping.initialConfig({}),
+          Tooltipping.initialConfig(providersBackstage.tooltips.getConfig({ tooltipText: translatedLabel }))
         ])
       });
       const formGroup = components => ({
@@ -17362,9 +17362,9 @@
         factory: Input,
         inputClasses: ['tox-textfield'],
         inputBehaviours: derive$1([
-          Disabling.config({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
+          Disabling.initialConfig({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
           receivingConfig(),
-          Tabstopping.config({}),
+          Tabstopping.initialConfig({}),
           config('size-input-events', [
             run$1(focusin(), (component, _simulatedEvent) => {
               emitWith(component, ratioEvent, { isField1 });
@@ -17422,7 +17422,7 @@
           });
         },
         coupledFieldBehaviours: derive$1([
-          Disabling.config({
+          Disabling.initialConfig({
             disabled: () => !spec.enabled || providersBackstage.isDisabled(),
             onDisabled: comp => {
               FormCoupledInputs.getField1(comp).bind(FormField.getField).each(Disabling.disable);
@@ -17489,7 +17489,7 @@
         ],
         sliderBehaviours: derive$1([
           ComposingConfigs.self(),
-          Focusing.config({})
+          Focusing.initialConfig({})
         ]),
         onChoose: (component, thumb, value) => {
           emitWith(component, formChangeEvent, {
@@ -17538,8 +17538,8 @@
           renderRows(spec.cells)
         ],
         behaviours: derive$1([
-          Tabstopping.config({}),
-          Focusing.config({})
+          Tabstopping.initialConfig({}),
+          Focusing.initialConfig({})
         ])
       };
     };
@@ -17547,9 +17547,9 @@
     const renderTextField = (spec, providersBackstage) => {
       const pLabel = spec.label.map(label => renderLabel$3(label, providersBackstage));
       const baseInputBehaviours = [
-        Disabling.config({ disabled: () => spec.disabled || providersBackstage.isDisabled() }),
+        Disabling.initialConfig({ disabled: () => spec.disabled || providersBackstage.isDisabled() }),
         receivingConfig(),
-        Keying.config({
+        Keying.initialConfig({
           mode: 'execution',
           useEnter: spec.multiline !== true,
           useControlEnter: spec.multiline === true,
@@ -17566,9 +17566,9 @@
             emitWith(component, formChangeEvent, { name: spec.name });
           })
         ]),
-        Tabstopping.config({})
+        Tabstopping.initialConfig({})
       ];
-      const validatingBehaviours = spec.validation.map(vl => Invalidating.config({
+      const validatingBehaviours = spec.validation.map(vl => Invalidating.initialConfig({
         getRoot: input => {
           return parentElement(input.element);
         },
@@ -17610,7 +17610,7 @@
       const extraClasses = spec.flex ? ['tox-form__group--stretched'] : [];
       const extraClasses2 = extraClasses.concat(spec.maximized ? ['tox-form-group--maximize'] : []);
       const extraBehaviours = [
-        Disabling.config({
+        Disabling.initialConfig({
           disabled: () => spec.disabled || providersBackstage.isDisabled(),
           onDisabled: comp => {
             FormField.getField(comp).each(Disabling.disable);
@@ -17899,7 +17899,7 @@
         columns: 1,
         presets: 'normal',
         classes: [],
-        dropdownBehaviours: [...tabstopping ? [Tabstopping.config({})] : []]
+        dropdownBehaviours: [...tabstopping ? [Tabstopping.initialConfig({})] : []]
       }, prefix, backstage.shared, btnName);
     };
     const getFetch = (items, getButton, backstage) => {
@@ -17968,13 +17968,13 @@
           ]
         },
         buttonBehaviours: derive$1([
-          ...visible ? [Tabstopping.config({})] : [],
-          Toggling.config({
+          ...visible ? [Tabstopping.initialConfig({})] : [],
+          Toggling.initialConfig({
             toggleClass: 'tox-trbtn--enabled',
             toggleOnExecute: false,
             aria: { mode: 'selected' }
           }),
-          Receiving.config({
+          Receiving.initialConfig({
             channels: {
               [`update-active-item-${ treeId }`]: {
                 onReceive: (comp, message) => {
@@ -18064,7 +18064,7 @@
           ]
         },
         buttonBehaviours: derive$1([
-          ...visible ? [Tabstopping.config({})] : [],
+          ...visible ? [Tabstopping.initialConfig({})] : [],
           config(directoryLabelEventsId, [run$1(keydown(), (comp, se) => {
               const isRightArrowKey = se.event.raw.code === 'ArrowRight';
               const isLeftArrowKey = se.event.raw.code === 'ArrowLeft';
@@ -18117,7 +18117,7 @@
           });
         }),
         behaviours: derive$1([
-          Sliding.config({
+          Sliding.initialConfig({
             dimension: { property: 'height' },
             closedClass: 'tox-tree--directory__children--closed',
             openClass: 'tox-tree--directory__children--open',
@@ -18125,7 +18125,7 @@
             shrinkingClass: 'tox-tree--directory__children--shrinking',
             expanded: visible
           }),
-          Replacing.config({})
+          Replacing.initialConfig({})
         ])
       };
     };
@@ -18188,7 +18188,7 @@
               ] : expandedIdsCell.get().filter(id => id !== node));
             })
           ]),
-          Toggling.config({
+          Toggling.initialConfig({
             ...directory.children.length > 0 ? { aria: { mode: 'expanded' } } : {},
             toggleClass: 'tox-tree--directory--expanded',
             onToggled: (comp, childrenVisible) => {
@@ -18239,7 +18239,7 @@
         },
         components: children(selectedIdCell.get(), expandedIds.get()),
         behaviours: derive$1([
-          Keying.config({
+          Keying.initialConfig({
             mode: 'flow',
             selector: '.tox-tree--leaf__label--visible, .tox-tree--directory__label--visible',
             cycles: false
@@ -18255,7 +18255,7 @@
                 node
               });
             })]),
-          Receiving.config({
+          Receiving.initialConfig({
             channels: {
               [`update-active-item-${ treeId }`]: {
                 onReceive: (comp, message) => {
@@ -18265,7 +18265,7 @@
               }
             }
           }),
-          Replacing.config({})
+          Replacing.initialConfig({})
         ])
       };
     };
@@ -18410,8 +18410,8 @@
       const getActiveMenu = sandboxComp => Composing.getCurrent(sandboxComp);
       const typeaheadCustomEvents = 'typeaheadevents';
       const behaviours = [
-        Focusing.config({}),
-        Representing.config({
+        Focusing.initialConfig({}),
+        Representing.initialConfig({
           onSetValue: detail.onSetValue,
           store: {
             mode: 'dataset',
@@ -18426,7 +18426,7 @@
             ...detail.initialData.map(d => wrap$1('initialValue', d)).getOr({})
           }
         }),
-        Streaming.config({
+        Streaming.initialConfig({
           stream: {
             mode: 'throttle',
             delay: detail.responseTime,
@@ -18463,7 +18463,7 @@
           },
           cancelEvent: typeaheadCancel()
         }),
-        Keying.config({
+        Keying.initialConfig({
           mode: 'special',
           onDown: (comp, simulatedEvent) => {
             navigateList(comp, simulatedEvent, Highlighting.highlightFirst);
@@ -18500,11 +18500,11 @@
             }
           }
         }),
-        Toggling.config({
+        Toggling.initialConfig({
           toggleClass: detail.markers.openClass,
           aria: { mode: 'expanded' }
         }),
-        Coupling.config({
+        Coupling.initialConfig({
           others: {
             sandbox: hotspot => {
               return makeSandbox$1(detail, hotspot, {
@@ -18746,8 +18746,8 @@
         buttonBehaviours: derive$1([
           DisablingConfigs.button(() => !spec.enabled || providersBackstage.isDisabled()),
           receivingConfig(),
-          Tabstopping.config({}),
-          ...tooltip.map(t => Tooltipping.config(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate(t) }))).toArray(),
+          Tabstopping.initialConfig({}),
+          ...tooltip.map(t => Tooltipping.initialConfig(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate(t) }))).toArray(),
           config('button press', [
             preventDefault('click'),
             preventDefault('mousedown')
@@ -19021,7 +19021,7 @@
           }
         },
         typeaheadBehaviours: derive$1([
-          ...urlBackstage.getValidationHandler().map(handler => Invalidating.config({
+          ...urlBackstage.getValidationHandler().map(handler => Invalidating.initialConfig({
             getRoot: comp => parentElement(comp.element),
             invalidClass: 'tox-control-wrap--status-invalid',
             notify: {
@@ -19052,8 +19052,8 @@
               validateOnLoad: false
             }
           })).toArray(),
-          Disabling.config({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
-          Tabstopping.config({}),
+          Disabling.initialConfig({ disabled: () => !spec.enabled || providersBackstage.isDisabled() }),
+          Tabstopping.initialConfig({}),
           config('urlinput-events', [
             run$1(input(), comp => {
               const currentValue = get$6(comp.element);
@@ -19134,7 +19134,7 @@
           pField,
           memStatus.asSpec()
         ],
-        behaviours: derive$1([Disabling.config({ disabled: () => !spec.enabled || providersBackstage.isDisabled() })])
+        behaviours: derive$1([Disabling.initialConfig({ disabled: () => !spec.enabled || providersBackstage.isDisabled() })])
       });
       const memUrlPickerButton = record(renderButton$1({
         name: spec.name,
@@ -19174,7 +19174,7 @@
         dom: renderFormFieldDom(),
         components: pLabel.toArray().concat([controlHWrapper()]),
         fieldBehaviours: derive$1([
-          Disabling.config({
+          Disabling.initialConfig({
             disabled: () => !spec.enabled || providersBackstage.isDisabled(),
             onDisabled: comp => {
               FormField.getField(comp).each(Disabling.disable);
@@ -19258,7 +19258,7 @@
         },
         behaviours: derive$1([
           ComposingConfigs.self(),
-          Disabling.config({
+          Disabling.initialConfig({
             disabled: () => !spec.enabled || providerBackstage.isDisabled(),
             onDisabled: component => {
               parentElement(component.element).each(element => add$2(element, 'tox-checkbox--disabled'));
@@ -19267,10 +19267,10 @@
               parentElement(component.element).each(element => remove$2(element, 'tox-checkbox--disabled'));
             }
           }),
-          Tabstopping.config({}),
-          Focusing.config({}),
+          Tabstopping.initialConfig({}),
+          Focusing.initialConfig({}),
           withElement(initialData, get$1, set$1),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onEnter: toggleCheckboxHandler,
             onSpace: toggleCheckboxHandler,
@@ -19287,7 +19287,7 @@
           classes: ['tox-checkbox__label']
         },
         components: [text$2(providerBackstage.translate(spec.label))],
-        behaviours: derive$1([Unselecting.config({})])
+        behaviours: derive$1([Unselecting.initialConfig({})])
       });
       const makeIcon = className => {
         const iconName = className === 'checked' ? 'selected' : 'unselected';
@@ -19320,7 +19320,7 @@
           pLabel
         ],
         fieldBehaviours: derive$1([
-          Disabling.config({ disabled: () => !spec.enabled || providerBackstage.isDisabled() }),
+          Disabling.initialConfig({ disabled: () => !spec.enabled || providerBackstage.isDisabled() }),
           receivingConfig()
         ])
       });
@@ -19334,7 +19334,7 @@
             classes: ['tox-form__group'],
             innerHtml: spec.html
           },
-          containerBehaviours: derive$1([Tooltipping.config({
+          containerBehaviours: derive$1([Tooltipping.initialConfig({
               ...providersBackstage.tooltips.getConfig({
                 tooltipText: '',
                 onShow: comp => {
@@ -19381,8 +19381,8 @@
             attributes: { role: 'document' }
           },
           containerBehaviours: derive$1([
-            Tabstopping.config({}),
-            Focusing.config({})
+            Tabstopping.initialConfig({}),
+            Focusing.initialConfig({})
           ])
         });
       }
@@ -20355,7 +20355,7 @@
       defaulted('setupItem', noop),
       SketchBehaviours.field('listBehaviours', [Replacing])
     ]);
-    const customListDetail = () => ({ behaviours: derive$1([Replacing.config({})]) });
+    const customListDetail = () => ({ behaviours: derive$1([Replacing.initialConfig({})]) });
     const itemsPart = optional({
       name: 'items',
       overrides: customListDetail
@@ -20383,7 +20383,7 @@
         });
       };
       const extra = detail.shell ? {
-        behaviours: [Replacing.config({})],
+        behaviours: [Replacing.initialConfig({})],
         components: []
       } : {
         behaviours: [],
@@ -20415,7 +20415,7 @@
       defaulted('shell', true),
       field('toolbarBehaviours', [Replacing])
     ]);
-    const enhanceGroups = () => ({ behaviours: derive$1([Replacing.config({})]) });
+    const enhanceGroups = () => ({ behaviours: derive$1([Replacing.initialConfig({})]) });
     const parts$8 = constant$1([optional({
         name: 'groups',
         overrides: enhanceGroups
@@ -20432,7 +20432,7 @@
       };
       const getGroupContainer = component => detail.shell ? Optional.some(component) : getPart(component, detail, 'groups');
       const extra = detail.shell ? {
-        behaviours: [Replacing.config({})],
+        behaviours: [Replacing.initialConfig({})],
         components: []
       } : {
         behaviours: [],
@@ -20975,7 +20975,7 @@
       });
     };
     const isDocked = lazyHeader => lazyHeader().map(Docking.isDocked).getOr(false);
-    const getIframeBehaviours = () => [Receiving.config({ channels: { [toolbarHeightChange()]: { onReceive: updateIframeContentFlow } } })];
+    const getIframeBehaviours = () => [Receiving.initialConfig({ channels: { [toolbarHeightChange()]: { onReceive: updateIframeContentFlow } } })];
     const getBehaviours = (editor, sharedBackstage) => {
       const focusedElm = value$2();
       const lazySink = sharedBackstage.getSink;
@@ -20992,8 +20992,8 @@
       };
       const additionalBehaviours = editor.inline ? [] : getIframeBehaviours();
       return [
-        Focusing.config({}),
-        Docking.config({
+        Focusing.initialConfig({}),
+        Docking.initialConfig({
           contextual: {
             lazyContext: comp => {
               const headerHeight = getOuter$2(comp.element);
@@ -21161,7 +21161,7 @@
         dom: detail.dom,
         components: [],
         behaviours: derive$1([
-          Replacing.config({}),
+          Replacing.initialConfig({}),
           config('menubar-events', [
             runOnAttached(component => {
               detail.onSetup(component);
@@ -21192,7 +21192,7 @@
               });
             })
           ]),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'flow',
             selector: '.' + 'tox-mbtn',
             onEscape: comp => {
@@ -21200,7 +21200,7 @@
               return Optional.some(true);
             }
           }),
-          Tabstopping.config({})
+          Tabstopping.initialConfig({})
         ]),
         apis,
         domModification: { attributes: { role: 'menubar' } }
@@ -21457,9 +21457,9 @@
           },
           components: [],
           behaviours: derive$1([
-            Tabstopping.config({}),
-            Focusing.config({}),
-            Sliding.config({
+            Tabstopping.initialConfig({}),
+            Focusing.initialConfig({}),
+            Sliding.initialConfig({
               dimension: { property: 'width' },
               closedClass: 'tox-sidebar--sliding-closed',
               openClass: 'tox-sidebar--sliding-open',
@@ -21480,8 +21480,8 @@
                 emitWith(slider, fixSize, { width: get$c(slider.element) + 'px' });
               }
             }),
-            Replacing.config({}),
-            Composing.config({
+            Replacing.initialConfig({}),
+            Composing.initialConfig({
               find: comp => {
                 const children = Replacing.contents(comp);
                 return head(children);
@@ -21506,12 +21506,12 @@
       set$9(component.element, 'aria-busy', true);
       const root = config.getRoot(component).getOr(component);
       const blockerBehaviours = derive$1([
-        Keying.config({
+        Keying.initialConfig({
           mode: 'special',
           onTab: () => Optional.some(true),
           onShiftTab: () => Optional.some(true)
         }),
-        Focusing.config({})
+        Focusing.initialConfig({})
       ]);
       const blockSpec = getBusySpec(root, blockerBehaviours);
       const blocker = root.getSystem().build(blockSpec);
@@ -21629,9 +21629,9 @@
         styles: { display: 'none' }
       },
       behaviours: derive$1([
-        Replacing.config({}),
-        Blocking.config({ focus: false }),
-        Composing.config({ find: comp => head(comp.components()) })
+        Replacing.initialConfig({}),
+        Blocking.initialConfig({ focus: false }),
+        Composing.initialConfig({ find: comp => head(comp.components()) })
       ]),
       components: []
     });
@@ -21826,7 +21826,7 @@
         name: 'button',
         overrides: detail => ({
           dom: { attributes: { 'aria-haspopup': 'true' } },
-          buttonBehaviours: derive$1([Toggling.config({
+          buttonBehaviours: derive$1([Toggling.initialConfig({
               toggleClass: detail.markers.toggledClass,
               aria: { mode: 'expanded' },
               toggleOnExecute: false,
@@ -21840,7 +21840,7 @@
         name: 'toolbar',
         overrides: detail => {
           return {
-            toolbarBehaviours: derive$1([Keying.config({
+            toolbarBehaviours: derive$1([Keying.initialConfig({
                 mode: 'cyclic',
                 onEscape: comp => {
                   getPart(comp, detail, 'button').each(Focusing.focus);
@@ -21908,14 +21908,14 @@
           attributes: { id: ariaControls.id }
         },
         behaviours: derive$1([
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onEscape: comp => {
               Sandboxing.close(comp);
               return Optional.some(true);
             }
           }),
-          Sandboxing.config({
+          Sandboxing.initialConfig({
             onOpen,
             onClose,
             isPartOf: (container, data, queryElem) => {
@@ -21925,7 +21925,7 @@
               return detail.lazySink(button).getOrDie();
             }
           }),
-          Receiving.config({
+          Receiving.initialConfig({
             channels: {
               ...receivingChannel$1({
                 isExtraPart: never,
@@ -21949,7 +21949,7 @@
         action: button => {
           toggle(button, externals);
         },
-        buttonBehaviours: SketchBehaviours.augment({ dump: externals.button().buttonBehaviours }, [Coupling.config({
+        buttonBehaviours: SketchBehaviours.augment({ dump: externals.button().buttonBehaviours }, [Coupling.initialConfig({
             others: {
               toolbarSandbox: button => {
                 return makeSandbox(button, spec, detail);
@@ -22019,7 +22019,7 @@
       uid: detail.uid,
       dom: detail.dom,
       components,
-      behaviours: augment(detail.tgroupBehaviours, [Keying.config({
+      behaviours: augment(detail.tgroupBehaviours, [Keying.initialConfig({
           mode: 'flow',
           selector: detail.markers.itemSelector
         })]),
@@ -22078,7 +22078,7 @@
         uid: detail.uid,
         dom: detail.dom,
         components,
-        behaviours: augment(detail.splitToolbarBehaviours, [Coupling.config({
+        behaviours: augment(detail.splitToolbarBehaviours, [Coupling.initialConfig({
             others: {
               overflowGroup: () => {
                 return ToolbarGroup.sketch({
@@ -22163,7 +22163,7 @@
         overrides: detail => {
           return {
             toolbarBehaviours: derive$1([
-              Sliding.config({
+              Sliding.initialConfig({
                 dimension: { property: 'height' },
                 closedClass: detail.markers.closedClass,
                 openClass: detail.markers.openClass,
@@ -22184,7 +22184,7 @@
                   getPart(comp, detail, 'overflow-button').each(Toggling.on);
                 }
               }),
-              Keying.config({
+              Keying.initialConfig({
                 mode: 'acyclic',
                 onEscape: comp => {
                   getPart(comp, detail, 'overflow-button').each(Focusing.focus);
@@ -22198,7 +22198,7 @@
       external({
         name: 'overflow-button',
         overrides: detail => ({
-          buttonBehaviours: derive$1([Toggling.config({
+          buttonBehaviours: derive$1([Toggling.initialConfig({
               toggleClass: detail.markers.overflowToggledClass,
               aria: { mode: 'pressed' },
               toggleOnExecute: false
@@ -22240,7 +22240,7 @@
         dom: detail.dom,
         components,
         behaviours: augment(detail.splitToolbarBehaviours, [
-          Coupling.config({
+          Coupling.initialConfig({
             others: {
               overflowGroup: toolbar => {
                 return ToolbarGroup.sketch({
@@ -22302,8 +22302,8 @@
         items: toolbarGroup.items,
         markers: { itemSelector: '*:not(.tox-split-button) > .tox-tbtn:not([disabled]), ' + '.tox-split-button:not([disabled]), ' + '.tox-toolbar-nav-js:not([disabled]), ' + '.tox-number-input:not([disabled])' },
         tgroupBehaviours: derive$1([
-          Tabstopping.config({}),
-          Focusing.config({})
+          Tabstopping.initialConfig({}),
+          Focusing.initialConfig({})
         ])
       };
     };
@@ -22316,7 +22316,7 @@
       return derive$1([
         DisablingConfigs.toolbarButton(toolbarSpec.providers.isDisabled),
         receivingConfig(),
-        Keying.config({
+        Keying.initialConfig({
           mode: modeName,
           onEscape: toolbarSpec.onEscape,
           selector: '.tox-toolbar__group'
@@ -22576,8 +22576,8 @@
           ]
         },
         behaviours: derive$1([
-          Focusing.config({}),
-          Keying.config({
+          Focusing.initialConfig({}),
+          Keying.initialConfig({
             mode: 'flow',
             selector: 'button, .tox-button',
             focusInside: FocusInsideModes.OnEnterOrSpaceMode
@@ -22743,8 +22743,8 @@
         },
         components: [],
         behaviours: derive$1([
-          Replacing.config({}),
-          Composing.config({
+          Replacing.initialConfig({}),
+          Composing.initialConfig({
             find: comp => {
               const children = Replacing.contents(comp);
               return head(children);
@@ -22894,7 +22894,7 @@
         sketch: spec => CustomList.sketch({
           uid: spec.uid,
           dom: spec.dom,
-          listBehaviours: derive$1([Keying.config({
+          listBehaviours: derive$1([Keying.initialConfig({
               mode: 'acyclic',
               selector: '.tox-toolbar'
             })]),
@@ -23340,7 +23340,7 @@
         columns: 1,
         presets: 'normal',
         classes: spec.icon.isSome() ? [] : ['bespoke'],
-        dropdownBehaviours: [Tooltipping.config({
+        dropdownBehaviours: [Tooltipping.initialConfig({
             ...backstage.shared.providers.tooltips.getConfig({
               tooltipText: backstage.shared.providers.translate(spec.tooltip),
               onShow: comp => {
@@ -23747,8 +23747,8 @@
           },
           components: [renderIconFromPack$1(title, backstage.shared.providers.icons)],
           buttonBehaviours: derive$1([
-            Disabling.config({}),
-            Tooltipping.config(backstage.shared.providers.tooltips.getConfig({ tooltipText: translatedTooltip })),
+            Disabling.initialConfig({}),
+            Tooltipping.initialConfig(backstage.shared.providers.tooltips.getConfig({ tooltipText: translatedTooltip })),
             config(altExecuting, [
               onControlAttached({
                 onSetup,
@@ -23800,7 +23800,7 @@
         },
         components: [Input.sketch({
             inputBehaviours: derive$1([
-              Disabling.config({}),
+              Disabling.initialConfig({}),
               config(customEvents, [
                 onControlAttached({
                   onSetup,
@@ -23819,7 +23819,7 @@
                   spec.onAction(Representing.getValue(comp));
                 })
               ]),
-              Keying.config({
+              Keying.initialConfig({
                 mode: 'special',
                 onEnter: _comp => {
                   changeValue(identity, true, true);
@@ -23846,8 +23846,8 @@
             ])
           })],
         behaviours: derive$1([
-          Focusing.config({}),
-          Keying.config({
+          Focusing.initialConfig({}),
+          Keying.initialConfig({
             mode: 'special',
             onEnter: focusInput,
             onSpace: focusInput,
@@ -23878,8 +23878,8 @@
           memPlus.asSpec()
         ],
         behaviours: derive$1([
-          Focusing.config({}),
-          Keying.config({
+          Focusing.initialConfig({}),
+          Keying.initialConfig({
             mode: 'flow',
             focusInside: FocusInsideModes.OnEnterOrSpaceMode,
             cycles: false,
@@ -24139,7 +24139,7 @@
           action: arrow => {
             arrow.getSystem().getByUid(detail.uid).each(emitExecute);
           },
-          buttonBehaviours: derive$1([Toggling.config({
+          buttonBehaviours: derive$1([Toggling.initialConfig({
               toggleOnExecute: false,
               toggleClass: detail.toggleClass
             })])
@@ -24256,7 +24256,7 @@
         },
         events: buttonEvents,
         behaviours: augment(detail.splitDropdownBehaviours, [
-          Coupling.config({
+          Coupling.initialConfig({
             others: {
               sandbox: hotspot => {
                 const arrow = getPartOrDie(hotspot, detail, 'arrow');
@@ -24274,14 +24274,14 @@
               }
             }
           }),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onSpace: executeOnButton,
             onEnter: executeOnButton,
             onDown: openMenu
           }),
-          Focusing.config({}),
-          Toggling.config({
+          Focusing.initialConfig({}),
+          Toggling.initialConfig({
             toggleOnExecute: false,
             aria: { mode: 'expanded' }
           })
@@ -24418,7 +24418,7 @@
               onControlAttached(specialisation, editorOffCell),
               onControlDetached(specialisation, editorOffCell)
             ]),
-            ...spec.tooltip.map(t => Tooltipping.config(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate(t) + spec.shortcut.map(shortcut => ` (${ convertText(shortcut) })`).getOr('') }))).toArray(),
+            ...spec.tooltip.map(t => Tooltipping.initialConfig(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate(t) + spec.shortcut.map(shortcut => ` (${ convertText(shortcut) })`).getOr('') }))).toArray(),
             DisablingConfigs.toolbarButton(() => !spec.enabled || providersBackstage.isDisabled()),
             receivingConfig()
           ].concat(specialisation.toolbarButtonBehaviours)),
@@ -24435,8 +24435,8 @@
     const renderToolbarToggleButton = (spec, providersBackstage, btnName) => renderToolbarToggleButtonWith(spec, providersBackstage, [], btnName);
     const renderToolbarToggleButtonWith = (spec, providersBackstage, bonusEvents, btnName) => renderCommonToolbarButton(spec, {
       toolbarButtonBehaviours: [
-        Replacing.config({}),
-        Toggling.config({
+        Replacing.initialConfig({}),
+        Toggling.initialConfig({
           toggleClass: 'tox-tbtn--enabled',
           aria: { mode: 'pressed' },
           toggleOnExecute: false
@@ -24512,9 +24512,9 @@
             onControlAttached(specialisation, editorOffCell),
             onControlDetached(specialisation, editorOffCell)
           ]),
-          Unselecting.config({}),
+          Unselecting.initialConfig({}),
           ...spec.tooltip.map(tooltip => {
-            return Tooltipping.config({
+            return Tooltipping.initialConfig({
               ...sharedBackstage.providers.tooltips.getConfig({
                 tooltipText: sharedBackstage.providers.translate(tooltip),
                 onShow: comp => {
@@ -24543,7 +24543,7 @@
         fetch: fetchChoices(getApi, spec, sharedBackstage.providers),
         parts: { menu: part(false, spec.columns, spec.presets) },
         components: [
-          SplitDropdown.parts.button(renderCommonStructure(spec.icon, spec.text, Optional.none(), Optional.some([Toggling.config({
+          SplitDropdown.parts.button(renderCommonStructure(spec.icon, spec.text, Optional.none(), Optional.some([Toggling.initialConfig({
               toggleClass: 'tox-tbtn--enabled',
               toggleOnExecute: false
             })]), sharedBackstage.providers)),
@@ -25308,7 +25308,7 @@
         data: ctx.initValue(),
         inputAttributes,
         selectOnFocus: true,
-        inputBehaviours: derive$1([Keying.config({
+        inputBehaviours: derive$1([Keying.initialConfig({
             mode: 'special',
             onEnter: input => commands.findPrimary(input).map(primary => {
               emitExecute(primary);
@@ -25759,7 +25759,7 @@
               });
             })
           ]),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onEscape: comp => last$1(stack.get()).fold(() => spec.onEscape(), _ => {
               emit(comp, backSlideEvent);
@@ -25829,7 +25829,7 @@
         },
         components: [toolbarSpec],
         behaviours: derive$1([
-          Keying.config({ mode: 'acyclic' }),
+          Keying.initialConfig({ mode: 'acyclic' }),
           config('pop-dialog-wrap-events', [
             runOnAttached(comp => {
               editor.shortcuts.add('ctrl+F9', 'focus statusbar', () => Keying.focusIn(comp));
@@ -27457,12 +27457,12 @@
         classes: ['tox-selector']
       },
       buttonBehaviours: derive$1([
-        Dragging.config({
+        Dragging.initialConfig({
           mode: 'mouseOrTouch',
           blockerClass: 'blocker',
           snaps
         }),
-        Unselecting.config({})
+        Unselecting.initialConfig({})
       ]),
       eventOrder: {
         mousedown: [
@@ -27637,14 +27637,14 @@
           attributes: { role: 'navigation' }
         },
         behaviours: derive$1([
-          Keying.config({
+          Keying.initialConfig({
             mode: 'flow',
             selector: 'div[role=button]'
           }),
-          Disabling.config({ disabled: providersBackstage.isDisabled }),
+          Disabling.initialConfig({ disabled: providersBackstage.isDisabled }),
           receivingConfig(),
-          Tabstopping.config({}),
-          Replacing.config({}),
+          Tabstopping.initialConfig({}),
+          Replacing.initialConfig({}),
           config('elementPathEvents', [runOnAttached((comp, _e) => {
               editor.shortcuts.add('alt+F11', 'focus statusbar elementpath', () => Keying.focusIn(comp));
               editor.on('NodeChange', e => {
@@ -27712,22 +27712,22 @@
           'data-mce-name': 'resize-handle'
         },
         behaviours: [
-          Dragging.config({
+          Dragging.initialConfig({
             mode: 'mouse',
             repositionTarget: false,
             onDrag: (_comp, _target, delta) => resize(editor, delta, resizeType),
             blockerClass: 'tox-blocker'
           }),
-          Keying.config({
+          Keying.initialConfig({
             mode: 'special',
             onLeft: () => keyboardHandler(editor, resizeType, -1, 0),
             onRight: () => keyboardHandler(editor, resizeType, 1, 0),
             onUp: () => keyboardHandler(editor, resizeType, 0, -1),
             onDown: () => keyboardHandler(editor, resizeType, 0, 1)
           }),
-          Tabstopping.config({}),
-          Focusing.config({}),
-          Tooltipping.config(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate('Resize') }))
+          Tabstopping.initialConfig({}),
+          Focusing.initialConfig({}),
+          Tooltipping.initialConfig(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate('Resize') }))
         ]
       }, providersBackstage.icons));
     };
@@ -27746,9 +27746,9 @@
         buttonBehaviours: derive$1([
           DisablingConfigs.button(providersBackstage.isDisabled),
           receivingConfig(),
-          Tabstopping.config({}),
-          Replacing.config({}),
-          Representing.config({
+          Tabstopping.initialConfig({}),
+          Replacing.initialConfig({}),
+          Representing.initialConfig({
             store: {
               mode: 'memory',
               initialValue: {
@@ -27812,7 +27812,7 @@
                   'HugeRTE'
                 ])
               },
-              behaviours: derive$1([Focusing.config({})])
+              behaviours: derive$1([Focusing.initialConfig({})])
             }]
         };
       };
@@ -28058,7 +28058,7 @@
             ].concat(deviceClasses),
             attributes: { ...global$8.isRtl() ? { dir: 'rtl' } : {} }
           },
-          behaviours: derive$1([Positioning.config({ useFixed: () => header.isDocked(lazyHeader) })])
+          behaviours: derive$1([Positioning.initialConfig({ useFixed: () => header.isDocked(lazyHeader) })])
         };
         const reactiveWidthSpec = {
           dom: { styles: { width: document.body.clientWidth + 'px' } },
@@ -28086,7 +28086,7 @@
             ].concat(deviceClasses),
             attributes: { ...global$8.isRtl() ? { dir: 'rtl' } : {} }
           },
-          behaviours: derive$1([Positioning.config({
+          behaviours: derive$1([Positioning.initialConfig({
               useFixed: () => header.isDocked(lazyHeader),
               getBounds: () => setupForTheme.getPopupSinkBounds()
             })])
@@ -28154,8 +28154,8 @@
           ],
           behaviours: derive$1([
             receivingConfig(),
-            Disabling.config({ disableClass: 'tox-hugerte--disabled' }),
-            Keying.config({
+            Disabling.initialConfig({ disableClass: 'tox-hugerte--disabled' }),
+            Keying.initialConfig({
               mode: 'cyclic',
               selector: '.tox-menubar, .tox-toolbar, .tox-toolbar__primary, .tox-toolbar__overflow--open, .tox-sidebar__overflow--open, .tox-statusbar__path, .tox-statusbar__wordcount, .tox-statusbar__branding a, .tox-statusbar__resize-handle'
             })
@@ -28291,7 +28291,7 @@
         name: 'draghandle',
         overrides: (detail, spec) => {
           return {
-            behaviours: derive$1([Dragging.config({
+            behaviours: derive$1([Dragging.initialConfig({
                 mode: 'mouse',
                 getTarget: handle => {
                   return ancestor(handle, '[role="dialog"]').getOr(handle);
@@ -28356,7 +28356,7 @@
           ...externalBlocker,
           components: externalBlocker.components.concat([premade(dialog)]),
           behaviours: derive$1([
-            Focusing.config({}),
+            Focusing.initialConfig({}),
             config('dialog-blocker-events', [runOnSource(focusin(), () => {
                 Blocking.isBlocked(dialog) ? noop() : Keying.focusIn(dialog);
               })])
@@ -28406,15 +28406,15 @@
           }
         },
         behaviours: augment(detail.modalBehaviours, [
-          Replacing.config({}),
-          Keying.config({
+          Replacing.initialConfig({}),
+          Keying.initialConfig({
             mode: 'cyclic',
             onEnter: detail.onExecute,
             onEscape: detail.onEscape,
             useTabstopAt: detail.useTabstopAt,
             firstTabstop: detail.firstTabstop
           }),
-          Blocking.config({ getRoot: dialogComp.get }),
+          Blocking.initialConfig({ getRoot: dialogComp.get }),
           config(modalEventsId, [runOnAttached(c => {
               labelledBy(c.element, getPartOrDie(c, detail, 'title').element);
             })])
@@ -29001,7 +29001,7 @@
             components: [memForm.asSpec()]
           }],
         behaviours: derive$1([
-          Keying.config({
+          Keying.initialConfig({
             mode: 'acyclic',
             useTabstopAt: not(isPseudoStop)
           }),
@@ -29025,13 +29025,13 @@
       components: detail.components,
       events: events$a(detail.action),
       behaviours: augment(detail.tabButtonBehaviours, [
-        Focusing.config({}),
-        Keying.config({
+        Focusing.initialConfig({}),
+        Keying.initialConfig({
           mode: 'execution',
           useSpace: true,
           useEnter: true
         }),
-        Representing.config({
+        Representing.initialConfig({
           store: {
             mode: 'memory',
             initialValue: detail.value
@@ -29124,7 +29124,7 @@
       'debug.sketcher': 'Tabbar',
       'domModification': { attributes: { role: 'tablist' } },
       'behaviours': augment(detail.tabbarBehaviours, [
-        Highlighting.config({
+        Highlighting.initialConfig({
           highlightClass: detail.markers.selectedClass,
           itemClass: detail.markers.tabClass,
           onHighlight: (tabbar, tab) => {
@@ -29134,7 +29134,7 @@
             set$9(tab.element, 'aria-selected', 'false');
           }
         }),
-        Keying.config({
+        Keying.initialConfig({
           mode: 'flow',
           getInitial: tabbar => {
             return Highlighting.getHighlighted(tabbar).map(tab => tab.element);
@@ -29154,7 +29154,7 @@
     const factory$1 = (detail, _spec) => ({
       uid: detail.uid,
       dom: detail.dom,
-      behaviours: augment(detail.tabviewBehaviours, [Replacing.config({})]),
+      behaviours: augment(detail.tabviewBehaviours, [Replacing.initialConfig({})]),
       domModification: { attributes: { role: 'tabpanel' } }
     });
     const Tabview = single({
@@ -29404,7 +29404,7 @@
                 },
                 components: map$2(tab.items, item => interpretInForm(parts, item, dialogData, backstage)),
                 formBehaviours: derive$1([
-                  Keying.config({
+                  Keying.initialConfig({
                     mode: 'acyclic',
                     useTabstopAt: not(isPseudoStop)
                   }),
@@ -29412,7 +29412,7 @@
                     runOnAttached(setDataOnForm),
                     runOnDetached(updateDataWithForm)
                   ]),
-                  Receiving.config({
+                  Receiving.initialConfig({
                     channels: wrapAll([
                       {
                         key: SendDataToSectionChannel,
@@ -29455,7 +29455,7 @@
               tabClass: 'tox-tab',
               selectedClass: 'tox-dialog__body-nav-item--active'
             },
-            tabbarBehaviours: derive$1([Tabstopping.config({})])
+            tabbarBehaviours: derive$1([Tabstopping.initialConfig({})])
           }),
           TabSection.parts.tabview({
             dom: {
@@ -29467,8 +29467,8 @@
         selectFirst: tabMode.selectFirst,
         tabSectionBehaviours: derive$1([
           config('tabpanel', tabMode.extraEvents),
-          Keying.config({ mode: 'acyclic' }),
-          Composing.config({ find: comp => head(TabSection.getViewItems(comp)) }),
+          Keying.initialConfig({ mode: 'acyclic' }),
+          Composing.initialConfig({ find: comp => head(TabSection.getViewItems(comp)) }),
           withComp(Optional.none(), tsection => {
             tsection.getSystem().broadcastOn([SendDataToSectionChannel], {});
             return storedValue.get();
@@ -29506,7 +29506,7 @@
         components: [],
         behaviours: derive$1([
           ComposingConfigs.childAt(0),
-          Reflecting.config({
+          Reflecting.initialConfig({
             channel: `${ bodyChannel }-${ dialogId }`,
             updateState,
             renderComponents,
@@ -29537,12 +29537,12 @@
                   attributes: { src: spec.url }
                 },
                 behaviours: derive$1([
-                  Tabstopping.config({}),
-                  Focusing.config({})
+                  Tabstopping.initialConfig({}),
+                  Focusing.initialConfig({})
                 ])
               })]
           }],
-        behaviours: derive$1([Keying.config({
+        behaviours: derive$1([Keying.initialConfig({
             mode: 'acyclic',
             useTabstopAt: not(isPseudoStop)
           })])
@@ -29576,7 +29576,7 @@
         }
       },
       action: onClose,
-      buttonBehaviours: derive$1([Tabstopping.config({})])
+      buttonBehaviours: derive$1([Tabstopping.initialConfig({})])
     }));
     const pUntitled = () => ModalDialog.parts.title({
       dom: {
@@ -29664,7 +29664,7 @@
         },
         dragBlockClass: blockerClass,
         modalBehaviours: derive$1([
-          Focusing.config({}),
+          Focusing.initialConfig({}),
           config('dialog-events', spec.dialogEvents.concat([
             runOnSource(focusin(), (comp, _se) => {
               Blocking.isBlocked(comp) ? noop() : Keying.focusIn(comp);
@@ -29715,8 +29715,8 @@
         }
       },
       buttonBehaviours: derive$1([
-        Tabstopping.config({}),
-        Tooltipping.config(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate('Close') }))
+        Tabstopping.initialConfig({}),
+        Tooltipping.initialConfig(providersBackstage.tooltips.getConfig({ tooltipText: providersBackstage.translate('Close') }))
       ]),
       components: [render$3('close', {
           tag: 'span',
@@ -29735,7 +29735,7 @@
           attributes: { ...titleId.map(x => ({ id: x })).getOr({}) }
         },
         components: [],
-        behaviours: derive$1([Reflecting.config({
+        behaviours: derive$1([Reflecting.initialConfig({
             channel: `${ titleChannel }-${ dialogId }`,
             initialData: spec,
             renderComponents
@@ -29750,7 +29750,7 @@
         renderDragHandle(),
         renderClose(providersBackstage)
       ],
-      containerBehaviours: derive$1([Dragging.config({
+      containerBehaviours: derive$1([Dragging.initialConfig({
           mode: 'mouse',
           blockerClass: 'blocker',
           getTarget: handle => {
@@ -30017,7 +30017,7 @@
       return {
         dom: fromHtml('<div class="tox-dialog__footer"></div>'),
         components: [],
-        behaviours: derive$1([Reflecting.config({
+        behaviours: derive$1([Reflecting.initialConfig({
             channel: `${ footerChannel }-${ dialogId }`,
             initialData: initSpec,
             updateState,
@@ -30166,7 +30166,7 @@
         body,
         footer,
         extraClasses: dialogSizeClasses,
-        extraBehaviours: [Reflecting.config({
+        extraBehaviours: [Reflecting.initialConfig({
             channel: `${ dialogChannel }-${ dialogId }`,
             updateState,
             initialData: dialogInit
@@ -30260,7 +30260,7 @@
           ]
         },
         behaviours: derive$1([
-          Keying.config({
+          Keying.initialConfig({
             mode: 'cyclic',
             onEscape: c => {
               emit(c, formCloseEvent);
@@ -30269,12 +30269,12 @@
             useTabstopAt: elem => !isPseudoStop(elem) && (name$3(elem) !== 'button' || get$f(elem, 'disabled') !== 'disabled'),
             firstTabstop: 1
           }),
-          Reflecting.config({
+          Reflecting.initialConfig({
             channel: `${ dialogChannel }-${ dialogId }`,
             updateState,
             initialData: dialogInit
           }),
-          Focusing.config({}),
+          Focusing.initialConfig({}),
           config('execute-on-form', dialogEvents.concat([
             runOnSource(focusin(), (comp, _se) => {
               Keying.focusIn(comp);
@@ -30283,8 +30283,8 @@
               comp.getSystem().broadcastOn([dialogFocusShiftedChannel], { newFocus: se.event.newFocus });
             })
           ])),
-          Blocking.config({ getRoot: () => Optional.some(dialog) }),
-          Replacing.config({}),
+          Blocking.initialConfig({ getRoot: () => Optional.some(dialog) }),
+          Replacing.initialConfig({}),
           memory({})
         ]),
         components: [
@@ -30413,7 +30413,7 @@
       const messageHandlerUnbinder = unbindable();
       const updateState = (_comp, incoming) => Optional.some(incoming);
       const extraBehaviours = [
-        Reflecting.config({
+        Reflecting.initialConfig({
           channel: `${ dialogChannel }-${ dialogId }`,
           updateState,
           initialData: internalDialog
@@ -30434,7 +30434,7 @@
           }),
           runOnDetached(messageHandlerUnbinder.clear)
         ]),
-        Receiving.config({
+        Receiving.initialConfig({
           channels: {
             [bodySendMessageChannel]: {
               onReceive: (comp, data) => {
@@ -30561,7 +30561,7 @@
       if (isStickyToolbar && isToolbarLocationTop) {
         return [];
       } else {
-        return [Docking.config({
+        return [Docking.initialConfig({
             contextual: {
               lazyContext: () => Optional.some(box$1(SugarElement.fromDom(editor.getContentAreaContainer()))),
               fadeInClass: 'tox-dialog-dock-fadein',
@@ -30733,7 +30733,7 @@
               config('window-manager-inline-events', [run$1(dismissRequested(), (_comp, _se) => {
                   emit(dialogUi.dialog, formCancelEvent);
                 })]),
-              Docking.config({
+              Docking.initialConfig({
                 contextual: {
                   lazyContext: () => Optional.some(box$1(SugarElement.fromDom(editor.getContentAreaContainer()))),
                   fadeInClass: 'tox-dialog-dock-fadein',

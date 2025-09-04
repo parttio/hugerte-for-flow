@@ -469,7 +469,7 @@ public class HugeRte extends CustomField<String>
         }
 
         for (int i = 0; i < plugins.length; i++) {
-            jsonArray.set(initialIndex, plugins[i].pluginLabel);
+            jsonArray.set(initialIndex, plugins[i].getClientSideRepresentation());
             initialIndex++;
         }
 
@@ -488,7 +488,7 @@ public class HugeRte extends CustomField<String>
             initBasicEditorConfiguration();
         }
 
-        String newconfig = Arrays.stream(menubars).map(m -> m.menubarLabel)
+        String newconfig = Arrays.stream(menubars).map(m -> m.getClientSideRepresentation())
                 .collect(Collectors.joining(" "));
 
         String menubar;
@@ -522,7 +522,7 @@ public class HugeRte extends CustomField<String>
         }
 
         for (int i = 0; i < toolbars.length; i++) {
-            toolbarStr = toolbarStr.concat(" ").concat(toolbars[i].toolbarLabel)
+            toolbarStr = toolbarStr.concat(" ").concat(toolbars[i].getClientSideRepresentation())
                     .concat(" ");
         }
 
@@ -576,47 +576,5 @@ public class HugeRte extends CustomField<String>
                 .callJsFunction("$connector.closeToolbarOverflowMenu"));
     }
 
-    /**
-     * Thrown, when the editor already has been initialized. For instance, the configuration must not be changed
-     * afterwards and is a typical source for this exception.
-     */
-    public static class AlreadyInitializedException extends RuntimeException {
-        public AlreadyInitializedException() {
-            super("Cannot apply configuration to the editor, it already has been initialized. You need to " +
-                  "detach it first");
-        }
-    }
 
-    /**
-     * Thrown, when a conflict in the configuration has been detected. This is for instance the case, when
-     * a plugin and another configuration should not be used in combination (e.g. config "resize" and plugin "autoresize").
-     */
-    public static class ConfigurationConflictException extends RuntimeException {
-        public ConfigurationConflictException(String message) {
-            super(message);
-        }
-    }
-
-    /**
-     * Directions, that can be set for the editor to be resizable. Please note, that "only horizonzal" resizing is
-     * not supported.
-     *
-     * @see <a href="https://www.tiny.cloud/docs/tinymce/latest/editor-size-options/#resize">Official TinyMCE docs</a>
-     */
-    public enum ResizeDirection {
-        /**
-         * Resizing is disabled.
-         */
-        NONE,
-
-        /**
-         * Enables vertical resizing.
-         */
-        VERTICALLY,
-
-        /**
-         * Enables vertical and horizontal resizing.
-         */
-        BOTH;
-    }
 }
