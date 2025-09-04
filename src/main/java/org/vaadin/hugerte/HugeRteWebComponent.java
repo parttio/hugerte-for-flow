@@ -40,7 +40,6 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
 
     // TODO binder
     // TODO enable / readonly
-    // TODO check client side imports,
     // TODO stylings / lumo integration
     // TODO field styling (e.g. label)
     // TODO theme variants
@@ -51,6 +50,8 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     // TODO test in dialog
     // TODO KeyNotifier
     // TODO Demos
+    // TODO review and finalize npm integration (see commented out code)
+    // TODO dynamic plugin loading for npm integration
 
     public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
