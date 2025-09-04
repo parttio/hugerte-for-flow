@@ -15,33 +15,33 @@ import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
 import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
 
 // --- HugeRTE core ---
+// @see https://github.com/hugerte/hugerte-docs
+// import basic scripts
 import hugerte from 'hugerte';
-
-// --- Required Runtime Imports (Theme, Skin, Content CSS) ---
-// TODO review
 import 'hugerte/models/dom';
 import 'hugerte/icons/default';
 import 'hugerte/themes/silver';
-import 'hugerte/skins/ui/oxide/skin.js';
-import 'hugerte/skins/ui/oxide/content.js';
 import 'hugerte/skins/content/default/content.js';
 
+// import skin and content css to prevent 404 issues
+// to be checked later, if this can be improved
+import 'hugerte/skins/ui/oxide/skin.min.css';
+import oxideContentCss from 'hugerte/skins/ui/oxide/content.min.css?raw';
+import defaultContentCss from 'hugerte/skins/content/default/content.min.css?raw';
+
 // TODO review plugins
-import 'hugerte/plugins/advlist';
-import 'hugerte/plugins/autolink';
-import 'hugerte/plugins/autoresize';
-import 'hugerte/plugins/link';
-import 'hugerte/plugins/lists';
-import 'hugerte/plugins/code';
-import 'hugerte/plugins/table';
-import 'hugerte/plugins/preview';
-import 'hugerte/plugins/searchreplace';
-import 'hugerte/plugins/wordcount';
+// import 'hugerte/plugins/advlist';
+// import 'hugerte/plugins/autolink';
+// import 'hugerte/plugins/autoresize';
+// import 'hugerte/plugins/link';
+// import 'hugerte/plugins/lists';
+// import 'hugerte/plugins/code';
+// import 'hugerte/plugins/table';
+// import 'hugerte/plugins/preview';
+// import 'hugerte/plugins/searchreplace';
+// import 'hugerte/plugins/wordcount';
 
 import {diff_match_patch} from 'diff-match-patch';
-
-// import { CustomFieldMixin } from './vaadin-custom-field-mixin.js';
-// import { customFieldStyles } from './vaadin-custom-field-styles.js';
 
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
 
@@ -133,6 +133,9 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             ...this.config,
             suffix: '.min',
             promotion: false,
+            skin: false,
+            content_css: false, // due to the postcss lit plugin we cannot pass in the min css files directly
+            content_style: [oxideContentCss, defaultContentCss].join('\n'),
             target,
             // readonly: !this.enabled, // comes form the field mixin
             setup: (editor) => {
@@ -177,12 +180,12 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                     // Nevertheless, this might break in the future, so for the long term, it might be useful to create
                     // our own lumo skin at some point so that we do not have to hack around this situation.
                     // TODO check if still needed
-                    const ourStyles = document.head.querySelector("[href*='hugerteLumo.css']");
-                    if (ourStyles) {
-                        document.head.append(ourStyles);
-                    } else {
-                        console.error("Could not find 'hugerteLumo.css'. Has it been renamed or moved?");
-                    }
+                    // const ourStyles = document.head.querySelector("[href*='vaadin-huge-rte.css']");
+                    // if (ourStyles) {
+                    //     document.head.append(ourStyles);
+                    // } else {
+                    //     console.error("Could not find 'vaadin-huge-rte.css'. Has it been renamed or moved?");
+                    // }
 
                     if (this._lastSyncedValue) {
                         editor.setContent(this._lastSyncedValue);

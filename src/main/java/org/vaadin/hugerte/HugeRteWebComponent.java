@@ -21,6 +21,7 @@ import com.vaadin.flow.dom.Element;
 /**
  * A Rich Text editor, based on HugeRTE JS component.
  * <p>
+ *
  * @author mstahv, Stefan Uebe
  */
 @NpmPackage(value = "hugerte", version = "1.0.9")
@@ -28,12 +29,14 @@ import com.vaadin.flow.dom.Element;
 @Tag("vaadin-huge-rte")
 @JsModule("./vaadin-huge-rte.js")
 @CssImport("./vaadin-huge-rte.css")
+//@StyleSheet("context://frontend/vaadin-huge-rte.css") // to add a "link" instead of an inline "style". Necessary to move the import manually behind the huge styles
 public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebComponent, String> implements
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRteWebComponent>, HasLabel {
 
     // TODO configuration general
     // TODO config plugins
+    // TODO import only necessary plugins
     // TODO config toolbar
     // TODO config menubar
     // TODO config resize
@@ -56,6 +59,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
 
     /**
      * Creates a new instance with the given label.
+     *
      * @param label label
      */
     public HugeRteWebComponent(String label) {
@@ -66,7 +70,8 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     /**
      * Creates a new instance with the given label and initial value. The initial value is set as it is without
      * any further processing.
-     * @param label label
+     *
+     * @param label        label
      * @param initialValue initial value
      */
     public HugeRteWebComponent(String label, String initialValue) {
@@ -78,8 +83,9 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     /**
      * Creates a new instance with the given label, initial value and value change listener. The initial value is set as it is without
      * any further processing.
-     * @param label label
-     * @param initialValue initial value
+     *
+     * @param label               label
+     * @param initialValue        initial value
      * @param valueChangeListener value change listener
      */
     public HugeRteWebComponent(String label, String initialValue, ValueChangeListener<? super ComponentValueChangeEvent<HugeRteWebComponent, String>> valueChangeListener) {
@@ -91,7 +97,8 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
 
     /**
      * Creates a new instance with the given label and value change listener.
-     * @param label label
+     *
+     * @param label               label
      * @param valueChangeListener value change listener
      */
     public HugeRteWebComponent(String label, ValueChangeListener<? super ComponentValueChangeEvent<HugeRteWebComponent, String>> valueChangeListener) {
@@ -102,6 +109,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
 
     /**
      * Creates a new instance with the given value change listener.
+     *
      * @param valueChangeListener value change listener
      */
     public HugeRteWebComponent(ValueChangeListener<? super ComponentValueChangeEvent<HugeRteWebComponent, String>> valueChangeListener) {
@@ -132,8 +140,9 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
 
     /**
      * Applies the given delta onto the "old" value. Returns the "new", resulting value
+     *
      * @param oldValue old value
-     * @param delta delta to apply
+     * @param delta    delta to apply
      * @return new value
      */
     public static String applyDelta(String oldValue, String delta) {
@@ -154,6 +163,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     /**
      * Sets the value change mode of this instance. By default the editor uses {@link ValueChangeMode#ON_CHANGE}. Null
      * resets the mode to the default.
+     *
      * @param valueChangeMode new value change mode
      */
     public void setValueChangeMode(ValueChangeMode valueChangeMode) {
@@ -166,10 +176,11 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
 
     /**
      * Returns the current value change mode. Never null.
+     *
      * @return value change mode
      */
     public ValueChangeMode getValueChangeMode() {
-        return ValueChangeMode.fromClientSide(getElement().getProperty("valueChangeMode",  DEFAULT_VALUE_CHANGE_MODE.getClientSide()));
+        return ValueChangeMode.fromClientSide(getElement().getProperty("valueChangeMode", DEFAULT_VALUE_CHANGE_MODE.getClientSide()));
     }
 
     /// Sets the timespan in milliseconds, that will be used by several value change modes.
@@ -180,7 +191,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     ///
     /// @param timeoutInMillseconds milliseconds to be used by the value change modes
     public void setValueChangeTimeout(int timeoutInMillseconds) {
-        if(timeoutInMillseconds <= 0) {
+        if (timeoutInMillseconds <= 0) {
             throw new IllegalArgumentException("Timeout must be greater than 0");
         }
 
