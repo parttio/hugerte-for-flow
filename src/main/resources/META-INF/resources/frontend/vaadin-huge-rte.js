@@ -46,22 +46,15 @@ import {diff_match_patch} from 'diff-match-patch';
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
 
     // can be overridden by the server using #setConfig
-    baseConfig = {};
+    rawInitialConfig = {};
 
     // will be overridden by the server on attachment time
-    config = {};
+    initialConfig = {};
 
     _lastSyncedValue = "";
     _valueChangeMode = "change";
-    _valueChangeTimeout = 2000;
 
-    static get is() {
-        return 'vaadin-huge-rte';
-    }
-
-    // static get styles() {
-    // return customFieldStyles;
-    // }
+    _valueChangeTimeout = 2_000;
 
     /** @protected */
     render() {
@@ -129,8 +122,8 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
         // create combined config, with based config being overriden by any additiona configurations
         const config = {
-            ...this.baseConfig,
-            ...this.config,
+            ...this.rawInitialConfig,
+            ...this.initialConfig,
             suffix: '.min',
             promotion: false,
             skin: false,
@@ -422,6 +415,10 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         if (this.editor.queryCommandState('ToggleToolbarDrawer')) {
             this.editor.execCommand('ToggleToolbarDrawer');
         }
+    }
+
+    static get is() {
+        return 'vaadin-huge-rte';
     }
 
 }

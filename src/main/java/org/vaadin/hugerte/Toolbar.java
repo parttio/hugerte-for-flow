@@ -1,6 +1,6 @@
 package org.vaadin.hugerte;
 
-public enum Toolbar {
+public enum Toolbar implements ClientSideReference {
     //@formatter:off
     SEPARATOR("|"),
     UNDO("undo"),
@@ -56,10 +56,14 @@ public enum Toolbar {
     RTL("rtl");
     //@formatter:on
 
-    public final String toolbarLabel;
+    private final String clientSideRepresentation;
 
-    private Toolbar(String toolbarLabel) {
-        this.toolbarLabel = toolbarLabel;
+    Toolbar(String clientSideRepresentation) {
+        this.clientSideRepresentation = clientSideRepresentation;
     }
 
+    @Override
+    public String getClientSideRepresentation() {
+        return clientSideRepresentation;
+    }
 }

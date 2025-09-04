@@ -2,6 +2,8 @@ package org.vaadin.hugerte;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
 import com.vaadin.flow.component.AbstractSinglePropertyField;
@@ -17,6 +19,9 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
 import com.vaadin.flow.dom.Element;
+import elemental.json.Json;
+import elemental.json.JsonArray;
+import elemental.json.JsonObject;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
@@ -50,12 +55,21 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
     // TODO static "createInstanceWithDefaultConfig()"
     // TODO tooltips
     // TODO close toolbar
+    // TODO test in dialog
     // TODO KeyNotifier
     // TODO Demos
 
-    private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
     public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
+    public static final String DEFAULT_HEIGHT = "500px";
+
+    private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
+
+    private final JsonObject initialConfig = Json.createObject();
+
+    private Plugin[] activePlugins = {};
+    private ResizeDirection resizeDirection = ResizeDirection.NONE;
+
 
     /**
      * Creates a new instance with the given label.
@@ -127,6 +141,8 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
         setValueChangeTimeout(DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
 
         Element element = getElement();
+        element.setPropertyJson("initialConfig", initialConfig);
+
         element.addEventListener("_blur", event -> fireEvent(new BlurEvent<>(this, true)));
         element.addEventListener("_focus", event -> fireEvent(new FocusEvent<>(this, true)));
 
@@ -136,6 +152,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
             String newValue = applyDelta(oldValue, delta);
             setModelValue(newValue, true);
         }).addEventData("event.detail.delta");
+
     }
 
     /**
@@ -160,6 +177,197 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
         return (String) results[0];
     }
 
+    /// Sets the base configuration object as RAW JS. So be very careful what you pass in here. Any other configuration,
+    /// set via the `configure()` methods will be applied on top of the given json object.
+    ///
+    /// @param jsConfig config to apply
+    public void setRawConfig(String jsConfig) {
+        checkAlreadyInitialized();
+        getElement().setPropertyJson("rawInitialConfig", Json.parse(jsConfig));
+    }
+
+    /**
+     * Sets a single string for the given configuration key. Please note, that there is no check, if the
+     * given config key exists or the value is valid or might be applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
+    public HugeRteWebComponent configure(String configurationKey, String value) {
+        checkAlreadyInitialized();
+        initialConfig.put(configurationKey, value);
+        return this;
+    }
+
+    /**
+     * Sets an array of strings for the given configuration key. The result will also be an array on the client side.
+     * Please note, that there is no check, if the given config key exists or the value is valid or might be
+     * applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
+    public HugeRteWebComponent configure(String configurationKey, String... value) {
+        checkAlreadyInitialized();
+        JsonArray array = Json.createArray();
+        for (int i = 0; i < value.length; i++) {
+            array.set(i, value[i]);
+        }
+        initialConfig.put(configurationKey, array);
+        return this;
+    }
+
+    /**
+     * Sets a single boolean value for the given configuration key. Please note, that there is no check, if the
+     * given config key exists or the value is valid or might be applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
+    public HugeRteWebComponent configure(String configurationKey, boolean value) {
+        checkAlreadyInitialized();
+        initialConfig.put(configurationKey, value);
+        return this;
+    }
+
+    /**
+     * Sets a single number for the given configuration key. Please note, that there is no check, if the
+     * given config key exists or the value is valid or might be applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
+    public HugeRteWebComponent configure(String configurationKey, double value) {
+        checkAlreadyInitialized();
+        initialConfig.put(configurationKey, value);
+        return this;
+    }
+
+    /**
+     * Sets a single string for the given configuration key by reading the given client side reference's representation.
+     * Please note, that there is no check, if the given config key exists or the value is valid or might be applied
+     * to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
+    public HugeRteWebComponent configure(String configurationKey, ClientSideReference value) {
+        return configure(configurationKey, value.getClientSideRepresentation());
+    }
+
+    /**
+     * Sets the language the editor shall use. This dedicated method exists due to the special handling
+     * of the {@link Language#ENGLISH} item.
+     * @param language language to set
+     * @return this instance
+     */
+    public HugeRteWebComponent configureLanguage(Language language) {
+        String code = language.getCode();
+        if (code != null) { // English has no code, since it has no dedicated lang file.
+            initialConfig.put("language", code);
+        } else {
+            initialConfig.remove("language");
+        }
+
+        return this;
+    }
+
+    /**
+     * Configures the plugins, that shall be enabled for this editor instance. Previous settings will be overridden.
+     * Passing nothing will disable all plugins.
+     *
+     * @param plugins plugins to enable
+     * @return this instance
+     */
+    public HugeRteWebComponent configurePlugins(Plugin... plugins) {
+        checkAlreadyInitialized();
+        checkForResizeConflicts();
+
+        this.activePlugins = plugins;
+
+        if (Set.of(plugins).contains(Plugin.AUTORESIZE)) {
+            setHeight(null);
+        }
+
+        JsonArray jsonArray = Json.createArray();
+        initialConfig.put("plugins", jsonArray);
+
+        for (Plugin plugin : plugins) {
+            jsonArray.set(jsonArray.length(), plugin.getClientSideRepresentation());
+        }
+
+        return this;
+    }
+
+    /**
+     * Configures the menubar of the editor instance to show the given items. Previous settings will be overridden.
+     * Passing nothing will hide the menubar.
+     *
+     * @param menubarItems menubar items to show
+     * @return this instance
+     */
+    public HugeRteWebComponent configureMenubar(Menubar... menubarItems) {
+        checkAlreadyInitialized();
+
+        configure("menubar", ClientSideReference.join(menubarItems));
+
+        return this;
+    }
+
+    /**
+     * Configures the toolbar of the editor instance to show the given items. Previous settings will be overridden.
+     * Passing nothing will hide the toolbar.
+     *
+     * @param toolbarItems toolbar items to show
+     * @return this instance
+     */
+    public HugeRteWebComponent configureToolbar(Toolbar... toolbarItems) {
+        checkAlreadyInitialized();
+        initialConfig.put("toolbar", ClientSideReference.join(toolbarItems));
+        return this;
+    }
+
+    /**
+     * Configures the resize option for the editor. Please note, that there are additional settings to this instance
+     * necessary, so it is not recommended to call directly {@code configure("resize", ...)}.
+     * @param direction direction
+     * @return this instance
+     */
+    public HugeRteWebComponent configureResize(ResizeDirection direction) {
+        this.resizeDirection = Objects.requireNonNull(direction);
+        checkForResizeConflicts();
+
+        if (direction != ResizeDirection.NONE) {
+            setHeight(null); // otherwise resize will not work as expected
+
+            if (direction == ResizeDirection.VERTICALLY) {
+                return configure("resize", true);
+            }
+
+            return configure("resize", "both");
+        }
+
+        // fallback, if configure resize is used multiple times
+        setHeight(DEFAULT_HEIGHT);
+        return configure("resize", false);
+    }
+
+    /**
+     * Ensures, that resize and autoresize are not enabled at the same time.
+     */
+    private void checkForResizeConflicts() {
+        if (resizeDirection != ResizeDirection.NONE && Set.of(activePlugins).contains(Plugin.AUTORESIZE)) {
+            throw new ConfigurationConflictException("The \"resize\" configuration and the \"autoresize\" plugin are" +
+                                                     " not compatible. Please check you configuration.");
+        }
+    }
+
+    private void checkAlreadyInitialized() {
+        if (isAttached()) {
+            throw new AlreadyInitializedException();
+        }
+    }
+
     /**
      * Sets the value change mode of this instance. By default the editor uses {@link ValueChangeMode#ON_CHANGE}. Null
      * resets the mode to the default.
@@ -170,7 +378,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
         if (valueChangeMode == null) {
             setValueChangeMode(DEFAULT_VALUE_CHANGE_MODE);
         } else {
-            getElement().setProperty("valueChangeMode", valueChangeMode.getClientSide());
+            getElement().setProperty("valueChangeMode", valueChangeMode.getClientSideRepresentation());
         }
     }
 
@@ -180,7 +388,7 @@ public class HugeRteWebComponent extends AbstractSinglePropertyField<HugeRteWebC
      * @return value change mode
      */
     public ValueChangeMode getValueChangeMode() {
-        return ValueChangeMode.fromClientSide(getElement().getProperty("valueChangeMode", DEFAULT_VALUE_CHANGE_MODE.getClientSide()));
+        return ValueChangeMode.fromClientSide(getElement().getProperty("valueChangeMode", DEFAULT_VALUE_CHANGE_MODE.getClientSideRepresentation()));
     }
 
     /// Sets the timespan in milliseconds, that will be used by several value change modes.
