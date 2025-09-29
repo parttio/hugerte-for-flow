@@ -57,28 +57,6 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             <style id="vaadin-themable-mixin-style">
 
                 /* LUMO Styles adapted from text field - start*/
-                
-                :host {
-                    color: var(--vaadin-input-field-value-color, var(--lumo-body-text-color));
-                    font-size: var(--vaadin-input-field-value-font-size, var(--lumo-font-size-m));
-                    font-family: var(--lumo-font-family);
-                    -webkit-font-smoothing: antialiased;
-                    -moz-osx-font-smoothing: grayscale;
-                    -webkit-tap-highlight-color: transparent;
-                    padding: var(--lumo-space-xs) 0;
-                    --_focus-ring-color: var(--vaadin-focus-ring-color, var(--lumo-primary-color-50pct));
-                    --_focus-ring-width: var(--vaadin-focus-ring-width, 2px);
-                    --_input-height: var(--vaadin-input-field-height, var(--lumo-text-field-size));
-                    --_disabled-value-color: var(--vaadin-input-field-disabled-value-color, var(--lumo-disabled-text-color));
-                }
-                
-                /*:host::before {*/
-                /*    content: '\\2003';*/
-                /*    width: 0;*/
-                /*    display: inline-block;*/
-                /*    !* Size and position this element on the same vertical position as the input-field element*/
-                /*          to make vertical align for the host element work as expected *!*/
-                /*}*/
 
                 :host([hidden]) {
                     display: none !important;
@@ -390,6 +368,8 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
         // create combined config, with based config being overriden by any additiona configurations
         const config = {
+            resize: false,
+            height: 250,
             ...this.rawInitialConfig,
             ...this.initialConfig,
             suffix: '.min',
@@ -403,6 +383,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
             // < Part of the npm integration (not yet working, therefore commented out)
 
             target,
+
             // readonly: !this.enabled, // comes form the field mixin
             setup: (editor) => {
                 this.editor = editor;
