@@ -1,5 +1,6 @@
 package org.vaadin.hugerte;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -17,12 +18,14 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
+import com.vaadin.flow.component.shared.HasThemeVariant;
 import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
 import com.vaadin.flow.dom.Element;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
+import elemental.json.JsonValue;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
@@ -37,14 +40,14 @@ import elemental.json.JsonObject;
 @CssImport("./vaadin-huge-rte.css")
 public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implements
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
-        HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper {
+        HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper, HasThemeVariant<HugeRteVariant> {
 
     // TODO enable / readonly
-    // TODO field styling (e.g. label)
     // TODO theme variants
     // TODO replace selection
-    // TODO static "createInstanceWithDefaultConfig()"
     // TODO tooltips
+    // TODO height issues
+    // TODO check autoresize
     // TODO close toolbar
     // TODO test in dialog
     // TODO KeyNotifier
@@ -62,7 +65,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
     private Plugin[] activePlugins = {};
     private ResizeDirection resizeDirection = ResizeDirection.NONE;
-
 
     /**
      * Creates a new instance with the given label.
@@ -184,6 +186,47 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     public void setRawConfig(String jsConfig) {
         checkAlreadyInitialized();
         getElement().setPropertyJson("rawInitialConfig", Json.parse(jsConfig));
+    }
+
+    ///  Returns a copy of the config as json. The returned object contains the raw config plus any other configurations.
+    ///  Please note, that the raw config can be overridden by other configuration methods.
+    ///
+    /// Returns an empty json object, if no configuration has been applied.
+    ///
+    /// @return configuration
+    public JsonObject getConfig() {
+        JsonObject configCopy = Json.createObject();
+
+        Serializable rawConfig = getElement().getPropertyRaw("rawInitialConfig");
+        if (rawConfig instanceof JsonObject joRawConfig) {
+            for (String key : joRawConfig.keys()) {
+                configCopy.put(key, (JsonValue) joRawConfig.get(key));
+            }
+        }
+
+        for (String key : this.initialConfig.keys()) {
+            configCopy.put(key, (JsonValue) this.initialConfig.get(key));
+        }
+
+        return configCopy;
+    }
+
+    /**
+     * Configures this instance with a default set of plugins, menubar and toolbar options enabled.
+     *
+     * @return this instance
+     */
+    public HugeRte configureBasicSetup() {
+        return configure("branding", false)
+                .configurePlugins(Plugin.ADVLIST, Plugin.AUTOLINK,
+                        Plugin.LISTS, Plugin.SEARCH_REPLACE)
+                .configureMenubar(Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
+                        Menubar.FORMAT).configureToolbar(Toolbar.UNDO, Toolbar.REDO,
+                        Toolbar.SEPARATOR, Toolbar.BLOCKS, Toolbar.SEPARATOR,
+                        Toolbar.BOLD, Toolbar.ITALIC, Toolbar.SEPARATOR,
+                        Toolbar.ALIGN_LEFT, Toolbar.ALIGN_CENTER, Toolbar.ALIGN_RIGHT,
+                        Toolbar.ALIGN_JUSTIFY, Toolbar.SEPARATOR, Toolbar.OUTDENT,
+                        Toolbar.INDENT);
     }
 
     /**
@@ -420,4 +463,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         return getElement().getProperty("valueChangeTimeout", DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
     }
 
+    public void replaceSelectionContent(String now) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
