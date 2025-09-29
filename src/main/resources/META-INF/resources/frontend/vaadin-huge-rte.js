@@ -8,11 +8,12 @@ import {html, LitElement} from 'lit';
 import {defineCustomElement} from '@vaadin/component-base/src/define.js';
 import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
-import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
 import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
 import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
+import { inputFieldShared } from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
+import { registerStyles, ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 
 import {diff_match_patch} from 'diff-match-patch';
 
@@ -34,6 +35,8 @@ import {diff_match_patch} from 'diff-match-patch';
 // import { loadHugeRtePlugins } from './vaadin-huge-rte-plugins.js';
 // < Part of the npm integration (not yet working, therefore commented out)
 
+registerStyles('vaadin-huge-rte', inputFieldShared, { moduleId: 'vaadin-huge-rte-styles' });
+
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
 
     // can be overridden by the server using #setConfig
@@ -51,7 +54,280 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     /** @protected */
     render() {
         return html`
-            <style>
+            <style id="vaadin-themable-mixin-style">
+
+                /* LUMO Styles adapted from text field - start*/
+                
+                :host {
+                    color: var(--vaadin-input-field-value-color, var(--lumo-body-text-color));
+                    font-size: var(--vaadin-input-field-value-font-size, var(--lumo-font-size-m));
+                    font-family: var(--lumo-font-family);
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                    -webkit-tap-highlight-color: transparent;
+                    padding: var(--lumo-space-xs) 0;
+                    --_focus-ring-color: var(--vaadin-focus-ring-color, var(--lumo-primary-color-50pct));
+                    --_focus-ring-width: var(--vaadin-focus-ring-width, 2px);
+                    --_input-height: var(--vaadin-input-field-height, var(--lumo-text-field-size));
+                    --_disabled-value-color: var(--vaadin-input-field-disabled-value-color, var(--lumo-disabled-text-color));
+                }
+                
+                /*:host::before {*/
+                /*    content: '\\2003';*/
+                /*    width: 0;*/
+                /*    display: inline-block;*/
+                /*    !* Size and position this element on the same vertical position as the input-field element*/
+                /*          to make vertical align for the host element work as expected *!*/
+                /*}*/
+
+                :host([hidden]) {
+                    display: none !important;
+                }
+
+                :host(:not([has-label])) [part='label'] {
+                    display: none;
+                }
+
+                [part='label'] {
+                    align-self: flex-start;
+                    color: var(--vaadin-input-field-label-color, var(--lumo-secondary-text-color));
+                    font-weight: var(--vaadin-input-field-label-font-weight, 500);
+                    font-size: var(--vaadin-input-field-label-font-size, var(--lumo-font-size-s));
+                    transition: color 0.2s;
+                    line-height: 1;
+                    padding-inline-start: calc(var(--lumo-border-radius-m) / 4);
+                    padding-inline-end: 1em;
+                    padding-bottom: 0.5em;
+                    /* As a workaround for diacritics being cut off, add a top padding and a
+                    negative margin to compensate */
+                    padding-top: 0.25em;
+                    margin-top: -0.25em;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    position: relative;
+                    max-width: 100%;
+                    box-sizing: border-box;
+                }
+
+                :host([focused]:not([readonly])) [part='label'] {
+                    color: var(--vaadin-input-field-focused-label-color, var(--lumo-primary-text-color));
+                }
+
+                :host(:hover:not([readonly]):not([focused])) [part='label'] {
+                    color: var(--vaadin-input-field-hovered-label-color, var(--lumo-body-text-color));
+                }
+
+                /* Touch device adjustment */
+                @media (pointer: coarse) {
+                    :host(:hover:not([readonly]):not([focused])) [part='label'] {
+                        color: var(--vaadin-input-field-label-color, var(--lumo-secondary-text-color));
+                    }
+                }
+
+                :host([has-label])::before {
+                    margin-top: calc(var(--lumo-font-size-s) * 1.5);
+                }
+
+                :host([has-label][theme~='small'])::before {
+                    margin-top: calc(var(--lumo-font-size-xs) * 1.5);
+                }
+
+                :host([has-label]) {
+                    padding-top: var(--lumo-space-m);
+                }
+
+                :host([has-label]) ::slotted([slot='tooltip']) {
+                    --vaadin-tooltip-offset-bottom: calc((var(--lumo-space-m) - var(--lumo-space-xs)) * -1);
+                }
+
+                :host([required]) [part='required-indicator']::after {
+                    content: var(--lumo-required-field-indicator, '\\2022');
+                    transition: opacity 0.2s;
+                    color: var(--lumo-required-field-indicator-color, var(--lumo-primary-text-color));
+                    position: absolute;
+                    right: 0;
+                    width: 1em;
+                    text-align: center;
+                }
+
+                :host([invalid]) [part='required-indicator']::after {
+                    color: var(--lumo-required-field-indicator-color, var(--lumo-error-text-color));
+                }
+
+                [part='error-message'] {
+                    margin-left: calc(var(--lumo-border-radius-m) / 4);
+                    font-size: var(--vaadin-input-field-error-font-size, var(--lumo-font-size-xs));
+                    line-height: var(--lumo-line-height-xs);
+                    font-weight: var(--vaadin-input-field-error-font-weight, 400);
+                    color: var(--vaadin-input-field-error-color, var(--lumo-error-text-color));
+                    will-change: max-height;
+                    transition: 0.4s max-height;
+                    max-height: 5em;
+                }
+
+                :host([has-error-message]) [part='error-message']::before,
+                :host([has-error-message]) [part='error-message']::after {
+                    content: '';
+                    display: block;
+                    height: 0.4em;
+                }
+
+                :host(:not([invalid])) [part='error-message'] {
+                    max-height: 0;
+                    overflow: hidden;
+                }
+
+                /* RTL specific styles */
+                :host([dir='rtl']) [part='required-indicator']::after {
+                    right: auto;
+                    left: 0;
+                }
+
+                :host([dir='rtl']) [part='error-message'] {
+                    margin-left: 0;
+                    margin-right: calc(var(--lumo-border-radius-m) / 4);
+                }
+
+                :host {
+                    --_helper-spacing: var(--vaadin-input-field-helper-spacing, 0.4em);
+                }
+
+                :host([has-helper]) [part='helper-text']::before {
+                    content: '';
+                    display: block;
+                    height: var(--_helper-spacing);
+                }
+
+                [part='helper-text'] {
+                    display: block;
+                    color: var(--vaadin-input-field-helper-color, var(--lumo-secondary-text-color));
+                    font-size: var(--vaadin-input-field-helper-font-size, var(--lumo-font-size-xs));
+                    line-height: var(--lumo-line-height-xs);
+                    font-weight: var(--vaadin-input-field-helper-font-weight, 400);
+                    margin-left: calc(var(--lumo-border-radius-m) / 4);
+                    transition: color 0.2s;
+                }
+
+                :host(:hover:not([readonly])) [part='helper-text'] {
+                    color: var(--lumo-body-text-color);
+                }
+
+                :host([disabled]) [part='helper-text'] {
+                    color: var(--lumo-disabled-text-color);
+                    -webkit-text-fill-color: var(--lumo-disabled-text-color);
+                }
+
+                :host([has-helper][theme~='helper-above-field']) [part='helper-text']::before {
+                    display: none;
+                }
+
+                :host([has-helper][theme~='helper-above-field']) [part='helper-text']::after {
+                    content: '';
+                    display: block;
+                    height: var(--_helper-spacing);
+                }
+
+                :host([has-helper][theme~='helper-above-field']) [part='label'] {
+                    order: 0;
+                    padding-bottom: var(--_helper-spacing);
+                }
+
+                :host([has-helper][theme~='helper-above-field']) [part='helper-text'] {
+                    order: 1;
+                }
+
+                :host([has-helper][theme~='helper-above-field']) [part='label'] + * {
+                    order: 2;
+                }
+
+                :host([has-helper][theme~='helper-above-field']) [part='error-message'] {
+                    order: 3;
+                }
+
+                /* Touch device adjustment */
+                @media (pointer: coarse) {
+                    :host(:hover:not([readonly]):not([focused]):not([disabled])) [part='input-field']::after {
+                        opacity: 0;
+                    }
+
+                    :host(:active:not([readonly]):not([focused]):not([disabled])) [part='input-field']::after {
+                        opacity: 0.2;
+                    }
+                }
+                
+                [part='input-field'] {
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                /* Trigger when not focusing using the keyboard */
+                :host([focused]:not([focus-ring]):not([readonly])) [part='input-field']::after {
+                    transform: scaleX(0);
+                    transition-duration: 0.15s, 1s;
+                }
+
+                /* Opt-in focus-ring when using pointer devices */
+                /* This applies a focus-ring as box-shadow when the element is focused, but
+                   the ring is only visible / has a width when the respective CSS property is
+                   "enabled" using a value of 1 */
+                :host([focused]) [part='input-field'] {
+                    /* Borders are implemented using box-shadows as well. To avoid overriding 
+                       the border on focus, even if the pointer focus-ring is disabled, we need to:
+                       - Duplicate the border box shadow for this rule
+                       - Remove the border (by using width of 0) when the focus-ring is visible,
+                         which is the same behavior as for the keyboard focus-ring below
+                       - Apply the border when the focus ring is not visible
+                    */
+                    --_pointer-focus-visible: clamp(0, var(--lumo-input-field-pointer-focus-visible, 0), 1);
+                    --_conditional-border-width: calc(calc(1 - var(--_pointer-focus-visible)) * var(--_input-border-width));
+                    --_conditional-focus-ring-width: calc(var(--_pointer-focus-visible) * var(--_focus-ring-width));
+                    box-shadow: inset 0 0 0 var(--_conditional-border-width) var(--_input-border-color),
+                    0 0 0 var(--_conditional-focus-ring-width) var(--_focus-ring-color);
+                }
+
+                /* Focus-ring when using keyboard navigation */
+                :host([focus-ring]) [part='input-field'] {
+                    box-shadow: 0 0 0 var(--_focus-ring-width) var(--_focus-ring-color);
+                }
+
+                /* Read-only style */
+                :host([readonly]) {
+                    --vaadin-input-field-border-color: transparent;
+                }
+
+                /* Disabled style */
+                :host([disabled]) {
+                    pointer-events: none;
+                    --vaadin-input-field-border-color: var(--lumo-contrast-20pct);
+                }
+
+                :host([disabled]) [part='label'],
+                :host([disabled]) [part='input-field'] ::slotted([slot$='fix']) {
+                    color: var(--lumo-disabled-text-color);
+                    -webkit-text-fill-color: var(--lumo-disabled-text-color);
+                }
+
+                :host([disabled]) [part='input-field'] ::slotted(:not([slot$='fix'])) {
+                    color: var(--_disabled-value-color);
+                    -webkit-text-fill-color: var(--_disabled-value-color);
+                }
+
+                /* Invalid style */
+                :host([invalid]) {
+                    --vaadin-input-field-border-color: var(--lumo-error-color);
+                    --_focus-ring-color: var(--lumo-error-color-50pct);
+                }
+
+                /* LUMO Styles adapted from text field - end*/
+
+
+                /* Styles customizations for the Huge RTE*/
+                [part='label'] {
+                    flex-shrink: 0;
+                }
+                
                 .vaadin-huge-rte-container {
                     align-self: stretch;
                     flex-grow: 1;
@@ -63,7 +339,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                     <span part="required-indicator" aria-hidden="true"></span>
                 </div>
 
-                <div class="inputs-wrapper" part="input-fields">
+                <div class="inputs-wrapper" part="input-field">
                     <slot id="slot"></slot>
                 </div>
 
@@ -276,7 +552,6 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         let now = Date.now();
         if (this._lastSyncedValueTimestamp < now - 50) { // explicit throttle to prevent too many events fired at all
             this._lastSyncedValueTimestamp = now;
-            console.info("sending delta")
 
             const currentValue = this.editor?.getContent() ?? this._lastSyncedValue;
 
