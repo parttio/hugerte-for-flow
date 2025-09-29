@@ -51,6 +51,17 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
     _valueChangeTimeout = 2_000;
 
+    static properties = {
+        disabled: {
+            type: Boolean,
+            reflectToAttribute: true
+        },
+        readonly: {
+            type: Boolean,
+            reflectToAttribute: true
+        }
+    }
+
     /** @protected */
     render() {
         return html`
@@ -191,7 +202,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                     color: var(--lumo-body-text-color);
                 }
 
-                :host([disabled]) [part='helper-text'] {
+                :host([disabled]) {
                     color: var(--lumo-disabled-text-color);
                     -webkit-text-fill-color: var(--lumo-disabled-text-color);
                 }
@@ -471,37 +482,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
         await hugerte.init(config);
 
-        if (this.disabled) {
-            this.editor.setMode('readonly');
-        }
     }
-
-    // syncValue() {
-    //     const value = this.editor.getContent();
-    //
-    //     if (this.lastSyncedValue !== value) {
-    //         this.dispatchEvent(new CustomEvent("change", {
-    //             detail: {value}
-    //         }));
-    //         this.lastSyncedValue = value;
-    //     }
-    // }
-
-    // // @deprecated
-    // setEditorContent(value) {
-    //     // Delay setting the content, otherwise there is issue during reattach
-    //     // TODO check if needed
-    //     // setTimeout(() => {
-    //     if (this.editorInitialized) {
-    //         this.lastSyncedValue = this.editor.setContent(value);
-    //         if (this.lastSyncedValue !== value) { // ensure, that the server also has the latest version of the client
-    //             this.syncValue();
-    //         }
-    //     } else {
-    //         this.lastSyncedValue = value;
-    //     }
-    //     // }, 50);
-    // }
 
     set value(value) {
         this._lastSyncedValue = value ?? "";
@@ -679,6 +660,17 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         if (this.editor.queryCommandState('ToggleToolbarDrawer')) {
             this.editor.execCommand('ToggleToolbarDrawer');
         }
+    }
+
+    updated(changedProperties) {
+        super.updated(changedProperties);
+        if (changedProperties.has("disabled") || changedProperties.has("readonly")) {
+            this.updateReadonlyMode();
+        }
+    }
+
+    updateReadonlyMode() {
+        this.editor.mode.set((this.disabled || this.readonly) ? 'readonly' : 'design');
     }
 
     static get is() {
