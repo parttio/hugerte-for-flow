@@ -1,4 +1,6 @@
 vaadin-huge-rte {
+    display: flex; /* cannot be placed in :host, since it will be overridden by lumo internal styles*/
+
     .tox {
         flex-grow: 1;
 
