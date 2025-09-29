@@ -41,8 +41,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
     // TODO enable / readonly
     // TODO tooltips
-    // TODO height issues
-    // TODO check autoresize
     // TODO close toolbar
     // TODO test in dialog
     // TODO KeyNotifier
