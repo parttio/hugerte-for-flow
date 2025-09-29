@@ -39,7 +39,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper, HasThemeVariant<HugeRteVariant> {
 
-    // TODO enable / readonly
     // TODO tooltips
     // TODO close toolbar
     // TODO test in dialog
@@ -169,7 +168,8 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
                 }
             }
 
-            this.isInitialized = true;
+            // we do this in before client response to allow other attach listeners to do their configs as well
+            runBeforeClientResponse(ui -> this.isInitialized = true);
         });
 
         addDetachListener(event -> {
