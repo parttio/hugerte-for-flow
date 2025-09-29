@@ -14,10 +14,10 @@ import org.vaadin.firitin.components.RichText;
 public class DeepLinkingView extends Div {
 
 
-    protected HugeRte hugeRte;
+    protected __HugeRte hugeRte;
 
     public DeepLinkingView() {
-        hugeRte = new HugeRte();
+        hugeRte = new __HugeRte();
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");

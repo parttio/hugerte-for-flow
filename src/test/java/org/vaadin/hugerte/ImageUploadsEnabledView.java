@@ -12,13 +12,13 @@ import org.vaadin.hugerte.imageuploads.ActiveEditors;
 @Menu
 public class ImageUploadsEnabledView extends Div {
 
-    protected HugeRte hugeRte;
+    protected __HugeRte hugeRte;
 
     @Autowired
     ActiveEditors activeEditors;
 
     public ImageUploadsEnabledView() {
-        hugeRte = new HugeRte();
+        hugeRte = new __HugeRte();
         hugeRte.configure("plugins", "code", "link", "image");
         hugeRte.configure("toolbar", "toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent' | link image");
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");

@@ -16,10 +16,10 @@ import com.vaadin.flow.router.Route;
 @Menu(order = 0)
 public class DemoView extends Div {
 
-    protected HugeRteWebComponent hugeRte;
+    protected HugeRte hugeRte;
 
     public DemoView() {
-        hugeRte = new HugeRteWebComponent();
+        hugeRte = new HugeRte();
         hugeRte.setValueChangeMode(ValueChangeMode.ON_BLUR);
         hugeRte.configureResize(ResizeDirection.BOTH);
 

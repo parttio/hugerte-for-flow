@@ -7,7 +7,7 @@ import com.vaadin.flow.router.Route;
 public class HugeRTEWithAdditionalConfig extends VerticalLayout {
 
     public HugeRTEWithAdditionalConfig() {
-        HugeRte hugeRte = new HugeRte();
+        __HugeRte hugeRte = new __HugeRte();
         hugeRte.configurePlugins(true, Plugin.TABLE)
                 .configureMenubar(true, Menubar.TABLE)
                 .configureToolbar(true, Toolbar.TABLE);

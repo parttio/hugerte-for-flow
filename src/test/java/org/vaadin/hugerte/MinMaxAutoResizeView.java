@@ -9,7 +9,7 @@ import com.vaadin.flow.router.Route;
 public class MinMaxAutoResizeView extends VerticalLayout {
 
     public MinMaxAutoResizeView() {
-        HugeRte rte = new HugeRte("Autoresize with a range of 200-600px");
+        __HugeRte rte = new __HugeRte("Autoresize with a range of 200-600px");
 
         rte.configurePlugins(Plugin.AUTORESIZE);
         rte.configure("max_height", 600);

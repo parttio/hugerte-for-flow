@@ -11,7 +11,7 @@ import com.vaadin.flow.router.Route;
 public class LocalizationSample extends VerticalLayout {
 
     private final ComboBox<Language> languageComboBox;
-    private HugeRte rte;
+    private __HugeRte rte;
 
     public LocalizationSample() {
         languageComboBox = new ComboBox<>("Language");
@@ -40,7 +40,7 @@ public class LocalizationSample extends VerticalLayout {
             value = rte.getCurrentValue();
             remove(rte);
         }
-        rte = new HugeRte();
+        rte = new __HugeRte();
 
         if(value != null) {
             rte.setValue(value);

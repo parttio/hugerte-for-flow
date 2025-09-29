@@ -1,106 +1,73 @@
-/*
- * Copyright 2020 Matti Tahvonen.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.vaadin.hugerte;
 
-import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.DetachEvent;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
+import com.vaadin.flow.component.AbstractSinglePropertyField;
+import com.vaadin.flow.component.Focusable;
+import com.vaadin.flow.component.HasLabel;
 import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.customfield.CustomField;
-import com.vaadin.flow.component.dependency.JavaScript;
-import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.shared.HasThemeVariant;
-import com.vaadin.flow.dom.DomEventListener;
-import com.vaadin.flow.dom.DomListenerRegistration;
+import com.vaadin.flow.component.HasStyle;
+import com.vaadin.flow.component.InputNotifier;
+import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.NpmPackage;
+import com.vaadin.flow.component.shared.HasValidationProperties;
+import com.vaadin.flow.data.binder.HasValidator;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.dom.Style.Overflow;
-import com.vaadin.flow.function.SerializableConsumer;
-import com.vaadin.flow.shared.Registration;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
-import elemental.json.JsonValue;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
  * <p>
- * @author mstahv
+ *
+ * @author mstahv, Stefan Uebe
  */
-//@Tag("vaadin-huge-rte")
-@JavaScript("context://frontend/hugerteConnector.js")
-@StyleSheet("context://frontend/hugerteLumo.css")
-public class HugeRte extends CustomField<String>
-        implements HasSize, HasThemeVariant<HugeRteVariant> {
+@Tag("vaadin-huge-rte")
+//@NpmPackage(value = "hugerte", version = "1.0.9") // > Part of the npm integration (not yet working, therefore commented out)
+@NpmPackage(value = "diff-match-patch", version = "1.0.5")
+@JsModule("./vaadin-huge-rte.js")
+@CssImport("./vaadin-huge-rte.css")
+public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implements
+        HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
+        HasSize, HasStyle, Focusable<HugeRte>, HasLabel {
 
+    // TODO binder
+    // TODO enable / readonly
+    // TODO stylings / lumo integration
+    // TODO field styling (e.g. label)
+    // TODO theme variants
+    // TODO replace selection
+    // TODO static "createInstanceWithDefaultConfig()"
+    // TODO tooltips
+    // TODO close toolbar
+    // TODO test in dialog
+    // TODO KeyNotifier
+    // TODO Demos
+    // TODO review and finalize npm integration (see commented out code)
+    // TODO dynamic plugin loading for npm integration
+
+    public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
+    public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
     public static final String DEFAULT_HEIGHT = "500px";
-    private final DomListenerRegistration domListenerRegistration;
-    private String id;
-    private boolean initialContentSent;
-    private String currentValue = "";
-    private String rawConfig;
-    JsonObject config = Json.createObject();
-    private final Element editorContainer = new Element("div");
-    private boolean connectorInitialized;
 
-    private final int debounceTimeout = 0;
-    private boolean basicEditorCreated;
-    private boolean enabled = true;
-    private boolean readOnly = false;
-    private ResizeDirection resizeDirection = ResizeDirection.NONE;
+    private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
+
+    private final JsonObject initialConfig = Json.createObject();
+
     private Plugin[] activePlugins = {};
+    private ResizeDirection resizeDirection = ResizeDirection.NONE;
 
-    /**
-     * Creates a new instance. Use the different `configure` methods to apply any necessary configuration before
-     * attaching it.
-     */
-    public HugeRte() {
-        super("");
-        addClassName("vaadin-huge-rte");
-        setHeight(DEFAULT_HEIGHT);
-        getStyle().setOverflow(Overflow.AUTO); // see https://github.com/parttio/hugerte-for-flow/issues/9
-
-        editorContainer.getStyle().set("height", "100%");
-        getElement().appendChild(editorContainer);
-
-        configureResize(ResizeDirection.NONE); // by default no resizing
-
-        domListenerRegistration = getElement().addEventListener("tchange",
-                (DomEventListener) event -> {
-                    boolean value = event.getEventData()
-                            .hasKey("event.htmlString");
-                    String htmlString = event.getEventData()
-                            .getString("event.htmlString");
-                    currentValue = htmlString;
-                    setModelValue(htmlString, true);
-                });
-        domListenerRegistration.addEventData("event.htmlString");
-        domListenerRegistration.debounce(debounceTimeout);
-
-        addBlurListener(e -> closeToolbarOverflowMenu());
-
-    }
 
     /**
      * Creates a new instance with the given label.
+     *
      * @param label label
      */
     public HugeRte(String label) {
@@ -111,7 +78,8 @@ public class HugeRte extends CustomField<String>
     /**
      * Creates a new instance with the given label and initial value. The initial value is set as it is without
      * any further processing.
-     * @param label label
+     *
+     * @param label        label
      * @param initialValue initial value
      */
     public HugeRte(String label, String initialValue) {
@@ -123,11 +91,12 @@ public class HugeRte extends CustomField<String>
     /**
      * Creates a new instance with the given label, initial value and value change listener. The initial value is set as it is without
      * any further processing.
-     * @param label label
-     * @param initialValue initial value
+     *
+     * @param label               label
+     * @param initialValue        initial value
      * @param valueChangeListener value change listener
      */
-    public HugeRte(String label, String initialValue, ValueChangeListener<? super ComponentValueChangeEvent<CustomField<String>, String>> valueChangeListener) {
+    public HugeRte(String label, String initialValue, ValueChangeListener<? super ComponentValueChangeEvent<HugeRte, String>> valueChangeListener) {
         this();
         setLabel(label);
         setValue(initialValue);
@@ -136,10 +105,11 @@ public class HugeRte extends CustomField<String>
 
     /**
      * Creates a new instance with the given label and value change listener.
-     * @param label label
+     *
+     * @param label               label
      * @param valueChangeListener value change listener
      */
-    public HugeRte(String label, ValueChangeListener<? super ComponentValueChangeEvent<CustomField<String>, String>> valueChangeListener) {
+    public HugeRte(String label, ValueChangeListener<? super ComponentValueChangeEvent<HugeRte, String>> valueChangeListener) {
         this();
         setLabel(label);
         addValueChangeListener(valueChangeListener);
@@ -147,386 +117,214 @@ public class HugeRte extends CustomField<String>
 
     /**
      * Creates a new instance with the given value change listener.
+     *
      * @param valueChangeListener value change listener
      */
-    public HugeRte(ValueChangeListener<? super ComponentValueChangeEvent<CustomField<String>, String>> valueChangeListener) {
+    public HugeRte(ValueChangeListener<? super ComponentValueChangeEvent<HugeRte, String>> valueChangeListener) {
         this();
         addValueChangeListener(valueChangeListener);
     }
 
-    @Override
-    protected String generateModelValue() {
-        return currentValue;
-    }
-
     /**
-     * Define the mode of value change triggering. BLUR: Value is triggered only
-     * when HugeRTE loses focus, TIMEOUT: HugeRTE will send value change eagerly
-     * but debounced with timeout, CHANGE: value change is sent when HugeRTE
-     * emits change event (e.g. enter, tab)
-     *
-     * @see #setDebounceTimeout(int)
-     * @param mode
-     *            The mode.
+     * Creates a new instance.
      */
-    public void setValueChangeMode(ValueChangeMode mode) {
-        if (mode == ValueChangeMode.ON_BLUR) {
-            runBeforeClientResponse(ui -> {
-                getElement().callJsFunction("$connector.setMode", "blur");
-            });
-        } else if (mode == ValueChangeMode.TIMEOUT) {
-            runBeforeClientResponse(ui -> {
-                getElement().callJsFunction("$connector.setMode", "timeout");
-            });
-        } else if (mode == ValueChangeMode.ON_CHANGE) {
-            runBeforeClientResponse(ui -> {
-                getElement().callJsFunction("$connector.setMode", "change");
-            });
-        }
-    }
+    public HugeRte() {
+        super("value", "", true);
 
-    /**
-     * Sets the debounce timeout for the value change event. The default is 0,
-     * when value change is triggered on blur and enter key presses. When value
-     * is more than 0 the value change is emitted with delay of given timeout
-     * milliseconds after last keystroke.
-     *
-     * @see #setValueChangeMode(ValueChangeMode)
-     * @param debounceTimeout
-     *            the debounce timeout in milliseconds
-     */
-    public void setDebounceTimeout(int debounceTimeout) {
-        if (debounceTimeout > 0) {
-            runBeforeClientResponse(ui -> {
-                getElement().callJsFunction("$connector.setEager", "timeout");
-            });
-        } else {
-            runBeforeClientResponse(ui -> {
-                getElement().callJsFunction("$connector.setEager", "change");
-            });
-        }
-        domListenerRegistration.debounce(debounceTimeout);
-    }
+        setValueChangeMode(DEFAULT_VALUE_CHANGE_MODE);
+        setValueChangeTimeout(DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-            editorContainer.setAttribute("id", id);
-        }
-        if (!getEventBus().hasListener(BlurEvent.class)) {
-            // adding fake blur listener so throttled value
-            // change events happen by latest at blur
-            addBlurListener(e -> {
-            });
-        }
-        if (!attachEvent.isInitialAttach()) {
-            // Value after initial attach should be set via HugeRTE JavaScript
-            // API, otherwise value is not updated upon reattach
-            initialContentSent = true;
-        }
-        super.onAttach(attachEvent);
-        if (attachEvent.isInitialAttach())
-            injectEditorScript();
-        initConnector();
-        saveOnClose();
-    }
+        Element element = getElement();
+        element.setPropertyJson("initialConfig", initialConfig);
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        // See https://github.com/parttio/tinymce-for-flow/issues/33
-        if (isVisible()) {
-            detachEvent.getUI().getPage().executeJs("""
-                    hugerte.get($0).remove();
-                    """, id);
-        }
-        super.onDetach(detachEvent);
-        initialContentSent = false;
-        connectorInitialized = false;
-        // save the current value to the dom element in case the component gets
-        // reattached
-    }
+        element.addEventListener("_blur", event -> fireEvent(new BlurEvent<>(this, true)));
+        element.addEventListener("_focus", event -> fireEvent(new FocusEvent<>(this, true)));
 
-    private void initConnector() {
-        runBeforeClientResponse(ui -> {
-            if(rawConfig == null) {
-                rawConfig = "{}";
-            }
-            ui.getPage().executeJs(
-                    "const editor = $0;" +
-                    "const rawconfig = " + rawConfig + ";\n" +
-                    "window.Vaadin.Flow.hugerteConnector.initLazy(rawconfig, $0, $1, $2, $3, $4)",
-                    getElement(), editorContainer, config, currentValue,
-                    (enabled && !readOnly))
-                    .then(res -> initialContentSent = true);
+        element.addEventListener("_value-delta", event -> {
+            String delta = event.getEventData().getString("event.detail.delta");
+            String oldValue = getValue();
+            String newValue = applyDelta(oldValue, delta);
+            setModelValue(newValue, true);
+        }).addEventData("event.detail.delta");
 
-            connectorInitialized = true;
+
+        addAttachListener(event -> {
+            // remove this call once the import is done via npm
+            getUI().orElseThrow().getPage().addJavaScript(
+                    "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
         });
-    }
-    
-    private void saveOnClose(){
-        runBeforeClientResponse(ui -> {
-            getElement().callJsFunction("$connector.saveOnClose");});
-    }
 
-    void runBeforeClientResponse(SerializableConsumer<UI> command) {
-        getElement().getNode().runWhenAttached(ui -> ui
-                .beforeClientResponse(this, context -> command.accept(ui)));
-    }
-
-    @Deprecated
-    public String getCurrentValue() {
-        return getValue();
     }
 
     /**
-     * Sets the base configuration object as RAW JS. So be very careful what you pass in here.
+     * Applies the given delta onto the "old" value. Returns the "new", resulting value
      *
-     * @param jsConfig config to apply
+     * @param oldValue old value
+     * @param delta    delta to apply
+     * @return new value
      */
-    public void setConfig(String jsConfig) {
-        checkAlreadyInitialized();
-        this.rawConfig = jsConfig;
+    public static String applyDelta(String oldValue, String delta) {
+        // convert string to patch object
+        List<Patch> patches = DIFF_MATCH_PATCH.patchFromText(delta);
+
+        // apply patch object
+        Object[] results = DIFF_MATCH_PATCH.patchApply(
+                patches instanceof LinkedList<Patch> alreadyLinkedList
+                        ? alreadyLinkedList
+                        : new LinkedList<>(patches),
+                oldValue);
+
+        // extract the resulting string
+        return (String) results[0];
     }
 
+    /// Sets the base configuration object as RAW JS. So be very careful what you pass in here. Any other configuration,
+    /// set via the `configure()` methods will be applied on top of the given json object.
+    ///
+    /// @param jsConfig config to apply
+    public void setRawConfig(String jsConfig) {
+        checkAlreadyInitialized();
+        getElement().setPropertyJson("rawInitialConfig", Json.parse(jsConfig));
+    }
+
+    /**
+     * Sets a single string for the given configuration key. Please note, that there is no check, if the
+     * given config key exists or the value is valid or might be applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
     public HugeRte configure(String configurationKey, String value) {
         checkAlreadyInitialized();
-        config.put(configurationKey, value);
+        initialConfig.put(configurationKey, value);
         return this;
     }
 
+    /**
+     * Sets an array of strings for the given configuration key. The result will also be an array on the client side.
+     * Please note, that there is no check, if the given config key exists or the value is valid or might be
+     * applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
     public HugeRte configure(String configurationKey, String... value) {
         checkAlreadyInitialized();
         JsonArray array = Json.createArray();
         for (int i = 0; i < value.length; i++) {
             array.set(i, value[i]);
         }
-        config.put(configurationKey, array);
+        initialConfig.put(configurationKey, array);
         return this;
     }
 
+    /**
+     * Sets a single boolean value for the given configuration key. Please note, that there is no check, if the
+     * given config key exists or the value is valid or might be applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
     public HugeRte configure(String configurationKey, boolean value) {
         checkAlreadyInitialized();
-        config.put(configurationKey, value);
+        initialConfig.put(configurationKey, value);
         return this;
     }
 
+    /**
+     * Sets a single number for the given configuration key. Please note, that there is no check, if the
+     * given config key exists or the value is valid or might be applied to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
     public HugeRte configure(String configurationKey, double value) {
         checkAlreadyInitialized();
-        config.put(configurationKey, value);
+        initialConfig.put(configurationKey, value);
         return this;
     }
 
+    /**
+     * Sets a single string for the given configuration key by reading the given client side reference's representation.
+     * Please note, that there is no check, if the given config key exists or the value is valid or might be applied
+     * to this key.
+     * @param configurationKey config key
+     * @param value value to set
+     * @return this instance
+     */
+    public HugeRte configure(String configurationKey, ClientSideReference value) {
+        return configure(configurationKey, value.getClientSideRepresentation());
+    }
+
+    /**
+     * Sets the language the editor shall use. This dedicated method exists due to the special handling
+     * of the {@link Language#ENGLISH} item.
+     * @param language language to set
+     * @return this instance
+     */
     public HugeRte configureLanguage(Language language) {
         String code = language.getCode();
         if (code != null) { // English has no code, since it has no dedicated lang file.
-            config.put("language", code);
+            initialConfig.put("language", code);
+        } else {
+            initialConfig.remove("language");
         }
+
         return this;
     }
 
     /**
-     * Replaces text in the editors selection (can be just a caret position).
-     * <p>
-     *     Note, that this updates the value on the client-side on the next round-trip,
-     *     so the value on the server side is not necessarily up-to-date, right after this
-     *     call, but will be synced soon and a value change event will be fired after a
-     *     small timeout.
-     * </p>
+     * Configures the plugins, that shall be enabled for this editor instance. Previous settings will be overridden.
+     * Passing nothing will disable all plugins.
      *
-     * @param htmlString
-     *            the html snippet to be inserted
+     * @param plugins plugins to enable
+     * @return this instance
      */
-    public void replaceSelectionContent(String htmlString) {
-        runBeforeClientResponse(ui -> getElement().callJsFunction(
-                "$connector.replaceSelectionContent", htmlString));
-    }
-
-    /**
-     * Injects actual editor script to the host page from the add-on bundle.
-     * <p>
-     * Override this with an empty implementation if you to use the cloud hosted
-     * version, or own custom script if needed.
-     */
-    protected void injectEditorScript() {
-        getUI().orElseThrow().getPage().addJavaScript(
-                "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
-    }
-
-    @Override
-    public void focus() {
-        runBeforeClientResponse(ui -> {
-            // Dialog has timing issues...
-            getElement().executeJs("""
-                    const el = this;
-                    if(el.$connector.isInDialog()) {
-                        setTimeout(() => {
-                            el.$connector.focus()
-                        }, 150);
-                    } else {
-                        el.$connector.focus();
-                    }
-                    """);
-            ;
-        });
-    }
-
-    @Override
-    public Registration addFocusListener(ComponentEventListener<FocusEvent<CustomField<String>>> listener) {
-        DomListenerRegistration domListenerRegistration = getElement()
-                .addEventListener("tfocus", event -> listener
-                        .onComponentEvent(new FocusEvent<>(this, true)));
-        return domListenerRegistration;
-    }
-
-    @Override
-    public Registration addBlurListener(ComponentEventListener<BlurEvent<CustomField<String>>> listener) {
-        DomListenerRegistration domListenerRegistration = getElement()
-                .addEventListener("tblur", event -> listener
-                        .onComponentEvent(new BlurEvent<>(this, true)));
-        return domListenerRegistration;
-    }
-
-    @Override
-    public void blur() {
-        throw new UnsupportedOperationException(
-                "Not implemented, HugeRTE does not support programmatic blur.");
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        adjustEnabledState();
-    }
-
-    private void adjustEnabledState() {
-        boolean reallyEnabled = this.enabled && !this.readOnly;
-        super.setEnabled(reallyEnabled);
-        runBeforeClientResponse(ui -> getElement()
-                .callJsFunction("$connector.setEnabled", reallyEnabled));
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
-        super.setReadOnly(readOnly);
-        adjustEnabledState();
-    }
-
-    @Override
-    protected void setPresentationValue(String html) {
-        this.currentValue = html;
-        if (initialContentSent) {
-            runBeforeClientResponse(ui -> getElement()
-                    .callJsFunction("$connector.setEditorContent", html));
-        }
-    }
-
-    private HugeRte initBasicEditorConfiguration() {
-        setValue("");
-        this.configure("branding", false);
-        this.basicEditorCreated = true;
-        this.configurePlugins(Plugin.ADVLIST, Plugin.AUTOLINK,
-                Plugin.LISTS, Plugin.SEARCH_REPLACE);
-        this.configureMenubar(Menubar.FILE, Menubar.EDIT, Menubar.VIEW,
-                Menubar.FORMAT);
-        this.configureToolbar(Toolbar.UNDO, Toolbar.REDO,
-                Toolbar.SEPARATOR, Toolbar.BLOCKS, Toolbar.SEPARATOR,
-                Toolbar.BOLD, Toolbar.ITALIC, Toolbar.SEPARATOR,
-                Toolbar.ALIGN_LEFT, Toolbar.ALIGN_CENTER, Toolbar.ALIGN_RIGHT,
-                Toolbar.ALIGN_JUSTIFY, Toolbar.SEPARATOR, Toolbar.OUTDENT,
-                Toolbar.INDENT);
-        return this;
-
-    }
-
     public HugeRte configurePlugins(Plugin... plugins) {
-        return configurePlugins(false, plugins);
-    }
-
-    public HugeRte configurePlugins(boolean setupBasicConfig, Plugin... plugins) {
         checkAlreadyInitialized();
-
-        this.activePlugins = plugins;
-
         checkForResizeConflicts();
 
-        if (setupBasicConfig && !basicEditorCreated) {
-            initBasicEditorConfiguration();
-        }
+        this.activePlugins = plugins;
 
         if (Set.of(plugins).contains(Plugin.AUTORESIZE)) {
             setHeight(null);
         }
 
-        JsonArray jsonArray = config.get("plugins");
-        int initialIndex = 0;
+        JsonArray jsonArray = Json.createArray();
+        initialConfig.put("plugins", jsonArray);
 
-        if (jsonArray != null) {
-            initialIndex = jsonArray.length();
-        } else {
-            jsonArray = Json.createArray();
+        for (Plugin plugin : plugins) {
+            jsonArray.set(jsonArray.length(), plugin.getClientSideRepresentation());
         }
 
-        for (int i = 0; i < plugins.length; i++) {
-            jsonArray.set(initialIndex, plugins[i].getClientSideRepresentation());
-            initialIndex++;
-        }
-
-        config.put("plugins", jsonArray);
         return this;
     }
 
-    public HugeRte configureMenubar(Menubar... menubars) {
-        return configureMenubar(false, menubars);
-    }
-
-    public HugeRte configureMenubar(boolean setupBasicConfig, Menubar... menubars) {
+    /**
+     * Configures the menubar of the editor instance to show the given items. Previous settings will be overridden.
+     * Passing nothing will hide the menubar.
+     *
+     * @param menubarItems menubar items to show
+     * @return this instance
+     */
+    public HugeRte configureMenubar(Menubar... menubarItems) {
         checkAlreadyInitialized();
 
-        if (setupBasicConfig && !basicEditorCreated) {
-            initBasicEditorConfiguration();
-        }
+        configure("menubar", ClientSideReference.join(menubarItems));
 
-        String newconfig = Arrays.stream(menubars).map(m -> m.getClientSideRepresentation())
-                .collect(Collectors.joining(" "));
-
-        String menubar;
-        if (config.hasKey("menubar")) {
-            menubar = config.getString("menubar");
-            menubar = menubar + " " + newconfig;
-        } else {
-            menubar = newconfig;
-        }
-
-        config.put("menubar", menubar);
         return this;
     }
 
-    public HugeRte configureToolbar(Toolbar... toolbars) {
-        return configureToolbar(false, toolbars);
-    }
-
-    public HugeRte configureToolbar(boolean setupBasicConfig, Toolbar... toolbars) {
+    /**
+     * Configures the toolbar of the editor instance to show the given items. Previous settings will be overridden.
+     * Passing nothing will hide the toolbar.
+     *
+     * @param toolbarItems toolbar items to show
+     * @return this instance
+     */
+    public HugeRte configureToolbar(Toolbar... toolbarItems) {
         checkAlreadyInitialized();
-
-        if (setupBasicConfig && !basicEditorCreated) {
-            initBasicEditorConfiguration();
-        }
-
-        JsonValue jsonValue = config.get("toolbar");
-        String toolbarStr = "";
-
-        if (jsonValue != null) {
-            toolbarStr = toolbarStr.concat(jsonValue.asString());
-        }
-
-        for (int i = 0; i < toolbars.length; i++) {
-            toolbarStr = toolbarStr.concat(" ").concat(toolbars[i].getClientSideRepresentation())
-                    .concat(" ");
-        }
-
-        config.put("toolbar", toolbarStr);
+        initialConfig.put("toolbar", ClientSideReference.join(toolbarItems));
         return this;
     }
 
@@ -566,15 +364,61 @@ public class HugeRte extends CustomField<String>
     }
 
     private void checkAlreadyInitialized() {
-        if (connectorInitialized) {
+        if (isAttached()) {
             throw new AlreadyInitializedException();
         }
     }
 
-    public void closeToolbarOverflowMenu() {
-        runBeforeClientResponse(ui -> getElement()
-                .callJsFunction("$connector.closeToolbarOverflowMenu"));
+    /**
+     * Sets the value change mode of this instance. By default the editor uses {@link ValueChangeMode#ON_CHANGE}. Null
+     * resets the mode to the default.
+     *
+     * @param valueChangeMode new value change mode
+     */
+    public void setValueChangeMode(ValueChangeMode valueChangeMode) {
+        if (valueChangeMode == null) {
+            setValueChangeMode(DEFAULT_VALUE_CHANGE_MODE);
+        } else {
+            getElement().setProperty("valueChangeMode", valueChangeMode.getClientSideRepresentation());
+        }
     }
 
+    /**
+     * Returns the current value change mode. Never null.
+     *
+     * @return value change mode
+     */
+    public ValueChangeMode getValueChangeMode() {
+        return ValueChangeMode.fromClientSide(getElement().getProperty("valueChangeMode", DEFAULT_VALUE_CHANGE_MODE.getClientSideRepresentation()));
+    }
+
+    /// Sets the timespan in milliseconds, that will be used by several value change modes.
+    /// * TIMEOUT: the time, that is waited after the last change before the value is synced.
+    /// * INTERVAL: the time between two value syncs. Also used as initial time before the first call.
+    ///
+    /// Default is 2000.
+    ///
+    /// Please note, that the client also throttles the amount of events, that might be fired to prevent the
+    /// events from overhelming the server.
+    ///
+    /// @param timeoutInMillseconds milliseconds to be used by the value change modes
+    public void setValueChangeTimeout(int timeoutInMillseconds) {
+        if (timeoutInMillseconds <= 0) {
+            throw new IllegalArgumentException("Timeout must be greater than 0");
+        }
+
+        getElement().setProperty("valueChangeTimeout", timeoutInMillseconds);
+    }
+
+    /// Sets the timespan in milliseconds, that will be used by several value change modes.
+    /// * TIMEOUT: the time, that is waited after the last change before the value is synced.
+    /// * INTERVAL: the time between two value syncs. Also used as initial time before the first call.
+    ///
+    /// Default is 2000.
+    ///
+    /// @return timespan in milliseconds
+    public int getValueChangeTimeout() {
+        return getElement().getProperty("valueChangeTimeout", DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
+    }
 
 }

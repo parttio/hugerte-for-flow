@@ -42,7 +42,7 @@ public class OnAttachTest extends VerticalLayout {
         add(button, button2, editor);
     }
 
-    public static class EditorView extends Composite<HugeRte> {
+    public static class EditorView extends Composite<__HugeRte> {
         private String value;
 
         public EditorView(String value) {

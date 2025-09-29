@@ -15,16 +15,12 @@
  */
 package org.vaadin.hugerte;
 
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLink;
 
 /**
  *
@@ -36,12 +32,12 @@ public class DifferentSizes extends VerticalLayout {
 
     private TextField questionKey = new TextField("Question Key");
 
-    private HugeRte tmcdeditor1 = new HugeRte();
-    private HugeRte tmcdeditor2 = new HugeRte();
-    private HugeRte tmcdeditor3 = new HugeRte();
-    private HugeRte tmcdeditor4 = new HugeRte();
-    private HugeRte tmcdeditor5 = new HugeRte();
-    private HugeRte tmcdeditor6 = new HugeRte();
+    private __HugeRte tmcdeditor1 = new __HugeRte();
+    private __HugeRte tmcdeditor2 = new __HugeRte();
+    private __HugeRte tmcdeditor3 = new __HugeRte();
+    private __HugeRte tmcdeditor4 = new __HugeRte();
+    private __HugeRte tmcdeditor5 = new __HugeRte();
+    private __HugeRte tmcdeditor6 = new __HugeRte();
     private TextField firstName = new TextField("First Name:");
     private TextField lastName = new TextField("Last Name:");
     private TextArea address = new TextArea("Address");
