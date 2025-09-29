@@ -16,16 +16,16 @@ public class EditorInDialog extends Div {
         Dialog dialog = new Dialog();
         Dialog dialog2 = new Dialog();
 
-        HugeRte editor = new HugeRte();
+        __HugeRte editor = new __HugeRte();
         editor.configure("plugins", "link");
 
-        HugeRte editor2 = new HugeRte();
+        __HugeRte editor2 = new __HugeRte();
         editor2.configure("plugins", "link");
 
-        HugeRte editor3 = new HugeRte();
+        __HugeRte editor3 = new __HugeRte();
         editor3.configure("plugins", "link");
 
-        HugeRte editor4 = new HugeRte();
+        __HugeRte editor4 = new __HugeRte();
         editor4.configure("plugins", "link");
 
         editor.addValueChangeListener(e -> {

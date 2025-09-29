@@ -30,8 +30,8 @@ public class ConfigurationOptions extends Div {
 
     }
 
-    private HugeRte addWithConfig() {
-        HugeRte hugeRte = new HugeRte();
+    private __HugeRte addWithConfig() {
+        __HugeRte hugeRte = new __HugeRte();
         hugeRte.setValue("Initial <em>content</em>");
         final Pre pre = new Pre();
         add(pre);

@@ -46,10 +46,10 @@ public class FullDemoView extends Div {
             .filter(Predicate.not(Plugin.AUTORESIZE::equals))
             .toArray(Plugin[]::new);
 
-    protected HugeRteWebComponent hugeRte;
+    protected HugeRte hugeRte;
 
     public FullDemoView() {
-        hugeRte = new HugeRteWebComponent();
+        hugeRte = new HugeRte();
         hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setRequiredIndicatorVisible(true);
 //        hugeRte.setErrorMessage("This is just a test");

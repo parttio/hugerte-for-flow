@@ -15,7 +15,7 @@ public class PreserveOnRefreshBug27 extends VerticalLayout {
 
     public PreserveOnRefreshBug27() {
         Dialog dialog = new Dialog();
-        HugeRte hugeRte = new HugeRte();
+        __HugeRte hugeRte = new __HugeRte();
         hugeRte.configure("branding", false);
         hugeRte.configure("statusbar", false);
         hugeRte.setValue("<h2>Hallo Leute,</h2>");

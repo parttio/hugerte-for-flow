@@ -3,7 +3,6 @@ package org.vaadin.hugerte;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
 @Route
@@ -15,7 +14,7 @@ public class HugeRTEWithVaadinSelect extends VerticalLayout {
 
     public HugeRTEWithVaadinSelect() {
         
-        HugeRte rte = new HugeRte();
+        __HugeRte rte = new __HugeRte();
         rte.setValue("Edit me");
         
         Select<Options> select = new Select<>();

@@ -4,7 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
-import org.vaadin.hugerte.HugeRte;
+import org.vaadin.hugerte.__HugeRte;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class ActiveEditors {
      * @param editor the component
      * @return the id
      */
-    public String register(HugeRte editor) {
+    public String register(__HugeRte editor) {
         String id = UUID.randomUUID().toString();
         idToUI.put(id, editor.getUI().get());
         return id;
@@ -47,7 +47,7 @@ public class ActiveEditors {
      *
      * @param editor
      */
-    public void deRegister(HugeRte editor) {
+    public void deRegister(__HugeRte editor) {
         UI ui = editor.getUI().get();
         var iterator = idToUI.entrySet().iterator();
         while(iterator.hasNext()) {

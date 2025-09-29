@@ -14,7 +14,7 @@ public class ReplaceSelectionContent extends VerticalLayout {
 
     public ReplaceSelectionContent() {
     	
-    	HugeRte editor = new HugeRte();
+    	__HugeRte editor = new __HugeRte();
     	
     	Button insertCurrentTime = new Button("Insert time");
     	
