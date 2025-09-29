@@ -37,8 +37,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper, HasThemeVariant<HugeRteVariant> {
 
     // TODO enable / readonly
-    // TODO theme variants
-    // TODO replace selection
     // TODO tooltips
     // TODO height issues
     // TODO check autoresize
