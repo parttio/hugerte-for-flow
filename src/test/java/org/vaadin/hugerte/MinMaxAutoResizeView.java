@@ -17,6 +17,7 @@ public class MinMaxAutoResizeView extends VerticalLayout {
         rte.configurePlugins(Plugin.AUTORESIZE);
         rte.configure("max_height", 600);
         rte.setMinHeight("200px");
+        rte.setHelperText("This demo shows the autoresize feature in combination with min and max height. Enter some text to see, how the editor behaves.");
 
         add(rte);
     }

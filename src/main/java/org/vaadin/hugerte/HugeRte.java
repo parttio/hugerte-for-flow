@@ -19,6 +19,7 @@ import com.vaadin.flow.function.SerializableConsumer;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
+import elemental.json.JsonType;
 import elemental.json.JsonValue;
 
 /**
@@ -49,11 +50,11 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
     public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
-    public static final String DEFAULT_HEIGHT = "500px";
 
     private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
 
     private final JsonObject initialConfig = Json.createObject();
+    private boolean isInitialized;
 
     private Plugin[] activePlugins = {};
     private ResizeDirection resizeDirection = ResizeDirection.NONE;
@@ -145,6 +146,35 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             // remove this call once the import is done via npm
             getUI().orElseThrow().getPage().addJavaScript(
                     "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
+
+
+            String height = getHeight();
+            String width = getWidth();
+            if (height != null || width != null) {
+                JsonObject config = getConfig();
+                if (config.hasKey("resize")) {
+                    JsonValue resize = config.get("resize");
+                    if ((resize.getType() == JsonType.BOOLEAN && resize.asBoolean()) || resize.getType() == JsonType.STRING && Objects.equals(resize.asString(), "both")) {
+
+                        // resize and Vaadin's "outer" dimensions does not work very well together, so in that case, we need to move the Vaadin dimension
+                        // to the huge itself, so that it can initialize the correct dimensions and allow correct resizing
+                        if (height != null) {
+                            setHeight(null);
+                            configure("height", height);
+                        }
+                        if (width != null) {
+                            setWidth(null);
+                            configure("width", width);
+                        }
+                    }
+                }
+            }
+
+            this.isInitialized = true;
+        });
+
+        addDetachListener(event -> {
+            this.isInitialized = false;
         });
 
     }
@@ -373,8 +403,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         checkForResizeConflicts();
 
         if (direction != ResizeDirection.NONE) {
-            setHeight(null); // otherwise resize will not work as expected
-
             if (direction == ResizeDirection.VERTICALLY) {
                 return configure("resize", true);
             }
@@ -382,8 +410,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             return configure("resize", "both");
         }
 
-        // fallback, if configure resize is used multiple times
-        setHeight(DEFAULT_HEIGHT);
         return configure("resize", false);
     }
 
@@ -398,7 +424,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     }
 
     private void checkAlreadyInitialized() {
-        if (isAttached()) {
+        if (this.isInitialized) {
             throw new AlreadyInitializedException();
         }
     }
