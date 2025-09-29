@@ -58,9 +58,9 @@ public class FullDemoView extends Div {
 //        hugeRte.setInvalid(true);
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
-        hugeRte.setHeight("550px");
-        hugeRte.setMinHeight("200px");
-        hugeRte.setMaxHeight("800px");
+        hugeRte.setHeight("450px");
+        hugeRte.setMinHeight("150px");
+        hugeRte.setMaxHeight("600px");
 
         hugeRte.configurePlugins(ALL_PLUGINS_WITHOUT_AUTO_RESIZE);
         hugeRte.configureToolbar(FULL_TOOLBAR);
