@@ -14,8 +14,10 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.shared.HasThemeVariant;
 import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
+import com.vaadin.flow.data.binder.Setter;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableConsumer;
+import com.vaadin.flow.function.ValueProvider;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -147,26 +149,25 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             getUI().orElseThrow().getPage().addJavaScript(
                     "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
 
+            // some convenience functionality. When resize is active, we try to auto convert dimensions for the devs
+            JsonObject config = getConfig();
+            if (config.hasKey("resize")) {
+                JsonValue resize = config.get("resize");
+                boolean resizeHorizontalActive = resize.getType() == JsonType.BOOLEAN && resize.asBoolean();
+                boolean resizeBothActive = resize.getType() == JsonType.STRING && Objects.equals(resize.asString(), "both");
+                if (resizeHorizontalActive || resizeBothActive) {
 
-            String height = getHeight();
-            String width = getWidth();
-            if (height != null || width != null) {
-                JsonObject config = getConfig();
-                if (config.hasKey("resize")) {
-                    JsonValue resize = config.get("resize");
-                    if ((resize.getType() == JsonType.BOOLEAN && resize.asBoolean()) || resize.getType() == JsonType.STRING && Objects.equals(resize.asString(), "both")) {
-
-                        // resize and Vaadin's "outer" dimensions does not work very well together, so in that case, we need to move the Vaadin dimension
-                        // to the huge itself, so that it can initialize the correct dimensions and allow correct resizing
-                        if (height != null) {
-                            setHeight(null);
-                            configure("height", height);
-                        }
-                        if (width != null) {
-                            setWidth(null);
-                            configure("width", width);
-                        }
+                    // resize and Vaadin's "outer" dimensions does not work very well together, so in that case, we need to move the Vaadin dimension
+                    // to the huge itself, so that it can initialize the correct dimensions and allow correct resizing
+                    if (resizeBothActive) {
+                        convertToConfiguration(HasSize::getWidth, HasSize::setWidth, "width", false);
+                        convertToConfiguration(HasSize::getMinWidth, HasSize::setMinWidth, "min_width", true);
+                        convertToConfiguration(HasSize::getMaxWidth, HasSize::setMaxWidth, "max_width", true);
                     }
+
+                    convertToConfiguration(HasSize::getHeight, HasSize::setHeight, "height", false);
+                    convertToConfiguration(HasSize::getMinHeight, HasSize::setMinHeight, "min_height", true);
+                    convertToConfiguration(HasSize::getMaxHeight, HasSize::setMaxHeight, "max_height", true);
                 }
             }
 
@@ -176,7 +177,18 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         addDetachListener(event -> {
             this.isInitialized = false;
         });
+    }
 
+    private void convertToConfiguration(ValueProvider<HugeRte, String> getter, Setter<HugeRte, String> setter, String hugeRteKey, boolean numericPixelOnly) {
+        String value = getter.apply(this);
+        if (value != null && (!numericPixelOnly || value.endsWith("px"))) {
+            setter.accept(this, null);
+            if (numericPixelOnly) {
+                configure(hugeRteKey, Double.parseDouble(value.replace("px", "")));
+            } else {
+                configure(hugeRteKey, value);
+            }
+        }
     }
 
     /**
