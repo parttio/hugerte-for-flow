@@ -29,6 +29,7 @@ public class BinderView extends VerticalLayout {
 
         binder.forField(rte)
                 .asRequired("Please set some awesome html content!")
+                .withValidator(s -> s.length() > 10, "Please add at least 10 characters") // does not make much sense for html, but for test purposes
                 .bind(Data::getHtmlContent, Data::setHtmlContent);
 
         binder.readBean(sampleData);

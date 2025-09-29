@@ -38,7 +38,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRte>, HasLabel {
 
-    // TODO binder
     // TODO enable / readonly
     // TODO stylings / lumo integration
     // TODO field styling (e.g. label)
