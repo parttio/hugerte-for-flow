@@ -7,14 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
-import com.vaadin.flow.component.AbstractSinglePropertyField;
-import com.vaadin.flow.component.Focusable;
-import com.vaadin.flow.component.HasHelper;
-import com.vaadin.flow.component.HasLabel;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.InputNotifier;
-import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
@@ -22,6 +15,7 @@ import com.vaadin.flow.component.shared.HasThemeVariant;
 import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
 import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.function.SerializableConsumer;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -463,7 +457,19 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         return getElement().getProperty("valueChangeTimeout", DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
     }
 
-    public void replaceSelectionContent(String now) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /// Replaces the current selection with the given html string. If no text is selected, then the new content
+    /// will be inserted at the caret's current position.
+    ///
+    /// @param htmlString the html snippet to be inserted
+    public void replaceSelectionContent(String htmlString) {
+        // not sure, why before client response, was taken from old code
+        runBeforeClientResponse(ui -> getElement().callJsFunction("replaceSelectionContent", htmlString));
     }
+
+    private void runBeforeClientResponse(SerializableConsumer<UI> command) {
+        getElement().getNode().runWhenAttached(ui -> ui
+                .beforeClientResponse(this, context -> command.accept(ui)));
+    }
+
+
 }
