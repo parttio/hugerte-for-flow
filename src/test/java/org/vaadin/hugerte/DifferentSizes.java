@@ -32,12 +32,12 @@ public class DifferentSizes extends VerticalLayout {
 
     private TextField questionKey = new TextField("Question Key");
 
-    private __HugeRte tmcdeditor1 = new __HugeRte();
-    private __HugeRte tmcdeditor2 = new __HugeRte();
-    private __HugeRte tmcdeditor3 = new __HugeRte();
-    private __HugeRte tmcdeditor4 = new __HugeRte();
-    private __HugeRte tmcdeditor5 = new __HugeRte();
-    private __HugeRte tmcdeditor6 = new __HugeRte();
+    private HugeRte tmcdeditor1 = new HugeRte();
+    private HugeRte tmcdeditor2 = new HugeRte();
+    private HugeRte tmcdeditor3 = new HugeRte();
+    private HugeRte tmcdeditor4 = new HugeRte();
+    private HugeRte tmcdeditor5 = new HugeRte();
+    private HugeRte tmcdeditor6 = new HugeRte();
     private TextField firstName = new TextField("First Name:");
     private TextField lastName = new TextField("Last Name:");
     private TextArea address = new TextArea("Address");
@@ -71,12 +71,12 @@ public class DifferentSizes extends VerticalLayout {
 
         //String tmcoptions = "{\"branding\": false,\"menubar\": false,\"contextmenu\": false,\"toolbar\": false,\"statusbar\": false}";
         String tmcoptions = "{\"resize\": false,\"statusbar\": false, \"menubar\": \"tools help\", \"branding\": false, \"plugins\" : \"link image code\",    \"toolbar\" : \"undo redo | styleselect | forecolor | bold italic underline | alignleft aligncenter alignright alignjustify | outdent indent | link image | code\" }";
-        tmcdeditor1.setConfig(tmcoptions);
-        tmcdeditor2.setConfig(tmcoptions);
-        tmcdeditor3.setConfig(tmcoptions);
-        tmcdeditor4.setConfig(tmcoptions);
-        tmcdeditor5.setConfig(tmcoptions);
-        tmcdeditor6.setConfig(tmcoptions);
+        tmcdeditor1.setRawConfig(tmcoptions);
+        tmcdeditor2.setRawConfig(tmcoptions);
+        tmcdeditor3.setRawConfig(tmcoptions);
+        tmcdeditor4.setRawConfig(tmcoptions);
+        tmcdeditor5.setRawConfig(tmcoptions);
+        tmcdeditor6.setRawConfig(tmcoptions);
 
         RadioButtonGroup<String> group = new RadioButtonGroup<>();
         group.setLabel("Have you anything to report like  lot of text?");

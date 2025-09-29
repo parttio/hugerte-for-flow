@@ -2,6 +2,7 @@ package org.vaadin.hugerte;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
@@ -13,8 +14,9 @@ import java.time.LocalDateTime;
 public class ReplaceSelectionContent extends VerticalLayout {
 
     public ReplaceSelectionContent() {
+        setAlignItems(Alignment.STRETCH);
     	
-    	__HugeRte editor = new __HugeRte();
+    	HugeRte editor = new HugeRte();
     	
     	Button insertCurrentTime = new Button("Insert time");
     	
@@ -32,12 +34,10 @@ public class ReplaceSelectionContent extends VerticalLayout {
 			Notification.show("ValueChange event: " + e.getValue());
 			System.out.println(e.getValue());
 		});
-    	
-    	add(editor, insertCurrentTime);
 
-		add(new Button("Show value", e -> {
-			Notification.show(editor.getValue());
-		}));
+        add(editor, new HorizontalLayout(insertCurrentTime, new Button("Show value", e -> {
+            Notification.show(editor.getValue());
+        })));
 
     }
 }

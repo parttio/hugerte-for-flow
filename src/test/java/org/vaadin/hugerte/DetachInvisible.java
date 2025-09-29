@@ -11,7 +11,8 @@ public class DetachInvisible extends VerticalLayout {
 
     public DetachInvisible() {
         // https://github.com/parttio/tinymce-for-flow/issues/33
-        __HugeRte hugeRte = new __HugeRte();
+        HugeRte hugeRte = new HugeRte();
+        hugeRte.setWidthFull();
         add(hugeRte);
         add(new Button("Toggle visible", e-> hugeRte.setVisible(!hugeRte.isVisible())));
         add(new Button("Detach", e-> hugeRte.removeFromParent()));

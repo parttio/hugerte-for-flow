@@ -17,13 +17,13 @@ public class Issue30 extends VerticalLayout {
 
         private static final long serialVersionUID = 1L;
 
-        private __HugeRte ivEditor = null;
+        private HugeRte ivEditor = null;
 
         public HugeRteField() {
             super();
             setWidth("100%");
             setHeight("500px");
-            ivEditor = new __HugeRte();
+            ivEditor = new HugeRte();
             //TODO GEAR-2044 GearRichtextEditorField : updateValue() wird nicht aufgerufen
             //https://github.com/parttio/tinymce-for-flow/issues/30
             //ivEditor.addValueChangeListener(e -> this.updateValue());
@@ -43,7 +43,7 @@ public class Issue30 extends VerticalLayout {
             getEditor().setValue(aNewPresentationValue);
         }
 
-        public __HugeRte getEditor() {
+        public HugeRte getEditor() {
             return ivEditor;
         }
 

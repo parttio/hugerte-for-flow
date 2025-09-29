@@ -14,10 +14,10 @@ import org.vaadin.firitin.components.RichText;
 public class DeepLinkingView extends Div {
 
 
-    protected __HugeRte hugeRte;
+    protected HugeRte hugeRte;
 
     public DeepLinkingView() {
-        hugeRte = new __HugeRte();
+        hugeRte = new HugeRte();
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
         hugeRte.setHeight("700px");
@@ -34,7 +34,7 @@ public class DeepLinkingView extends Div {
             var n = new Notification("", 3000);
             n.add(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getCurrentValue())
+                    new RichText(hugeRte.getValue())
                     )
             );
             n.open();

@@ -14,7 +14,7 @@ public class HugeRTEWithVaadinSelect extends VerticalLayout {
 
     public HugeRTEWithVaadinSelect() {
         
-        __HugeRte rte = new __HugeRte();
+        HugeRte rte = new HugeRte();
         rte.setValue("Edit me");
         
         Select<Options> select = new Select<>();
