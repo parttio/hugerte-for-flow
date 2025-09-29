@@ -637,10 +637,14 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         this._valueChangeHandleForInterval = setInterval(this.onValueChange.bind(this), this.valueChangeTimeout);
     }
 
+    /**
+     * Replaces the current selection with the given html snippet. If nothing
+     * is selected, the content will be added at the caret's position
+     * @param html
+     */
     replaceSelectionContent(html) {
-        throw new Error("Currently not implemented, check if still needed");
-        // this.editor.selection.setContent(html);
-        // this.syncValue();
+        this.editor.selection.setContent(html);
+        this.onValueChange();
     }
 
     focus() {
