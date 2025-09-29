@@ -26,7 +26,7 @@ public class GitHubIssue2 extends Composite<VerticalLayout> {
 
 	public GitHubIssue2() {
 		this.getContent().setSizeFull();
-		__HugeRte editor = new __HugeRte();
+		HugeRte editor = new HugeRte();
 		editor.setValue("sample text");
 		tab1Layout.add(new Span("Huge RTE Editor"), editor);
 		tab2Layout.add(new Span("tab 2"));

@@ -9,8 +9,9 @@ import com.vaadin.flow.router.Route;
 public class AutoSavePluginExample extends VerticalLayout {
 
     public AutoSavePluginExample() {
-        __HugeRte hugeRte = new __HugeRte();
-        hugeRte.configurePlugins(true, Plugin.AUTOSAVE)
+        HugeRte hugeRte = new HugeRte()
+                .configureBasicSetup()
+                .configurePlugins(Plugin.AUTOSAVE)
                 // TODO add constant
                 .configure("toolbar", "restoredraft")
                 // save more eagerly for demo

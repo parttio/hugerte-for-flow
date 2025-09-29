@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class UpdateValueOnDetachedEditor extends VerticalLayout {
     public UpdateValueOnDetachedEditor() {
 
-        __HugeRte hugeRte = new __HugeRte();
+        HugeRte hugeRte = new HugeRte();
         hugeRte.setValue("Jorma");
 
         Button b = new Button("Replace value while detached");
@@ -24,5 +24,6 @@ public class UpdateValueOnDetachedEditor extends VerticalLayout {
 
         add(b, hugeRte);
 
+        setHorizontalComponentAlignment(Alignment.STRETCH, hugeRte);
     }
 }

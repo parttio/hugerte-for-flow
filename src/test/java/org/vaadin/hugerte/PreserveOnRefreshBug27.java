@@ -14,8 +14,9 @@ import org.vaadin.firitin.components.button.VButton;
 public class PreserveOnRefreshBug27 extends VerticalLayout {
 
     public PreserveOnRefreshBug27() {
+        setAlignItems(Alignment.STRETCH);
         Dialog dialog = new Dialog();
-        __HugeRte hugeRte = new __HugeRte();
+        HugeRte hugeRte = new HugeRte();
         hugeRte.configure("branding", false);
         hugeRte.configure("statusbar", false);
         hugeRte.setValue("<h2>Hallo Leute,</h2>");

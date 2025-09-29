@@ -16,12 +16,12 @@ import org.vaadin.hugerte.imageuploads.ActiveEditors;
 @Menu
 public class ImagePickerCallback extends Div {
 
-    protected __HugeRte hugeRte;
+    protected HugeRte hugeRte;
 
-    public static class FileCallbackHugeRte extends __HugeRte {
+    public static class FileCallbackHugeRte extends HugeRte {
         public FileCallbackHugeRte() {
             // This is RAW JS!! Other options are evaluated as JSON on top of this
-            setConfig("""
+            setRawConfig("""
                 {
                     file_picker_callback: (callback, value, meta) => {
                         // save callback for later use

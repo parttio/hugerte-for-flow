@@ -30,15 +30,15 @@ public class ConfigurationOptions extends Div {
 
     }
 
-    private __HugeRte addWithConfig() {
-        __HugeRte hugeRte = new __HugeRte();
+    private HugeRte addWithConfig() {
+        HugeRte hugeRte = new HugeRte();
         hugeRte.setValue("Initial <em>content</em>");
         final Pre pre = new Pre();
         add(pre);
         add(hugeRte);
         getElement().getNode().runWhenAttached(ui -> ui
                 .beforeClientResponse(this, context -> {
-                    pre.setText(hugeRte.config.toJson());
+                    pre.setText(hugeRte.getConfig().toJson());
                 }));
         return hugeRte;
     }

@@ -29,7 +29,7 @@ public class ThemeVariantsView extends VerticalLayout {
         Data sampleData = new Data();
         sampleData.setHtmlContent("<p>This is my <b>initial sample value</b></p>");
 
-        __HugeRte rte = new __HugeRte();
+        HugeRte rte = new HugeRte();
         rte.setLabel(label);
         rte.addThemeVariants(variants);
 
