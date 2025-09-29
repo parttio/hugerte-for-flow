@@ -8,6 +8,7 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
 import com.vaadin.flow.component.AbstractSinglePropertyField;
 import com.vaadin.flow.component.Focusable;
+import com.vaadin.flow.component.HasHelper;
 import com.vaadin.flow.component.HasLabel;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
@@ -36,10 +37,9 @@ import elemental.json.JsonObject;
 @CssImport("./vaadin-huge-rte.css")
 public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implements
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
-        HasSize, HasStyle, Focusable<HugeRte>, HasLabel {
+        HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper {
 
     // TODO enable / readonly
-    // TODO stylings / lumo integration
     // TODO field styling (e.g. label)
     // TODO theme variants
     // TODO replace selection

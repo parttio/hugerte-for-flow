@@ -62,6 +62,8 @@ public class FullDemoView extends Div {
         hugeRte.configureToolbar(FULL_TOOLBAR);
         hugeRte.configureResize(ResizeDirection.BOTH);
 
+        hugeRte.setHelperText("The Huge RTE is a community driven fork of the Tiny MCE 6.");
+
         add(hugeRte);
 
         Button b = new Button("Set content dynamically", e -> {

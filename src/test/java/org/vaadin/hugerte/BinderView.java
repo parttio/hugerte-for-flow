@@ -6,7 +6,9 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
@@ -20,10 +22,14 @@ public class BinderView extends VerticalLayout {
         Data sampleData = new Data();
         sampleData.setHtmlContent("<p>This is my <b>initial sample value</b></p>");
 
+        TextField plainContent = new TextField("Plain content");
+        plainContent.setValueChangeMode(ValueChangeMode.EAGER);
+
         HugeRte rte = new HugeRte();
         rte.setLabel("My Aweseom Rich Text Editor");
+        rte.setValueChangeMode(org.vaadin.hugerte.ValueChangeMode.INTERVAL);
 
-        add(rte);
+        add(plainContent, rte);
 
         Binder<Data> binder = new Binder<>();
 
@@ -31,6 +37,11 @@ public class BinderView extends VerticalLayout {
                 .asRequired("Please set some awesome html content!")
                 .withValidator(s -> s.length() > 10, "Please add at least 10 characters") // does not make much sense for html, but for test purposes
                 .bind(Data::getHtmlContent, Data::setHtmlContent);
+
+        binder.forField(plainContent)
+                .asRequired("Please set some boring old, non-html content!")
+                .withValidator(s -> s.length() > 10, "Please add at least 10 characters") // does not make much sense for html, but for test purposes
+                .bind(Data::getPlainContent, Data::setPlainContent);
 
         binder.readBean(sampleData);
 

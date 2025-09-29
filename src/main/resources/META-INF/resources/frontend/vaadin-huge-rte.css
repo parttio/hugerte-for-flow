@@ -1,16 +1,4 @@
 vaadin-huge-rte {
-    display: flex; /*default for fields is inline-flex, but for a "big" component like this, a block-like behavior seems more fitting*/
-
-    &::part(label) {
-        flex-shrink: 0; /*there might be use cases, where the height of the fields leads to having the label being shrinked away - this shall prevent it*/
-    }
-
-    &::part(input-fields) {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
     .tox {
         flex-grow: 1;
 
