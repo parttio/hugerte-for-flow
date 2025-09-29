@@ -43,6 +43,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     initialConfig = {};
 
     _lastSyncedValue = "";
+    _lastSyncedValueTimestamp = 0;
     _valueChangeMode = "change";
 
     _valueChangeTimeout = 2_000;
@@ -189,17 +190,14 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                 editor.on('blur', e => {
                     this.dispatchEvent(new CustomEvent("_blur"));
                     this.onValueChangeIfMode("blur");
-                    if (this._timeoutValueChangeDebouncer) {
-                        this._timeoutValueChangeDebouncer.flush();
-                    }
                 });
 
                 editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));
 
                 editor.on('input', e => {
                     if (this.valueChangeMode === "timeout") {
-                        clearTimeout(this._timeoutValueChangeHandle);
-                        this._timeoutValueChangeHandle = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
+                        clearTimeout(this._valueChangeHandleForTimeout);
+                        this._valueChangeHandleForTimeout = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
                     }
 
                     return this.dispatchEvent(new Event('input'));
@@ -275,21 +273,27 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
      * delta, update the "old value" property and send an event to the server.
      */
     onValueChange() {
-        const currentValue = this.editor?.getContent() ?? this._lastSyncedValue;
+        let now = Date.now();
+        if (this._lastSyncedValueTimestamp < now - 50) { // explicit throttle to prevent too many events fired at all
+            this._lastSyncedValueTimestamp = now;
+            console.info("sending delta")
 
-        // init lib
-        const dmp = new diff_match_patch();
-        const patch = dmp.patch_make(this._lastSyncedValue, currentValue);
-        const delta = dmp.patch_toText(patch);
+            const currentValue = this.editor?.getContent() ?? this._lastSyncedValue;
 
-        this._lastSyncedValue = currentValue;
+            // init lib
+            const dmp = new diff_match_patch();
+            const patch = dmp.patch_make(this._lastSyncedValue, currentValue);
+            const delta = dmp.patch_toText(patch);
 
-        if (delta) {
-            this.dispatchEvent(new CustomEvent("_value-delta", {
-                detail: {
-                    delta
-                }
-            }));
+            this._lastSyncedValue = currentValue;
+
+            if (delta) {
+                this.dispatchEvent(new CustomEvent("_value-delta", {
+                    detail: {
+                        delta
+                    }
+                }));
+            }
         }
     }
 
@@ -300,13 +304,13 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         if(this._valueChangeMode !== newValueChangeMode) {
             this._valueChangeMode = newValueChangeMode;
 
-            if (this._valueChangeMode !== "timeout" && this._timeoutValueChangeHandle) {
+            if (this._valueChangeMode !== "timeout" && this._valueChangeHandleForTimeout) {
                 this.stopValueChangeTimeout();
             }
 
             if(this._valueChangeMode === "interval") {
                 this.startValueChangInterval();
-            } else if(this._intervalValueChangeHandle) {
+            } else if (this._valueChangeHandleForInterval) {
                 this.stopValueChangeInterval();
             }
 
@@ -325,9 +329,9 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         if(this._valueChangeTimeout !== newTimeout) {
             this._valueChangeTimeout = newTimeout;
 
-            if(this._timeoutValueChangeHandle) {
+            if (this._valueChangeHandleForTimeout) {
                 this.stopValueChangeTimeout();
-            } else if(this._intervalValueChangeHandle) {
+            } else if (this._valueChangeHandleForInterval) {
                 this.startValueChangInterval(); // also stops the current interval
             }
 
@@ -340,22 +344,22 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
     stopValueChangeTimeout() {
         this.onValueChange(); // flush value to server
-        clearTimeout(this._timeoutValueChangeHandle);
-        delete this._timeoutValueChangeHandle;
+        clearTimeout(this._valueChangeHandleForTimeout);
+        delete this._valueChangeHandleForTimeout;
     }
 
     stopValueChangeInterval() {
         this.onValueChange(); // flush value to server
-        window.clearInterval(this._intervalValueChangeHandle);
-        delete this._intervalValueChangeHandle;
+        window.clearInterval(this._valueChangeHandleForInterval);
+        delete this._valueChangeHandleForInterval;
     }
 
     startValueChangInterval() {
-        if(this._intervalValueChangeHandle) {
+        if (this._valueChangeHandleForInterval) {
             this.stopValueChangeInterval();
         }
 
-        this._intervalValueChangeHandle = setInterval(this.onValueChange.bind(this), this.valueChangeTimeout);
+        this._valueChangeHandleForInterval = setInterval(this.onValueChange.bind(this), this.valueChangeTimeout);
     }
 
     replaceSelectionContent(html) {
