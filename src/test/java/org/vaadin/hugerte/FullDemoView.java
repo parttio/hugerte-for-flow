@@ -96,11 +96,17 @@ public class FullDemoView extends Div {
             Notification.show("Blur event!");
         });
 
-        Button disable = new Button("Disabble", e-> {
+        Button disable = new Button("Disable", e-> {
             hugeRte.setEnabled(!hugeRte.isEnabled());
             e.getSource().setText(hugeRte.isEnabled() ? "Disable" : "Enable");
         });
         add(disable);
+
+        Button readonly = new Button("Readonly", e-> {
+            hugeRte.setReadOnly(!hugeRte.isReadOnly());
+            e.getSource().setText(hugeRte.isReadOnly() ? "Writable" : "Readonly");
+        });
+        add(readonly);
 
         Button blur = new Button("blur (NOT SUPPORTED really, but of course works from button)", e-> {
             hugeRte.blur();
