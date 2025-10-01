@@ -423,34 +423,32 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                     this.editor = editor;
 
                     editor.on('init', () => {
-                        this.editorInitialized = true;
-
-                        // TODO check if still needed
-                        // if (this.isInDialog()) {
-                        //     // This is inside a shadowroot (Dialog in Vaadin)
-                        //     // and needs some hacks to make this nagigateable with keyboard
-                        //     if (c.tabIndex < 0) {
-                        //         // make the wrapping element also focusable
-                        //         c.setAttribute("tabindex", 0);
-                        //     }
-                        //     // on focus to wrapping element, pass forward to editor
-                        //     c.addEventListener("focus", () => {
-                        //         editor.focus();
-                        //     });
-                        //     // Move aux element as child from body to element to fix menus in modal Dialog
-                        //     Array.from(document.getElementsByClassName('tox-hugerte-aux')).forEach(aux => {
-                        //         if (!aux.dontmove) {
-                        //             aux.parentElement.removeChild(aux);
-                        //             // Fix to allow menu grow outside Dialog
-                        //             aux.style.position = 'absolute';
-                        //             c.editor = editor;
-                        //             c.appendChild(aux);
-                        //         }
-                        //     });
-                        // } else {
-                        //     const aux = document.getElementsByClassName('tox-hugerte-aux')[0];
-                        //     aux.dontmove = true;
-                        // }
+                        // TODO check if still needed in V25
+                        if (this.isInDialog()) {
+                            // This is inside a shadowroot (Dialog in Vaadin)
+                            // and needs some hacks to make this nagigateable with keyboard
+                            if (this.tabIndex < 0) {
+                                // make the wrapping element also focusable
+                                this.setAttribute("tabindex", 0);
+                            }
+                            // on focus to wrapping element, pass forward to editor
+                            this.addEventListener("focus", () => {
+                                editor.focus();
+                            });
+                            // Move aux element as child from body to element to fix menus in modal Dialog
+                            Array.from(document.getElementsByClassName('tox-hugerte-aux')).forEach(aux => {
+                                if (!aux.dontmove) {
+                                    aux.parentElement.removeChild(aux);
+                                    // Fix to allow menu grow outside Dialog
+                                    aux.style.position = 'absolute';
+                                    this.editor = editor;
+                                    this.appendChild(aux);
+                                }
+                            });
+                        } else {
+                            const aux = document.getElementsByClassName('tox-hugerte-aux')[0];
+                            aux.dontmove = true;
+                        }
 
                         // HugeRTE appends its skin css into the head when gets loaded. Flow applies its css beforehand,
                         // which means, that our custom Lumo css is overridden by the default css of the RTE. Thus our
