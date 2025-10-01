@@ -211,17 +211,21 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         return (String) results[0];
     }
 
-    /// Sets the base configuration object as RAW JS. So be very careful what you pass in here. Any other configuration,
-    /// set via the `configure()` methods will be applied on top of the given json object.
+    /// Sets the base configuration object as a raw JS config object. The string must start with "{" and end with "}".
+    ///
+    /// **Be careful, when using this method. Never pass any user entered
+    /// content in here, but only things, that you have the full control about**.
+    ///
+    /// Any other configuration, set via the `configure()` methods will be applied on top, when initializing the client.
     ///
     /// @param jsConfig config to apply
     public void setRawConfig(String jsConfig) {
         checkAlreadyInitialized();
-        getElement().setPropertyJson("rawInitialConfig", Json.parse(jsConfig));
+        getElement().setProperty("rawInitialConfigString", jsConfig);
     }
 
-    ///  Returns a copy of the config as json. The returned object contains the raw config plus any other configurations.
-    ///  Please note, that the raw config can be overridden by other configuration methods.
+    ///  Returns a copy of the config as json. The returned object does not contain the raw config but only configuration
+    ///  applied by using the configure api.
     ///
     /// Returns an empty json object, if no configuration has been applied.
     ///
