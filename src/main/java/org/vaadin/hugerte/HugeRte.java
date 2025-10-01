@@ -36,14 +36,8 @@ import elemental.json.JsonValue;
 @JsModule("./vaadin-huge-rte.js")
 @CssImport("./vaadin-huge-rte.css")
 public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implements
-        HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
+        HasValidationProperties, HasValidator<String>, InputNotifier,
         HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper, HasThemeVariant<HugeRteVariant> {
-
-    // TODO test in dialog
-    // TODO KeyNotifier
-    // TODO Demos
-    // TODO review and finalize npm integration (see commented out code)
-    // TODO dynamic plugin loading for npm integration
 
     public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
