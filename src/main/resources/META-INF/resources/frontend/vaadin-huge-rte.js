@@ -12,8 +12,8 @@ import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
 import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
 import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
-import { inputFieldShared } from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
-import { registerStyles, ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
+import {registerStyles, ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 
 import {diff_match_patch} from 'diff-match-patch';
 
@@ -40,7 +40,7 @@ registerStyles('vaadin-huge-rte', inputFieldShared, { moduleId: 'vaadin-huge-rte
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
 
     // can be overridden by the server using #setConfig
-    rawInitialConfig = {};
+    rawInitialConfigString = {};
 
     // will be overridden by the server on attachment time
     initialConfig = {};
@@ -381,7 +381,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         const config = {
             resize: false,
             height: 250,
-            ...this.rawInitialConfig,
+            ...(eval("(" + (this.rawInitialConfigString?.trim() || "{}") + ")")), // raw initial config is a string
             ...this.initialConfig,
             suffix: '.min',
             promotion: false,
