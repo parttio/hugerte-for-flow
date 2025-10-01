@@ -11,7 +11,6 @@ import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
 import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
-import {TooltipController} from '@vaadin/component-base/src/tooltip-controller.js';
 import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
 import {registerStyles, ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 
@@ -64,6 +63,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
     /** @protected */
     render() {
+        console.info("render");
         return html`
             <style id="vaadin-themable-mixin-style">
 
@@ -360,13 +360,25 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         // });
     }
 
-    async firstUpdated() {
+    firstUpdated() {
+    }
+
+    async connectedCallback() {
+        super.connectedCallback();
+
+        // not sure if this might be an issue, if called here already, since "render" has not yet happend
+        // if so, add a check for "has been rendered" for reattachments and also add a call of init editor to
+        // first update.
         await this._initEditor();
     }
 
     disconnectedCallback() {
         if (this.editor) {
             this.editor.remove();
+            this.lightDomContainer.remove();
+
+            delete this.lightDomContainer;
+            delete this.editor;
         }
 
         if (this.beforeUnloadHandler) {
@@ -376,123 +388,125 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         super.disconnectedCallback();
     }
 
-    async _initEditor() {
-        let target = document.createElement('div');
-        this.append(target); // will be put into the default slot
+     _initEditor() {
+        if (!this.editor) {
+            this.lightDomContainer = document.createElement('div');
+            this.append(this.lightDomContainer); // will be put into the default slot
 
-        let rawConfig = {};
-        if(typeof this.rawInitialConfig === "string") {
-            rawConfig = eval("(" + (this.rawInitialConfig?.trim() || "{}") + ")");
-        } else if(typeof this.rawInitialConfig === "object") {
-            rawConfig = this.rawInitialConfig;
-        }
+            let rawConfig = {};
+            if (typeof this.rawInitialConfig === "string") {
+                rawConfig = eval("(" + (this.rawInitialConfig?.trim() || "{}") + ")");
+            } else if (typeof this.rawInitialConfig === "object") {
+                rawConfig = this.rawInitialConfig;
+            }
 
-        // create combined config, with based config being overriden by any additiona configurations
-        const config = {
-            resize: false,
-            height: 250,
-            ...rawConfig, // raw initial config is a string
-            ...this.initialConfig,
-            suffix: '.min',
-            promotion: false,
-            branding: false, // hides the hugerte branding in the editor
+            // create combined config, with based config being overriden by any additiona configurations
+            const config = {
+                resize: false,
+                height: 250,
+                ...rawConfig, // raw initial config is a string
+                ...this.initialConfig,
+                suffix: '.min',
+                promotion: false,
+                branding: false, // hides the hugerte branding in the editor
+
+                // > Part of the npm integration (not yet working, therefore commented out)
+                // skin: false,
+                // content_css: false, // due to the postcss lit plugin we cannot pass in the min css files directly
+                // content_style: [oxideContentCss, defaultContentCss].join('\n'),
+                // < Part of the npm integration (not yet working, therefore commented out)
+
+                target: this.lightDomContainer,
+
+                // readonly: !this.enabled, // comes form the field mixin
+                setup: (editor) => {
+                    this.editor = editor;
+
+                    editor.on('init', () => {
+                        this.editorInitialized = true;
+
+                        // TODO check if still needed
+                        // if (this.isInDialog()) {
+                        //     // This is inside a shadowroot (Dialog in Vaadin)
+                        //     // and needs some hacks to make this nagigateable with keyboard
+                        //     if (c.tabIndex < 0) {
+                        //         // make the wrapping element also focusable
+                        //         c.setAttribute("tabindex", 0);
+                        //     }
+                        //     // on focus to wrapping element, pass forward to editor
+                        //     c.addEventListener("focus", () => {
+                        //         editor.focus();
+                        //     });
+                        //     // Move aux element as child from body to element to fix menus in modal Dialog
+                        //     Array.from(document.getElementsByClassName('tox-hugerte-aux')).forEach(aux => {
+                        //         if (!aux.dontmove) {
+                        //             aux.parentElement.removeChild(aux);
+                        //             // Fix to allow menu grow outside Dialog
+                        //             aux.style.position = 'absolute';
+                        //             c.editor = editor;
+                        //             c.appendChild(aux);
+                        //         }
+                        //     });
+                        // } else {
+                        //     const aux = document.getElementsByClassName('tox-hugerte-aux')[0];
+                        //     aux.dontmove = true;
+                        // }
+
+                        // HugeRTE appends its skin css into the head when gets loaded. Flow applies its css beforehand,
+                        // which means, that our custom Lumo css is overridden by the default css of the RTE. Thus our
+                        // customization might be ignored and needs additional ugly customization like !importan or
+                        // more specific selectors.
+                        // Therefore we have this small workaround here to ensure, that our css is loaded AFTER
+                        // the hugerte skin css.
+                        // Nevertheless, this might break in the future, so for the long term, it might be useful to create
+                        // our own lumo skin at some point so that we do not have to hack around this situation.
+                        // TODO check if still needed
+                        // const ourStyles = document.head.querySelector("[href*='vaadin-huge-rte.css']");
+                        // if (ourStyles) {
+                        //     document.head.append(ourStyles);
+                        // } else {
+                        //     console.error("Could not find 'vaadin-huge-rte.css'. Has it been renamed or moved?");
+                        // }
+
+                        if (this._lastSyncedValue) {
+                            editor.setContent(this._lastSyncedValue);
+                            this.onValueChange(); // flush updated value - needed, if the initial value is not original hugerte html
+                        }
+                    });
+
+                    editor.on('change', e => {
+                        this.onValueChangeIfMode("change");
+                    });
+
+                    editor.on('blur', e => {
+                        this.closeToolbarOverflowMenu();
+                        this.onValueChangeIfMode("blur");
+
+                        this.dispatchEvent(new CustomEvent("_blur"));
+                    });
+
+                    editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));
+
+                    editor.on('input', e => {
+                        if (this.valueChangeMode === "timeout") {
+                            clearTimeout(this._valueChangeHandleForTimeout);
+                            this._valueChangeHandleForTimeout = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
+                        }
+
+                        return this.dispatchEvent(new Event('input'));
+                    });
+                }
+            };
 
             // > Part of the npm integration (not yet working, therefore commented out)
-            // skin: false,
-            // content_css: false, // due to the postcss lit plugin we cannot pass in the min css files directly
-            // content_style: [oxideContentCss, defaultContentCss].join('\n'),
+            // load all configured plugins dynamically
+            // if (config.plugins?.length) {
+            //     await loadHugeRtePlugins(config.plugins);
+            // }
             // < Part of the npm integration (not yet working, therefore commented out)
 
-            target,
-
-            // readonly: !this.enabled, // comes form the field mixin
-            setup: (editor) => {
-                this.editor = editor;
-
-                editor.on('init', () => {
-                    this.editorInitialized = true;
-
-                    // TODO check if still needed
-                    // if (this.isInDialog()) {
-                    //     // This is inside a shadowroot (Dialog in Vaadin)
-                    //     // and needs some hacks to make this nagigateable with keyboard
-                    //     if (c.tabIndex < 0) {
-                    //         // make the wrapping element also focusable
-                    //         c.setAttribute("tabindex", 0);
-                    //     }
-                    //     // on focus to wrapping element, pass forward to editor
-                    //     c.addEventListener("focus", () => {
-                    //         editor.focus();
-                    //     });
-                    //     // Move aux element as child from body to element to fix menus in modal Dialog
-                    //     Array.from(document.getElementsByClassName('tox-hugerte-aux')).forEach(aux => {
-                    //         if (!aux.dontmove) {
-                    //             aux.parentElement.removeChild(aux);
-                    //             // Fix to allow menu grow outside Dialog
-                    //             aux.style.position = 'absolute';
-                    //             c.editor = editor;
-                    //             c.appendChild(aux);
-                    //         }
-                    //     });
-                    // } else {
-                    //     const aux = document.getElementsByClassName('tox-hugerte-aux')[0];
-                    //     aux.dontmove = true;
-                    // }
-
-                    // HugeRTE appends its skin css into the head when gets loaded. Flow applies its css beforehand,
-                    // which means, that our custom Lumo css is overridden by the default css of the RTE. Thus our
-                    // customization might be ignored and needs additional ugly customization like !importan or
-                    // more specific selectors.
-                    // Therefore we have this small workaround here to ensure, that our css is loaded AFTER
-                    // the hugerte skin css.
-                    // Nevertheless, this might break in the future, so for the long term, it might be useful to create
-                    // our own lumo skin at some point so that we do not have to hack around this situation.
-                    // TODO check if still needed
-                    // const ourStyles = document.head.querySelector("[href*='vaadin-huge-rte.css']");
-                    // if (ourStyles) {
-                    //     document.head.append(ourStyles);
-                    // } else {
-                    //     console.error("Could not find 'vaadin-huge-rte.css'. Has it been renamed or moved?");
-                    // }
-
-                    if (this._lastSyncedValue) {
-                        editor.setContent(this._lastSyncedValue);
-                        this.onValueChange(); // flush updated value - needed, if the initial value is not original hugerte html
-                    }
-                });
-
-                editor.on('change', e => {
-                    this.onValueChangeIfMode("change");
-                });
-
-                editor.on('blur', e => {
-                    this.closeToolbarOverflowMenu();
-                    this.onValueChangeIfMode("blur");
-
-                    this.dispatchEvent(new CustomEvent("_blur"));
-                });
-
-                editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));
-
-                editor.on('input', e => {
-                    if (this.valueChangeMode === "timeout") {
-                        clearTimeout(this._valueChangeHandleForTimeout);
-                        this._valueChangeHandleForTimeout = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
-                    }
-
-                    return this.dispatchEvent(new Event('input'));
-                });
-            }
-        };
-
-        // > Part of the npm integration (not yet working, therefore commented out)
-        // load all configured plugins dynamically
-        // if (config.plugins?.length) {
-        //     await loadHugeRtePlugins(config.plugins);
-        // }
-        // < Part of the npm integration (not yet working, therefore commented out)
-
-        await hugerte.init(config);
+            hugerte.init(config);
+        }
 
     }
 
