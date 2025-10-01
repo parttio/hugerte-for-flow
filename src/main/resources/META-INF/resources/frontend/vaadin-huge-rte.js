@@ -348,13 +348,16 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
     ready() {
         super.ready();
 
-        this._tooltipController = new TooltipController(this);
-        this.addController(this._tooltipController);
-        this._tooltipController.setShouldShow(() => {
-            // const inputs = target.inputs || [];
-            // return !inputs.some((el) => el.opened);
-            return true;
-        });
+        // implement tooltip support later - might make sense to allow more distinct tooltip handling
+        // than just one tooltip, for instance for buttons and so on, especially, since hugerte brings some
+        // own tooltips
+        // this._tooltipController = new TooltipController(this);
+        // this.addController(this._tooltipController);
+        // this._tooltipController.setShouldShow(target => {
+        //     // const inputs = target.inputs || [];
+        //     // return !inputs.some((el) => el.opened);
+        //     return true;
+        // });
     }
 
     async firstUpdated() {
@@ -463,8 +466,10 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                 });
 
                 editor.on('blur', e => {
-                    this.dispatchEvent(new CustomEvent("_blur"));
+                    this.closeToolbarOverflowMenu();
                     this.onValueChangeIfMode("blur");
+
+                    this.dispatchEvent(new CustomEvent("_blur"));
                 });
 
                 editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));

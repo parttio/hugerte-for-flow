@@ -39,8 +39,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         HasValidationProperties, HasValidator<String>, InputNotifier, /*TODO KeyNotifier,*/
         HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper, HasThemeVariant<HugeRteVariant> {
 
-    // TODO tooltips
-    // TODO close toolbar
     // TODO test in dialog
     // TODO KeyNotifier
     // TODO Demos
