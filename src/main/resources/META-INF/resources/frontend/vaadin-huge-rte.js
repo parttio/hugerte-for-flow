@@ -14,6 +14,7 @@ import {KeyboardMixin} from '@vaadin/a11y-base/src/keyboard-mixin.js';
 import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
 import {registerStyles, ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 
+
 import {diff_match_patch} from 'diff-match-patch';
 
 
@@ -36,7 +37,7 @@ import {diff_match_patch} from 'diff-match-patch';
 
 registerStyles('vaadin-huge-rte', inputFieldShared, { moduleId: 'vaadin-huge-rte-styles' });
 
-class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
+class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement))))) {
 
     // can be overridden by the server using #setConfig
     rawInitialConfig = {};
@@ -496,6 +497,7 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
                 }
             };
 
+
             // > Part of the npm integration (not yet working, therefore commented out)
             // load all configured plugins dynamically
             // if (config.plugins?.length) {
@@ -505,7 +507,6 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
 
             hugerte.init(config);
         }
-
     }
 
     set value(value) {
