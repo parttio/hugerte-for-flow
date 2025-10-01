@@ -40,7 +40,7 @@ registerStyles('vaadin-huge-rte', inputFieldShared, { moduleId: 'vaadin-huge-rte
 class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))))) {
 
     // can be overridden by the server using #setConfig
-    rawInitialConfigString = {};
+    rawInitialConfig = {};
 
     // will be overridden by the server on attachment time
     initialConfig = {};
@@ -377,11 +377,18 @@ class HugeRte extends FieldMixin(FocusMixin(KeyboardMixin(ThemableMixin(ElementM
         let target = document.createElement('div');
         this.append(target); // will be put into the default slot
 
+        let rawConfig = {};
+        if(typeof this.rawInitialConfig === "string") {
+            rawConfig = eval("(" + (this.rawInitialConfig?.trim() || "{}") + ")");
+        } else if(typeof this.rawInitialConfig === "object") {
+            rawConfig = this.rawInitialConfig;
+        }
+
         // create combined config, with based config being overriden by any additiona configurations
         const config = {
             resize: false,
             height: 250,
-            ...(eval("(" + (this.rawInitialConfigString?.trim() || "{}") + ")")), // raw initial config is a string
+            ...rawConfig, // raw initial config is a string
             ...this.initialConfig,
             suffix: '.min',
             promotion: false,

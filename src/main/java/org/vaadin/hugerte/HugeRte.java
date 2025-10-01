@@ -221,7 +221,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     /// @param jsConfig config to apply
     public void setRawConfig(String jsConfig) {
         checkAlreadyInitialized();
-        getElement().setProperty("rawInitialConfigString", jsConfig);
+        getElement().setProperty("rawInitialConfig", jsConfig);
     }
 
     ///  Returns a copy of the config as json. The returned object does not contain the raw config but only configuration
