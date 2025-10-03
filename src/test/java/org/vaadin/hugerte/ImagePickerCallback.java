@@ -24,10 +24,11 @@ public class ImagePickerCallback extends Div {
             setRawConfig("""
                 {
                     file_picker_callback: (callback, value, meta) => {
+                        const webComponent = this.editor.editorContainer.parentElement;
                         // save callback for later use
-                        editor._image_callback = callback;
+                        webComponent._image_callback = callback;
                         // trigger some Vaadin function (that opens a dialog)
-                        editor.$server.filePickerCallback(meta.filetype);
+                        webComponent.$server.filePickerCallback(meta.filetype);
                     }
                 }
                 """);
