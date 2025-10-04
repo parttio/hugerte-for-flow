@@ -1,4 +1,13 @@
+html {
+  --menubar-background-color: var(--lumo-contrast-5pct);
+}
+
+[theme~="dark"] {
+  --menubar-background-color: var(--lumo-base-color);
+}
+  
 .vaadin-huge-rte {
+
   display: flex; /*default for fields is inline-flex, but for a "big" component like this, a block-like behavior seems more fitting*/
 
   &::part(label) {
@@ -16,13 +25,13 @@
   }
 
   .tox-editor-header > .tox-menubar {
-    background-color: var(--lumo-contrast-5pct);
+    background-color: var(--menubar-background-color);
     padding-left: var(--lumo-space-s);
     padding-right: var(--lumo-space-s);
   }
 
   .tox-editor-container .tox-editor-header .tox-toolbar-overlord > .tox-toolbar__primary {
-    background-color: var(--lumo-contrast-5pct);
+    background-color: var(--menubar-background-color);
     border-top: unset;
 
     /*
@@ -49,11 +58,15 @@
     background: transparent;
   }
 
+  .tox-mbtn:hover:not(:disabled):not(.tox-mbtn--active) {
+    background: var(--lumo-primary-color-50pct);
+  }
+
   .tox-tbtn--enabled:not(.tox-split-button__chevron) {
     background: var(--lumo-primary-color);
   }
 
-  .tox-tbtn:hover {
+  .tox-toolbar__group button.tox-tbtn:hover {
     background: var(--lumo-contrast-10pct);
   }
 
@@ -112,28 +125,6 @@
     color: var(--lumo-body-text-color);
   }
 
-  .tox-menu.tox-collection.tox-collection--list.tox-selected-menu {
-    border-radius: var(--lumo-border-radius-m);
-  }
-
-  .tox-menu.tox-collection.tox-collection--list {
-    background: var(--lumo-base-color);
-    box-shadow: var(--lumo-box-shadow-m);
-  }
-
-  .tox-menu.tox-collection--list .tox-collection__item.tox-collection__item--active {
-    color: var(--lumo-body-text-color);
-    background-color: var(--lumo-primary-color-10pct);
-  }
-
-  .tox-menu.tox-collection.tox-collection--list {
-    min-width: var(--hugerte-mce-menu-width, 300px);
-  }
-
-  .tox-menu-nav__js.tox-collection__item.tox-collection__item {
-    color: var(--lumo-body-text-color);
-  }
-
   .tox-collection > .tox-collection__group {
     border-color: var(--lumo-contrast-20pct) !important;
     padding-top: var(--lumo-space-s) !important;
@@ -158,15 +149,6 @@
     fill: var(--lumo-contrast-50pct);
   }
 
-  .tox-fancymenuitem .tox-insert-table-picker .tox-insert-table-picker__selected {
-    background-color: var(--lumo-primary-color-10pct);
-    border-color: var(--lumo-primary-color-50pct);
-  }
-
-  .tox-fancymenuitem .tox-insert-table-picker .tox-insert-table-picker {
-    border-color: var(--lumo-contrast-20pct);
-  }
-
   .hugerte-flow[readonly] .tox-editor-header {
     display: none;
   }
@@ -176,14 +158,17 @@
   }
 
   .tox-pop,
-  .tox-toolbar__overflow,
-  .tox-menu {
+  .tox-toolbar__overflow {
     width: max-content;
   }
 
   .tox:not([dir="rtl"]) .tox-toolbar__group:not(:last-of-type),
   .tox[dir="rtl"] .tox-toolbar__group:not(:last-of-type) {
     border-right-color: var(--lumo-contrast-20pct);
+  }
+
+  .tox-split-button:hover {
+    box-shadow: 0 0 0 1px var(--lumo-primary-color-50pct);
   }
 
   .tox-edit-area::before {
@@ -203,5 +188,87 @@
   }
 }
 
+.tox-hugerte-aux {
 
+  .tox-menu.tox-collection.tox-collection--list.tox-selected-menu {
+    border-radius: var(--lumo-border-radius-m);
+  }
 
+  .tox-menu.tox-collection.tox-collection--list {
+    background: var(--lumo-base-color);
+    box-shadow: var(--lumo-box-shadow-m);
+  }
+
+  .tox-menu.tox-collection--list .tox-collection__item.tox-collection__item--active {
+    color: var(--lumo-body-text-color);
+    background-color: var(--lumo-primary-color-10pct);
+  }
+
+  .tox-menu.tox-collection.tox-collection--list {
+    min-width: var(--hugerte-mce-menu-width, 200px);
+  }
+
+  .tox-menu-nav__js.tox-collection__item.tox-collection__item--enabled {
+    background-color: var(--lumo-base-color);
+  }
+
+  .tox-menu-nav__js.tox-collection__item.tox-collection__item {
+    color: var(--lumo-body-text-color);
+  }
+
+  .tox-menu {
+    width: max-content;
+  }
+
+  .tox-fancymenuitem .tox-insert-table-picker .tox-insert-table-picker__selected {
+    background-color: var(--lumo-primary-color-10pct);
+    border-color: var(--lumo-primary-color-50pct);
+  }
+
+  .tox-fancymenuitem .tox-insert-table-picker .tox-insert-table-picker {
+    border-color: var(--lumo-contrast-20pct);
+  }
+
+  .tox-insert-table-picker {
+    background-color: var(--lumo-base-color);
+  }
+
+  .tox-toolbar__overflow {
+    background-color: var(--menubar-background-color) !important;
+    box-shadow: var(--lumo-box-shadow-m) !important;
+    border: 1px solid var(--lumo-contrast-10pct) !important;
+  }
+
+  .tox-tbtn {
+    background-color: var(--menubar-background-color);
+    color: var(--lumo-body-text-color)
+  }
+
+  .tox-tbtn--enabled:hover:not(.tox-split-button__chevron) {
+    background: var(--lumo-primary-color-50pct);
+  }
+
+  .tox-tbtn--disabled[aria-disabled="true"] .tox-icon > svg {
+    fill: var(--lumo-contrast-20pct);
+  }
+
+  .tox-tbtn .tox-icon > svg {
+    fill: var(--lumo-contrast-60pct);
+  }
+
+  .tox-tbtn--enabled .tox-icon > svg {
+    fill: var(--lumo-primary-contrast-color);
+  }
+
+  .tox-tbtn--enabled:hover .tox-icon > svg {
+    fill: var(--lumo-primary-contrast-color);
+  }
+ 
+  .tox-tbtn:focus {
+    background: var(--lumo-primary-color-10pct); 
+  }
+
+  .tox-toolbar__group button.tox-tbtn:hover {
+    background: var(--lumo-contrast-10pct);
+  }
+}
