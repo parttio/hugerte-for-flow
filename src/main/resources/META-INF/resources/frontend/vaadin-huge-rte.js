@@ -4,15 +4,15 @@
  * https://github.com/parttio/hugerte-for-flow/
  * This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
  */
-import {html, LitElement} from 'lit';
+import {css, html, LitElement} from 'lit';
 import {defineCustomElement} from '@vaadin/component-base/src/define.js';
 import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
-import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
-import {registerStyles, ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-
+import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import { LumoInjectionMixin } from '@vaadin/vaadin-themable-mixin/lumo-injection-mixin.js';
+import { inputFieldShared } from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
 
 import {diff_match_patch} from 'diff-match-patch';
 
@@ -34,9 +34,7 @@ import {diff_match_patch} from 'diff-match-patch';
 // import { loadHugeRtePlugins } from './vaadin-huge-rte-plugins.js';
 // < Part of the npm integration (not yet working, therefore commented out)
 
-registerStyles('vaadin-huge-rte', inputFieldShared, { moduleId: 'vaadin-huge-rte-styles' });
-
-class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement))))) {
+class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMixin(LumoInjectionMixin(LitElement)))))) {
 
     // can be overridden by the server using #setConfig
     rawInitialConfig = {};
@@ -61,35 +59,31 @@ class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMi
         }
     }
 
+    static get styles() {
+        return [inputFieldShared, css`
+            /* Styles customizations for the Huge RTE*/
+            [part='label'] {
+                flex-shrink: 0;
+            }
+
+            .vaadin-huge-rte-container {
+                align-self: stretch;
+                flex-grow: 1;
+            }`];
+    }
+
     /** @protected */
     render() {
         console.info("render");
         return html`
-            <style id="vaadin-themable-mixin-style">
-
-                /* LUMO Styles adapted from text field - start*/
-
-                /* LUMO Styles adapted from text field - end*/
-
-
-                /* Styles customizations for the Huge RTE*/
-                [part='label'] {
-                    flex-shrink: 0;
-                }
-                
-                .vaadin-huge-rte-container {
-                    align-self: stretch;
-                    flex-grow: 1;
-                }
-            </style>
-            <div class="vaadin-huge-rte-container">
+            <div class="vaadin-huge-rte-container vaadin-field-container">
                 <div part="label" @click="${this.focus}">
                     <slot name="label"></slot>
                     <span part="required-indicator" aria-hidden="true"></span>
                 </div>
 
-                <div class="inputs-wrapper" part="input-field">
-                    <slot id="slot"></slot>
+                <div part="input-field">
+                    <slot></slot>
                 </div>
 
                 <div part="helper-text">
