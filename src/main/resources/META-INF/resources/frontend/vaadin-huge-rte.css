@@ -1,9 +1,11 @@
 html {
-    --menubar-background-color: var(--lumo-contrast-5pct);
+    --hugerte-menubar-background-color: var(--lumo-contrast-5pct);
+    --hugerte-pop-arrow-border: #eee;
 }
 
 [theme~="dark"] {
-    --menubar-background-color: var(--lumo-base-color);
+    --hugerte-menubar-background-color: var(--lumo-base-color);
+    --hugerte-pop-arrow-border: var(--lumo-base-color);
 }
 
 vaadin-huge-rte {
@@ -22,13 +24,13 @@ vaadin-huge-rte {
         }
 
         .tox-editor-header > .tox-menubar {
-            background-color: var(--menubar-background-color);
+        background-color: var(--hugerte-menubar-background-color);
             padding-left: var(--lumo-space-s);
             padding-right: var(--lumo-space-s);
         }
 
         .tox-editor-container .tox-editor-header .tox-toolbar-overlord > .tox-toolbar__primary {
-            background-color: var(--menubar-background-color);
+        background-color: var(--hugerte-menubar-background-color);
             border-top: unset;
 
             /*
@@ -53,10 +55,6 @@ vaadin-huge-rte {
         :is(.tox-tbtn, .tox-mbtn, .tox-split-button:focus) {
             /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
             background: transparent;
-        }
-
-        .tox-mbtn:hover:not(:disabled):not(.tox-mbtn--active) {
-            background: var(--lumo-primary-color-50pct);
         }
 
         .tox-tbtn--enabled:not(.tox-split-button__chevron) {
@@ -238,7 +236,7 @@ vaadin-huge-rte {
 }
 
 /* overlays */
-.tox-hugerte-aux {
+.tox.tox-hugerte-aux {
     .tox-menu.tox-collection.tox-collection--list.tox-selected-menu {
         border-radius: var(--lumo-border-radius-m);
     }
@@ -283,13 +281,13 @@ vaadin-huge-rte {
     }
 
     .tox-toolbar__overflow {
-        background-color: var(--menubar-background-color) !important;
+        background-color: var(--hugerte-menubar-background-color) !important;
         box-shadow: var(--lumo-box-shadow-m) !important;
         border: 1px solid var(--lumo-contrast-10pct) !important;
     }
 
     .tox-tbtn {
-        background-color: var(--menubar-background-color);
+        background-color: var(--hugerte-menubar-background-color);
         color: var(--lumo-body-text-color)
     }
 
@@ -372,4 +370,16 @@ vaadin-huge-rte {
         border-bottom: 2px solid var(--lumo-primary-color);
     }
 
+    .tox-pop__dialog {
+        background-color: var(--lumo-base-color);
+        border-color: var(--lumo-base-color);
+    }
+
+    .tox-pop.tox-pop--left::before {
+        border-color: transparent var(--hugerte-pop-arrow-border) transparent transparent;
+    }
+    .tox-pop.tox-pop--left::after {
+        border-color: transparent var(--lumo-base-color) transparent transparent;
+    }
 }
+
