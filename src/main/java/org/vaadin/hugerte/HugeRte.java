@@ -1,6 +1,5 @@
 package org.vaadin.hugerte;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +17,11 @@ import com.vaadin.flow.data.binder.Setter;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.function.ValueProvider;
-import elemental.json.Json;
-import elemental.json.JsonArray;
-import elemental.json.JsonObject;
-import elemental.json.JsonType;
-import elemental.json.JsonValue;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.JsonNodeType;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
@@ -44,7 +43,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
     private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
 
-    private final JsonObject initialConfig = Json.createObject();
+    private final ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
     private boolean isInitialized;
 
     private Plugin[] activePlugins = {};
@@ -126,7 +125,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         element.addEventListener("_focus", event -> fireEvent(new FocusEvent<>(this, true)));
 
         element.addEventListener("_value-delta", event -> {
-            String delta = event.getEventData().getString("event.detail.delta");
+            String delta = event.getEventData().get("event.detail.delta").asString();
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
             setModelValue(newValue, true);
@@ -139,11 +138,11 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
                     "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
 
             // some convenience functionality. When resize is active, we try to auto convert dimensions for the devs
-            JsonObject config = getConfig();
-            if (config.hasKey("resize")) {
-                JsonValue resize = config.get("resize");
-                boolean resizeHorizontalActive = resize.getType() == JsonType.BOOLEAN && resize.asBoolean();
-                boolean resizeBothActive = resize.getType() == JsonType.STRING && Objects.equals(resize.asString(), "both");
+            ObjectNode config = getConfig();
+            if (config.has("resize")) {
+                JsonNode resize = config.get("resize");
+                boolean resizeHorizontalActive = resize.getNodeType() == JsonNodeType.BOOLEAN && resize.asBoolean();
+                boolean resizeBothActive = resize.getNodeType() == JsonNodeType.STRING && Objects.equals(resize.asString(), "both");
                 if (resizeHorizontalActive || resizeBothActive) {
 
                     // resize and Vaadin's "outer" dimensions does not work very well together, so in that case, we need to move the Vaadin dimension
@@ -222,8 +221,8 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     /// Returns an empty json object, if no configuration has been applied.
     ///
     /// @return configuration
-    public JsonObject getConfig() {
-        return Json.parse(this.initialConfig.toJson());
+    public ObjectNode getConfig() {
+        return this.initialConfig.deepCopy();
     }
 
     /**
@@ -267,11 +266,12 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
      */
     public HugeRte configure(String configurationKey, String... value) {
         checkAlreadyInitialized();
-        JsonArray array = Json.createArray();
-        for (int i = 0; i < value.length; i++) {
-            array.set(i, value[i]);
+        ArrayNode array = JsonNodeFactory.instance.arrayNode(value.length);
+        for (String s : value) {
+            array.add(s);
         }
-        initialConfig.put(configurationKey, array);
+
+        initialConfig.set(configurationKey, array);
         return this;
     }
 
@@ -347,11 +347,11 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             setHeight(null);
         }
 
-        JsonArray jsonArray = Json.createArray();
-        initialConfig.put("plugins", jsonArray);
+        ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode(plugins.length);
+        initialConfig.set("plugins", jsonArray);
 
         for (Plugin plugin : plugins) {
-            jsonArray.set(jsonArray.length(), plugin.getClientSideRepresentation());
+            jsonArray.add(plugin.getClientSideRepresentation());
         }
 
         return this;
