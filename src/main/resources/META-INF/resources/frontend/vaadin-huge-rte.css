@@ -1,3 +1,11 @@
+html {
+    --menubar-background-color: var(--lumo-contrast-5pct);
+}
+
+[theme~="dark"] {
+    --menubar-background-color: var(--lumo-base-color);
+}
+
 vaadin-huge-rte {
     display: flex; /* cannot be placed in :host, since it will be overridden by lumo internal styles*/
 
@@ -14,13 +22,13 @@ vaadin-huge-rte {
         }
 
         .tox-editor-header > .tox-menubar {
-            background-color: var(--lumo-contrast-5pct);
+            background-color: var(--menubar-background-color);
             padding-left: var(--lumo-space-s);
             padding-right: var(--lumo-space-s);
         }
 
         .tox-editor-container .tox-editor-header .tox-toolbar-overlord > .tox-toolbar__primary {
-            background-color: var(--lumo-contrast-5pct);
+            background-color: var(--menubar-background-color);
             border-top: unset;
 
             /*
@@ -45,6 +53,10 @@ vaadin-huge-rte {
         :is(.tox-tbtn, .tox-mbtn, .tox-split-button:focus) {
             /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
             background: transparent;
+        }
+
+        .tox-mbtn:hover:not(:disabled):not(.tox-mbtn--active) {
+            background: var(--lumo-primary-color-50pct);
         }
 
         .tox-tbtn--enabled:not(.tox-split-button__chevron) {
@@ -173,6 +185,30 @@ vaadin-huge-rte {
         .tox-edit-area::before {
             border-color: var(--vaadin-huge-rte-editor-focus-color, var(--lumo-primary-color));
         }
+
+        .tox-split-button:hover {
+            box-shadow: 0 0 0 1px var(--lumo-primary-color-50pct);
+        }
+
+        .tox-statusbar {
+            background-color: var(--lumo-base-color);
+            color: var(--lumo-body-text-color);
+        }
+
+        .tox-statusbar a,
+        .tox-statusbar__path-item,
+        .tox-statusbar__wordcount {
+            color: var(--lumo-body-text-color);
+        }
+
+        .tox-statusbar__path-item:hover {
+            color: var(--lumo-primary-text-color) !important;
+        }
+
+        .tox-statusbar a:hover {
+            color: var(--lumo-primary-text-color) !important;
+            text-decoration: underline;
+        }
     }
 
     .hugerte-flow[readonly] .tox-editor-header {
@@ -188,8 +224,6 @@ vaadin-huge-rte {
         border-right-color: var(--lumo-contrast-20pct);
     }
 
-
-
     &[invalid] .tox-edit-area::before {
         --vaadin-huge-rte-editor-focus-color: var(--vaadin-huge-rte-invalid-editor-focus-color, var(--lumo-error-color));
     }
@@ -203,5 +237,139 @@ vaadin-huge-rte {
     }
 }
 
+/* overlays */
+.tox-hugerte-aux {
+    .tox-menu.tox-collection.tox-collection--list.tox-selected-menu {
+        border-radius: var(--lumo-border-radius-m);
+    }
 
+    .tox-menu.tox-collection.tox-collection--list {
+        background: var(--lumo-base-color);
+        box-shadow: var(--lumo-box-shadow-m);
+    }
 
+    .tox-menu.tox-collection--list .tox-collection__item.tox-collection__item--active {
+        color: var(--lumo-body-text-color);
+        background-color: var(--lumo-primary-color-10pct);
+    }
+
+    .tox-menu.tox-collection.tox-collection--list {
+        min-width: var(--hugerte-mce-menu-width, 200px);
+    }
+
+    .tox-menu-nav__js.tox-collection__item.tox-collection__item--enabled {
+        background-color: var(--lumo-base-color);
+    }
+
+    .tox-menu-nav__js.tox-collection__item.tox-collection__item {
+        color: var(--lumo-body-text-color);
+    }
+
+    .tox-menu {
+        width: max-content;
+    }
+
+    .tox-fancymenuitem .tox-insert-table-picker .tox-insert-table-picker__selected {
+        background-color: var(--lumo-primary-color-10pct);
+        border-color: var(--lumo-primary-color-50pct);
+    }
+
+    .tox-fancymenuitem .tox-insert-table-picker .tox-insert-table-picker {
+        border-color: var(--lumo-contrast-20pct);
+    }
+
+    .tox-insert-table-picker {
+        background-color: var(--lumo-base-color);
+    }
+
+    .tox-toolbar__overflow {
+        background-color: var(--menubar-background-color) !important;
+        box-shadow: var(--lumo-box-shadow-m) !important;
+        border: 1px solid var(--lumo-contrast-10pct) !important;
+    }
+
+    .tox-tbtn {
+        background-color: var(--menubar-background-color);
+        color: var(--lumo-body-text-color)
+    }
+
+    .tox-tbtn--enabled:hover:not(.tox-split-button__chevron) {
+        background: var(--lumo-primary-color-50pct);
+    }
+
+    .tox-tbtn--disabled[aria-disabled="true"] .tox-icon > svg {
+        fill: var(--lumo-contrast-20pct);
+    }
+
+    .tox-tbtn .tox-icon > svg {
+        fill: var(--lumo-contrast-60pct);
+    }
+
+    .tox-tbtn--enabled .tox-icon > svg {
+        fill: var(--lumo-primary-contrast-color);
+    }
+
+    .tox-tbtn--enabled:hover .tox-icon > svg {
+        fill: var(--lumo-primary-contrast-color);
+    }
+
+    .tox-tbtn:focus {
+        background: var(--lumo-primary-color-10pct);
+    }
+
+    .tox-toolbar__group button.tox-tbtn:hover {
+        background: var(--lumo-contrast-10pct);
+    }
+
+    .tox-dialog-wrapper .tox-dialog-backdrop {
+        background-color: var(--lumo-contrast-50pct);
+    }
+
+    .tox-dialog {
+        background-color: var(--lumo-base-color);
+        color: var(--lumo-body-text-color);
+        box-shadow: var(--lumo-box-shadow-m);
+        border-radius: var(--lumo-border-radius-m);
+}
+
+    .tox-dialog__header {
+        background-color: var(--lumo-base-color);
+        color: var(--lumo-body-text-color);
+    }
+
+    .tox-dialog__body {
+        color: var(--lumo-body-text-color);
+    }
+
+    .tox-dialog__body-content .tox-form__group h1 {
+        color: var(--lumo-body-text-color);
+    }
+
+    .tox-dialog__footer {
+        background-color: var(--lumo-base-color);
+    }
+
+    .tox-dialog__footer .tox-button {
+        background-color: var(--lumo-primary-color);
+        color: var(--lumo-primary-contrast-color);
+        border-color: var(--lumo-primary-color);
+    }
+
+    .tox-dialog__header .tox-button--naked {
+        color: var(--lumo-contrast-40pct);
+    }
+
+    .tox-dialog__header .tox-button--naked.tox-button--icon:hover:not(:disabled) {
+        color: var(--lumo-contrast-20pct);
+    }
+
+    .tox-dialog__body-nav-item {
+        color: var(--lumo-body-text-color);
+    }
+
+    .tox-dialog__body-nav-item--active {
+        color: var(--lumo-primary-text-color);
+        border-bottom: 2px solid var(--lumo-primary-color);
+    }
+
+}
