@@ -135,11 +135,6 @@ public class FullDemoView extends Div {
 
         add(bDialog);
 
-        add(new Button("Switch Theme", e -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-            themeList.set("dark", !themeList.contains("dark"));
-        }));
-
         hugeRte.addValueChangeListener(e -> {
             Notification.show("ValueChange event!");
             System.out.println(e.getValue());
