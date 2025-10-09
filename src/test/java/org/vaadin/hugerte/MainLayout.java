@@ -73,7 +73,7 @@ public class MainLayout extends AppLayout {
     private enum Theme implements ClientSideReference {
         NONE(null),
         LUMO("@vaadin/vaadin-lumo-styles/lumo.css"),
-        AURA("@vaadin/vaadin-aura-styles/aura.css");
+        AURA("@vaadin/aura/aura.css");
 
         private final String value;
 
