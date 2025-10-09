@@ -9,11 +9,12 @@
     <url>https://github.com/parttio/hugerte-for-flow</url>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <vaadin.version>24.9.0</vaadin.version>
+        <vaadin.version>25.0.0-alpha12</vaadin.version>
+        <lombok.version>1.18.40</lombok.version>
     </properties>
     <organization>
         <name>Team Parttio</name>
@@ -61,7 +62,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.5.5</version>
+                <version>4.0.0-M3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
