@@ -2,7 +2,7 @@ package org.vaadin.hugerte;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import org.vaadin.firitin.components.RichText;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -26,7 +26,7 @@ public class ValueChangeModesView extends VerticalLayout {
         hugeRte.setLabel("Hello Huge RTE");
 
         Span timePicker = new Span();
-        RichText output = new RichText();
+        Html output = new Html("<div></div>");
 
         Select<ValueChangeMode> modeSelect = new Select<>();
         modeSelect.setItems(ValueChangeMode.values());
@@ -47,7 +47,7 @@ public class ValueChangeModesView extends VerticalLayout {
 
         hugeRte.addValueChangeListener(e -> {
             timePicker.setText(LocalTime.now().truncatedTo(ChronoUnit.MILLIS).toString());
-            output.setRichText(e.getValue());
+            output.setHtmlContent("<div>" + e.getValue() + "</div>");
         });
 
         modeSelect.setValue(hugeRte.getValueChangeMode());

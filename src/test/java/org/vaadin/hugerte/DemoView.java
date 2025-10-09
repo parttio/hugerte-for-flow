@@ -1,12 +1,11 @@
 package org.vaadin.hugerte;
 
-import org.vaadin.firitin.components.RichText;
-import com.sun.jna.platform.unix.solaris.LibKstat.KstatNamed.UNION.STR;
+import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.HtmlContainer;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -39,7 +38,7 @@ public class DemoView extends VerticalLayout {
         Button b2 = new Button("Show content", e -> {
             var n = new Dialog(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getValue())
+                    new Html("<div>" + hugeRte.getValue() + "</div>")
             ));
             n.open();
         });

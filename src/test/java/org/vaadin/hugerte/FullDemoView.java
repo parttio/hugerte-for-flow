@@ -2,7 +2,7 @@ package org.vaadin.hugerte;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
-import org.vaadin.firitin.components.RichText;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.UI;
@@ -80,7 +80,7 @@ public class FullDemoView extends Div {
             var n = new Notification("", 3000);
             n.add(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getValue())
+                    new Html("<div>" + hugeRte.getValue() + "</div>")
                     )
             );
             n.open();
