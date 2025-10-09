@@ -223,20 +223,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     ///
     /// @return configuration
     public JsonObject getConfig() {
-        JsonObject configCopy = Json.createObject();
-
-        Serializable rawConfig = getElement().getPropertyRaw("rawInitialConfig");
-        if (rawConfig instanceof JsonObject joRawConfig) {
-            for (String key : joRawConfig.keys()) {
-                configCopy.put(key, (JsonValue) joRawConfig.get(key));
-            }
-        }
-
-        for (String key : this.initialConfig.keys()) {
-            configCopy.put(key, (JsonValue) this.initialConfig.get(key));
-        }
-
-        return configCopy;
+        return Json.parse(this.initialConfig.toJson());
     }
 
     /**
