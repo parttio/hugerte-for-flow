@@ -13,6 +13,7 @@ import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 import { LumoInjectionMixin } from '@vaadin/vaadin-themable-mixin/lumo-injection-mixin.js';
 import { inputFieldShared } from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
+import { SlotStylesMixin } from '@vaadin/component-base/src/slot-styles-mixin.js';
 
 import {diff_match_patch} from 'diff-match-patch';
 
@@ -34,7 +35,7 @@ import {diff_match_patch} from 'diff-match-patch';
 // import { loadHugeRtePlugins } from './vaadin-huge-rte-plugins.js';
 // < Part of the npm integration (not yet working, therefore commented out)
 
-class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMixin(LumoInjectionMixin(LitElement)))))) {
+class HugeRte extends SlotStylesMixin(FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMixin(LumoInjectionMixin(LitElement))))))) {
 
     // can be overridden by the server using #setConfig
     rawInitialConfig = {};
@@ -65,7 +66,7 @@ class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMi
                 display: flex;
                 flex-direction: column;
             }
-        
+
             /* Styles customizations for the Huge RTE*/
             [part='label'] {
                 flex-shrink: 0;
@@ -83,7 +84,7 @@ class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMi
     /** @protected */
     render() {
         return html`
-            <div class="vaadin-huge-rte-container vaadin-text-area-container">
+            <div class="vaadin-huge-rte-container vaadin-field-container">
                 <div part="label" @click="${this.focus}">
                     <slot name="label"></slot>
                     <span part="required-indicator" aria-hidden="true"></span>
