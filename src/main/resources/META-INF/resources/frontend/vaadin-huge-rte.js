@@ -61,6 +61,11 @@ class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMi
 
     static get styles() {
         return [inputFieldShared, css`
+            :host {
+                display: flex;
+                flex-direction: column;
+            }
+        
             /* Styles customizations for the Huge RTE*/
             [part='label'] {
                 flex-shrink: 0;
@@ -69,14 +74,16 @@ class HugeRte extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMi
             .vaadin-huge-rte-container {
                 align-self: stretch;
                 flex-grow: 1;
-            }`];
+            }
+        
+        
+        `];
     }
 
     /** @protected */
     render() {
-        console.info("render");
         return html`
-            <div class="vaadin-huge-rte-container vaadin-field-container">
+            <div class="vaadin-huge-rte-container vaadin-text-area-container">
                 <div part="label" @click="${this.focus}">
                     <slot name="label"></slot>
                     <span part="required-indicator" aria-hidden="true"></span>
