@@ -9,11 +9,11 @@ import {defineCustomElement} from '@vaadin/component-base/src/define.js';
 import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
-import {FocusMixin} from '@vaadin/a11y-base/src/focus-mixin.js';
-import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import { LumoInjectionMixin } from '@vaadin/vaadin-themable-mixin/lumo-injection-mixin.js';
-import { inputFieldShared } from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
-import { SlotStylesMixin } from '@vaadin/component-base/src/slot-styles-mixin.js';
+import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
+import {requiredField} from '@vaadin/vaadin-lumo-styles/mixins/required-field.js';
+import {SlotStylesMixin} from '@vaadin/component-base/src/slot-styles-mixin.js';
+import {ThemeDetectionMixin} from "@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js";
 
 import {diff_match_patch} from 'diff-match-patch';
 
@@ -35,7 +35,15 @@ import {diff_match_patch} from 'diff-match-patch';
 // import { loadHugeRtePlugins } from './vaadin-huge-rte-plugins.js';
 // < Part of the npm integration (not yet working, therefore commented out)
 
-class HugeRte extends SlotStylesMixin(FieldMixin(FocusMixin(ThemableMixin(ElementMixin(PolylitMixin(LumoInjectionMixin(LitElement))))))) {
+
+class HugeRte extends SlotStylesMixin(
+    FieldMixin(
+        ThemableMixin(
+            ElementMixin(
+                ThemeDetectionMixin(
+                    PolylitMixin(LitElement))))))
+    // FocusMixin is explicitly not used, as it would mess up the focused attribute
+{
 
     // can be overridden by the server using #setConfig
     rawInitialConfig = {};
@@ -57,11 +65,15 @@ class HugeRte extends SlotStylesMixin(FieldMixin(FocusMixin(ThemableMixin(Elemen
         readonly: {
             type: Boolean,
             reflectToAttribute: true
+        },
+        focused: {
+            type: Boolean,
+            reflectToAttribute: true
         }
     }
 
     static get styles() {
-        return [inputFieldShared, css`
+        return [inputFieldShared, requiredField, css`
             :host {
                 display: flex;
                 flex-direction: column;
@@ -185,7 +197,6 @@ class HugeRte extends SlotStylesMixin(FieldMixin(FocusMixin(ThemableMixin(Elemen
                     this.editor = editor;
 
                     editor.on('init', () => {
-                        // TODO check if still needed in V25
                         if (this.isInDialog()) {
                             // This is inside a shadowroot (Dialog in Vaadin)
                             // and needs some hacks to make this nagigateable with keyboard
@@ -238,14 +249,22 @@ class HugeRte extends SlotStylesMixin(FieldMixin(FocusMixin(ThemableMixin(Elemen
                         this.onValueChangeIfMode("change");
                     });
 
+                    // we need to fire custom focus and blur events and trigger the Vaadin events on the
+                    // client. If we would simply forward them, it would lead to a mass of focus and blur events.
+                    editor.on('focus', e => {
+                        this.focused = true;
+
+                        this.dispatchEvent(new CustomEvent("_focus"));
+                    });
+
                     editor.on('blur', e => {
+                        this.focused = false;
+
                         this.closeToolbarOverflowMenu();
                         this.onValueChangeIfMode("blur");
 
                         this.dispatchEvent(new CustomEvent("_blur"));
                     });
-
-                    editor.on('focus', e => this.dispatchEvent(new CustomEvent("_focus")));
 
                     editor.on('input', e => {
                         if (this.valueChangeMode === "timeout") {

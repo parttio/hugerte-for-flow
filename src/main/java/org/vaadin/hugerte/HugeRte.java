@@ -121,6 +121,9 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         Element element = getElement();
         element.setPropertyJson("initialConfig", initialConfig);
 
+        // don't remove
+        // we have to wrap the client side focus events in custom events to prevent an endless wave of
+        // focus events by just forwarding them
         element.addEventListener("_blur", event -> fireEvent(new BlurEvent<>(this, true)));
         element.addEventListener("_focus", event -> fireEvent(new FocusEvent<>(this, true)));
 
