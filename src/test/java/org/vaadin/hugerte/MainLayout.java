@@ -2,6 +2,9 @@ package org.vaadin.hugerte;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.vaadin.flow.theme.aura.Aura;
+import com.vaadin.flow.theme.lumo.Lumo;
 import org.apache.commons.lang3.StringUtils;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -31,27 +34,14 @@ public class MainLayout extends AppLayout {
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
 
-        Select<Theme> themeSelect = new Select<>("", Theme.values());
-        themeSelect.addValueChangeListener(e -> {
-            if(currentStyleSheetRegistration != null) {
-                currentStyleSheetRegistration.remove();
-                currentStyleSheetRegistration = null;
-            }
-
-            Theme theme = e.getValue();
-
-            if (theme.getClientSideRepresentation() != null) {
-                currentStyleSheetRegistration = UI.getCurrent().getPage().addStyleSheet(theme.getClientSideRepresentation());
-            }
-        });
-        themeSelect.setValue(Theme.LUMO);
+        Select<Theme> themeSelect = initThemeSelector();
         themeSelect.getStyle().setMarginLeft("auto");
 
         Button darkMode = new Button("Dark Mode", e -> {
             ThemeList themeList = UI.getCurrent().getElement().getThemeList();
             boolean lightModeActive = !themeList.contains("dark");
             themeList.set("dark", lightModeActive);
-            e.getSource().setText(lightModeActive ? "Dark Mode" : "Light Mode");
+            e.getSource().setText(lightModeActive ? "Light Mode" : "Dark Mode");
         });
 
 
@@ -70,10 +60,27 @@ public class MainLayout extends AppLayout {
         addToDrawer(scroller);
     }
 
+    private Select<Theme> initThemeSelector() {
+        Select<Theme> themeSelect = new Select<>("", Theme.values());
+        themeSelect.addValueChangeListener(e -> {
+            if(currentStyleSheetRegistration != null) {
+                currentStyleSheetRegistration.remove();
+                currentStyleSheetRegistration = null;
+            }
+
+            Theme theme = e.getValue();
+
+            if (theme.getClientSideRepresentation() != null) {
+                currentStyleSheetRegistration = UI.getCurrent().getPage().addStyleSheet(theme.getClientSideRepresentation());
+            }
+        });
+        themeSelect.setValue(Theme.LUMO);
+        return themeSelect;
+    }
+
     private enum Theme implements ClientSideReference {
-        NONE(null),
-        LUMO("@vaadin/vaadin-lumo-styles/lumo.css"),
-        AURA("@vaadin/aura/aura.css");
+        LUMO(Lumo.STYLESHEET),
+        AURA(Aura.STYLESHEET);
 
         private final String value;
 

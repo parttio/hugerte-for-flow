@@ -13,8 +13,8 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <vaadin.version>25.0.0-alpha12</vaadin.version>
-        <lombok.version>1.18.40</lombok.version>
+        <vaadin.version>25.0.0-beta8</vaadin.version>
+        <lombok.version>1.18.42</lombok.version>
     </properties>
     <organization>
         <name>Team Parttio</name>
@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>4.0.0-M3</version>
+                <version>4.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -116,6 +116,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-dev</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>test</scope>
@@ -138,6 +143,12 @@
             <version>0.0.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>test3</scope>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>in.virit</groupId>-->
 <!--            <artifactId>viritin</artifactId>-->

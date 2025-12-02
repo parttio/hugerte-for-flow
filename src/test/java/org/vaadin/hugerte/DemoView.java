@@ -10,6 +10,8 @@ import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 
@@ -29,7 +31,7 @@ public class DemoView extends VerticalLayout {
         hugeRte.setLabel("Hello Huge RTE");
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
 //        hugeRte.setHeight("700px");
-        add(hugeRte);
+        add(new TextField("Sample Textfield"), new TextArea("Sample Textarea"), hugeRte);
 
         Button b = new Button("Set content dynamically", e -> {
             hugeRte.setValue("New value");
