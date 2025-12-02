@@ -10,8 +10,8 @@ import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
 import {requiredField} from '@vaadin/vaadin-lumo-styles/mixins/required-field.js';
+import {inputFieldShared} from '@vaadin/vaadin-lumo-styles/mixins/input-field-shared.js';
 import {SlotStylesMixin} from '@vaadin/component-base/src/slot-styles-mixin.js';
 import {ThemeDetectionMixin} from "@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js";
 
@@ -88,8 +88,6 @@ class HugeRte extends SlotStylesMixin(
                 align-self: stretch;
                 flex-grow: 1;
             }
-        
-        
         `];
     }
 
@@ -222,22 +220,6 @@ class HugeRte extends SlotStylesMixin(
                             const aux = document.getElementsByClassName('tox-hugerte-aux')[0];
                             aux.dontmove = true;
                         }
-
-                        // HugeRTE appends its skin css into the head when gets loaded. Flow applies its css beforehand,
-                        // which means, that our custom Lumo css is overridden by the default css of the RTE. Thus our
-                        // customization might be ignored and needs additional ugly customization like !importan or
-                        // more specific selectors.
-                        // Therefore we have this small workaround here to ensure, that our css is loaded AFTER
-                        // the hugerte skin css.
-                        // Nevertheless, this might break in the future, so for the long term, it might be useful to create
-                        // our own lumo skin at some point so that we do not have to hack around this situation.
-                        // TODO check if still needed
-                        // const ourStyles = document.head.querySelector("[href*='vaadin-huge-rte.css']");
-                        // if (ourStyles) {
-                        //     document.head.append(ourStyles);
-                        // } else {
-                        //     console.error("Could not find 'vaadin-huge-rte.css'. Has it been renamed or moved?");
-                        // }
 
                         if (this._lastSyncedValue) {
                             editor.setContent(this._lastSyncedValue);
