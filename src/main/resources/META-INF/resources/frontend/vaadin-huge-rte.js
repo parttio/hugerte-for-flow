@@ -10,7 +10,6 @@ import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import {requiredField} from '@vaadin/vaadin-lumo-styles/mixins/required-field.js';
 import {inputFieldShared} from '@vaadin/vaadin-lumo-styles/mixins/input-field-shared.js';
 import {SlotStylesMixin} from '@vaadin/component-base/src/slot-styles-mixin.js';
 import {ThemeDetectionMixin} from "@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js";
@@ -73,7 +72,7 @@ class HugeRte extends SlotStylesMixin(
     }
 
     static get styles() {
-        return [inputFieldShared, requiredField, css`
+        return [inputFieldShared, css`
             :host {
                 display: flex;
                 flex-direction: column;
