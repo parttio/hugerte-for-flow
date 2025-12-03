@@ -7,6 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 21

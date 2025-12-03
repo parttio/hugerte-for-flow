@@ -258,8 +258,10 @@
                 </plugins>
             </build>
         </profile>
+
+        <!--TODO rebuild release and release-gpg to a smoother variant or check, if config helps-->
         <profile>
-            <id>release-win11</id>
+            <id>release-gpg</id>
             <build>
                 <plugins>
                     <plugin>
