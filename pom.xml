@@ -100,20 +100,6 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spring-boot-starter</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>hilla</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>copilot</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>hilla-dev</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
@@ -140,13 +126,13 @@
         <dependency>
             <groupId>in.virit</groupId>
             <artifactId>mopo</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <scope>test3</scope>
+            <scope>test</scope>
         </dependency>
 
 <!--        <dependency>-->
@@ -224,33 +210,6 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
-
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>flatten-maven-plugin</artifactId>-->
-<!--                <version>1.5.0</version>-->
-<!--                <configuration>-->
-<!--                    <flattenMode>oss</flattenMode>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    &lt;!&ndash; enable flattening &ndash;&gt;-->
-<!--                    <execution>-->
-<!--                        <id>flatten</id>-->
-<!--                        <phase>process-resources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>flatten</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                    &lt;!&ndash; ensure proper cleanup &ndash;&gt;-->
-<!--                    <execution>-->
-<!--                        <id>flatten.clean</id>-->
-<!--                        <phase>clean</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>clean</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 

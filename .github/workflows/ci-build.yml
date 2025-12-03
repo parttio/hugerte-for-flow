@@ -15,4 +15,4 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots install -Pproduction javadoc:javadoc
+        run: mvn --batch-mode --update-snapshots install javadoc:javadoc

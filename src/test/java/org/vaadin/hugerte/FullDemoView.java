@@ -2,10 +2,8 @@ package org.vaadin.hugerte;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
-import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
+
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -122,7 +120,7 @@ public class FullDemoView extends Div {
             dialog.open();
             dialog.setCloseOnOutsideClick(false);
             dialog.setResizable(true);
-            dialog.setModal(true);
+            dialog.setModality(ModalityMode.VISUAL);
             dialog.setDraggable(true);
             dialog.setWidth("700px");
 
