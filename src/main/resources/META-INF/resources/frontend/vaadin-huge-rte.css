@@ -22,13 +22,13 @@ vaadin-huge-rte {
         }
 
         .tox-editor-header > .tox-menubar {
-        background-color: var(--hugerte-menubar-background-color);
+            background-color: var(--hugerte-menubar-background-color);
             padding-left: var(--lumo-space-s);
             padding-right: var(--lumo-space-s);
         }
 
         .tox-editor-container .tox-editor-header .tox-toolbar-overlord > .tox-toolbar__primary {
-        background-color: var(--hugerte-menubar-background-color);
+            background-color: var(--hugerte-menubar-background-color);
             border-top: unset;
 
             /*
@@ -50,7 +50,10 @@ vaadin-huge-rte {
             padding: 0;
         }
 
-        :is(.tox-tbtn, .tox-mbtn, .tox-split-button:focus) {
+        :is(.tox-tbtn,
+            .tox-tbtn--disabled,
+            .tox-mbtn,
+            .tox-split-button:focus) {
             /* keep this before the --enabled variants, otherwise it will override (or needs a :not)*/
             background: transparent;
         }
@@ -59,20 +62,34 @@ vaadin-huge-rte {
             background: var(--lumo-primary-color);
         }
 
+        .tox-tbtn--enabled.tox-tbtn--disabled:not(.tox-split-button__chevron) {
+            background: var(--lumo-primary-color-50pct);
+        }
+
         .tox-tbtn:hover {
             background: var(--lumo-contrast-10pct);
         }
 
-        .tox-tbtn--disabled:hover {
+        /*.tox-tbtn--disabled:hover {*/
+        .tox-tbtn--disabled .tox-tbtn:hover,
+        .tox-split-button.tox-tbtn--disabled:hover,
+        .tox-split-button.tox-tbtn--disabled .tox-tbtn:hover{
             background: var(--lumo-contrast-5pct);
         }
 
         .tox-tbtn--enabled:hover:not(.tox-split-button__chevron) {
             background: var(--lumo-primary-color-50pct);
         }
+        .tox-tbtn--enabled.tox-tbtn--disabled:hover:not(.tox-split-button__chevron) {
+            background: var(--lumo-primary-color-10pct);
+        }
 
         .tox-tbtn--disabled[aria-disabled="true"] .tox-icon > svg {
             fill: var(--lumo-contrast-20pct);
+        }
+
+        .tox-tbtn--disabled[aria-disabled="true"].tox-tbtn--enabled .tox-icon > svg {
+            fill: var(--lumo-primary-contrast-color);
         }
 
         .tox-tbtn .tox-icon > svg {
@@ -102,6 +119,7 @@ vaadin-huge-rte {
         .tox-mbtn.tox-mbtn--select.tox-mbtn--active {
             background: var(--lumo-primary-color-50pct);
             color: var(--lumo-primary-contrast-color);
+
         }
 
         /*.tox-menubar > .tox-mbtn.tox-mbtn--select:hover:not(:disabled) {*/
@@ -111,10 +129,18 @@ vaadin-huge-rte {
         .tox-mbtn.tox-mbtn--select {
             color: var(--lumo-body-text-color);
             font-size: var(--lumo-font-size-m);
+
+            &[disabled] {
+                color: var(--lumo-disabled-text-color);
+            }
         }
 
         .tox-tbtn.tox-tbtn--select.tox-tbtn--bespoke {
             color: var(--lumo-body-text-color);
+
+            &[disabled] {
+                color: var(--lumo-disabled-text-color);
+            }
         }
 
         .tox-menu.tox-collection.tox-collection--list.tox-selected-menu {
@@ -326,7 +352,7 @@ vaadin-huge-rte {
         color: var(--lumo-body-text-color);
         box-shadow: var(--lumo-box-shadow-m);
         border-radius: var(--lumo-border-radius-m);
-}
+    }
 
     .tox-dialog__header {
         background-color: var(--lumo-base-color);

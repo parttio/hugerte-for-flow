@@ -16,25 +16,6 @@ import {ThemeDetectionMixin} from "@vaadin/vaadin-themable-mixin/vaadin-theme-de
 
 import {diff_match_patch} from 'diff-match-patch';
 
-
-// > Part of the npm integration (not yet working, therefore commented out)
-// --- HugeRTE core ---
-// @see https://github.com/hugerte/hugerte-docs
-// import basic scripts
-// import hugerte from 'hugerte';
-// import 'hugerte/models/dom';
-// import 'hugerte/icons/default';
-// import 'hugerte/themes/silver';
-// import 'hugerte/skins/content/default/content.js';
-// import skin and content css to prevent 404 issues
-// to be checked later, if this can be improved
-// import 'hugerte/skins/ui/oxide/skin.min.css';
-// import oxideContentCss from 'hugerte/skins/ui/oxide/content.min.css?raw';
-// import defaultContentCss from 'hugerte/skins/content/default/content.min.css?raw';
-// import { loadHugeRtePlugins } from './vaadin-huge-rte-plugins.js';
-// < Part of the npm integration (not yet working, therefore commented out)
-
-
 class HugeRte extends SlotStylesMixin(
     FieldMixin(
         ThemableMixin(
@@ -78,14 +59,13 @@ class HugeRte extends SlotStylesMixin(
                 flex-direction: column;
             }
 
-            /* Styles customizations for the Huge RTE*/
-            [part='label'] {
-                flex-shrink: 0;
-            }
-
             .vaadin-huge-rte-container {
                 align-self: stretch;
                 flex-grow: 1;
+
+                display: flex;
+                flex-direction: column;
+                row-gap: var(--lumo-space-xs);
             }
         `];
     }
@@ -159,7 +139,7 @@ class HugeRte extends SlotStylesMixin(
         super.disconnectedCallback();
     }
 
-     _initEditor() {
+    _initEditor() {
         if (!this.editor) {
             this.lightDomContainer = document.createElement('div');
             this.append(this.lightDomContainer); // will be put into the default slot
@@ -224,6 +204,8 @@ class HugeRte extends SlotStylesMixin(
                             editor.setContent(this._lastSyncedValue);
                             this.onValueChange(); // flush updated value - needed, if the initial value is not original hugerte html
                         }
+
+                        this.updateReadonlyMode();
                     });
 
                     editor.on('change', e => {
@@ -456,7 +438,7 @@ class HugeRte extends SlotStylesMixin(
     }
 
     updateReadonlyMode() {
-        this.editor.mode.set((this.disabled || this.readonly) ? 'readonly' : 'design');
+        this.editor?.mode.set((this.disabled || this.readonly) ? 'readonly' : 'design');
     }
 
     static get is() {
