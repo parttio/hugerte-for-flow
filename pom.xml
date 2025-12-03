@@ -3,7 +3,7 @@
 
     <groupId>org.parttio</groupId>
     <artifactId>hugerte-for-flow</artifactId>
-    <version>2.0.0</version>
+    <version>1.0.11-SNAPSHOT</version>
     <name>HugeRTE for Flow</name>
     <description>Integration of HugeRTE for Vaadin Flow</description>
     <url>https://github.com/parttio/hugerte-for-flow</url>
@@ -38,7 +38,7 @@
         <url>https://github.com/parttio/hugerte-for-flow</url>
         <connection>scm:git:git://github.com/parttio/hugerte-for-flow.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:/parttio/hugerte-for-flow.git</developerConnection>
-        <tag>hugerte-for-flow-2.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
