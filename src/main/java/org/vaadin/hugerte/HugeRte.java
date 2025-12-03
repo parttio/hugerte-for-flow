@@ -176,7 +176,11 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         if (value != null && (!numericPixelOnly || value.endsWith("px"))) {
             setter.accept(this, null);
             if (numericPixelOnly) {
-                configure(hugeRteKey, Double.parseDouble(value.replace("px", "")));
+                try {
+                    configure(hugeRteKey, Double.parseDouble(value.replace("px", "")));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(hugeRteKey + " does not point to a valid number");
+                }
             } else {
                 configure(hugeRteKey, value);
             }
@@ -457,13 +461,13 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     /// Please note, that the client also throttles the amount of events, that might be fired to prevent the
     /// events from overhelming the server.
     ///
-    /// @param timeoutInMillseconds milliseconds to be used by the value change modes
-    public void setValueChangeTimeout(int timeoutInMillseconds) {
-        if (timeoutInMillseconds <= 0) {
-            throw new IllegalArgumentException("Timeout must be greater than 0");
+    /// @param timeoutInMilliseconds milliseconds to be used by the value change modes
+    public void setValueChangeTimeout(int timeoutInMilliseconds) {
+        if (timeoutInMilliseconds < 0) {
+            throw new IllegalArgumentException("Timeout must be zero or greater!");
         }
 
-        getElement().setProperty("valueChangeTimeout", timeoutInMillseconds);
+        getElement().setProperty("valueChangeTimeout", timeoutInMilliseconds);
     }
 
     /// Sets the timespan in milliseconds, that will be used by several value change modes.

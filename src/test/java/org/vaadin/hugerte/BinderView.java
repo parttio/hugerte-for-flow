@@ -26,7 +26,7 @@ public class BinderView extends VerticalLayout {
         plainContent.setValueChangeMode(ValueChangeMode.EAGER);
 
         HugeRte rte = new HugeRte();
-        rte.setLabel("My Aweseom Rich Text Editor");
+        rte.setLabel("My Awesome Rich Text Editor");
         rte.setValueChangeMode(org.vaadin.hugerte.ValueChangeMode.INTERVAL);
 
         add(plainContent, rte);

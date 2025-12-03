@@ -13,13 +13,13 @@ public enum ValueChangeMode implements ClientSideReference {
     ON_CHANGE("change"),
 
     /**
-     * Syns the value with the server, when the editor loses the focus ("blur event").
+     * Syncs the value with the server, when the editor loses the focus ("blur event").
      */
     ON_BLUR("blur"),
 
     /**
      * <p>
-     * Syns the value after the last change, when a certain amount of time has passed. If before that timeout any
+     * Syncs the value after the last change, when a certain amount of time has passed. If before that timeout any
      * additional changes are made, the timeout is reset and starts again.
      * </p><p>
      * This is the equivalent to Vaadin's native {@link com.vaadin.flow.data.value.ValueChangeMode#LAZY}
@@ -49,8 +49,8 @@ public enum ValueChangeMode implements ClientSideReference {
     }
 
     /**
-     * Interpretes the given string as the client side representation of an enum and returns the matching instance.
-     * @param clientSide client side represenation
+     * Interprets the given string as the client side representation of an enum and returns the matching instance.
+     * @param clientSide client side representation
      * @return instance
      * @throws IllegalArgumentException on any unknown string
      */

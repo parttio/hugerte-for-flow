@@ -68,9 +68,6 @@ public class DemoView extends VerticalLayout {
 
         hugeRte.addValueChangeListener(e -> {
             Notification.show("ValueChange event!");
-            System.out.println();
-            System.out.println("### value change event###");
-            System.out.println(e.getValue());
         });
 
     }

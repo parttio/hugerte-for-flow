@@ -151,7 +151,7 @@ class HugeRte extends SlotStylesMixin(
                 rawConfig = this.rawInitialConfig;
             }
 
-            // create combined config, with based config being overriden by any additiona configurations
+            // create combined config, with based config being overriden by any additional configurations
             const config = {
                 resize: false,
                 height: 250,
@@ -169,14 +169,14 @@ class HugeRte extends SlotStylesMixin(
 
                 target: this.lightDomContainer,
 
-                // readonly: !this.enabled, // comes form the field mixin
+                // readonly: !this.enabled, // comes from the field mixin
                 setup: (editor) => {
                     this.editor = editor;
 
                     editor.on('init', () => {
                         if (this.isInDialog()) {
                             // This is inside a shadowroot (Dialog in Vaadin)
-                            // and needs some hacks to make this nagigateable with keyboard
+                            // and needs some hacks to make this navigable with keyboard
                             if (this.tabIndex < 0) {
                                 // make the wrapping element also focusable
                                 this.setAttribute("tabindex", 0);
@@ -191,7 +191,6 @@ class HugeRte extends SlotStylesMixin(
                                     aux.parentElement.removeChild(aux);
                                     // Fix to allow menu grow outside Dialog
                                     aux.style.position = 'absolute';
-                                    this.editor = editor;
                                     this.appendChild(aux);
                                 }
                             });
@@ -415,7 +414,7 @@ class HugeRte extends SlotStylesMixin(
         if (!this.beforeUnloadHandler) {
             this.beforeUnloadHandler = (event) => {
                 const blurEvent = new Event("blur");
-                c.dispatchEvent(blurEvent);
+                this.dispatchEvent(blurEvent);
 
                 this.syncValue();
             };
