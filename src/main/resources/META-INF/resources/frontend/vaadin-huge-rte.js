@@ -313,7 +313,7 @@ class HugeRte extends SlotStylesMixin(
             }
 
             if(this._valueChangeMode === "interval") {
-                this.startValueChangInterval();
+                this.startValueChangeInterval();
             } else if (this._valueChangeHandleForInterval) {
                 this.stopValueChangeInterval();
             }
@@ -336,7 +336,7 @@ class HugeRte extends SlotStylesMixin(
             if (this._valueChangeHandleForTimeout) {
                 this.stopValueChangeTimeout();
             } else if (this._valueChangeHandleForInterval) {
-                this.startValueChangInterval(); // also stops the current interval
+                this.startValueChangeInterval(); // also stops the current interval
             }
 
         }
@@ -358,7 +358,7 @@ class HugeRte extends SlotStylesMixin(
         delete this._valueChangeHandleForInterval;
     }
 
-    startValueChangInterval() {
+    startValueChangeInterval() {
         if (this._valueChangeHandleForInterval) {
             this.stopValueChangeInterval();
         }
