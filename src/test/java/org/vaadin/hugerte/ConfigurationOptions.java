@@ -38,7 +38,7 @@ public class ConfigurationOptions extends Div {
         add(hugeRte);
         getElement().getNode().runWhenAttached(ui -> ui
                 .beforeClientResponse(this, context -> {
-                    pre.setText(hugeRte.config.toJson());
+                    pre.setText(hugeRte.getConfig().toPrettyString());
                 }));
         return hugeRte;
     }

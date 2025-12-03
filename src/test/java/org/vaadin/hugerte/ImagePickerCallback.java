@@ -21,13 +21,14 @@ public class ImagePickerCallback extends Div {
     public static class FileCallbackHugeRte extends HugeRte {
         public FileCallbackHugeRte() {
             // This is RAW JS!! Other options are evaluated as JSON on top of this
-            setConfig("""
+            setRawConfig("""
                 {
                     file_picker_callback: (callback, value, meta) => {
+                        const webComponent = this.editor.editorContainer.parentElement;
                         // save callback for later use
-                        editor._image_callback = callback;
+                        webComponent._image_callback = callback;
                         // trigger some Vaadin function (that opens a dialog)
-                        editor.$server.filePickerCallback(meta.filetype);
+                        webComponent.$server.filePickerCallback(meta.filetype);
                     }
                 }
                 """);

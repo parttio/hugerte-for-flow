@@ -1,20 +1,31 @@
 package org.vaadin.hugerte;
 
 import java.util.List;
+import java.util.Optional;
+
+import com.vaadin.flow.theme.aura.Aura;
+import com.vaadin.flow.theme.lumo.Lumo;
 import org.apache.commons.lang3.StringUtils;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
+import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 @Layout
 public class MainLayout extends AppLayout {
+
+    private Registration currentStyleSheetRegistration;
 
     public MainLayout() {
         DrawerToggle toggle = new DrawerToggle();
@@ -22,7 +33,19 @@ public class MainLayout extends AppLayout {
         title.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
-        addToNavbar(toggle, title);
+
+        Select<Theme> themeSelect = initThemeSelector();
+        themeSelect.getStyle().setMarginLeft("auto");
+
+        Button darkMode = new Button("Dark Mode", e -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+            boolean lightModeActive = !themeList.contains("dark");
+            themeList.set("dark", lightModeActive);
+            e.getSource().setText(lightModeActive ? "Light Mode" : "Dark Mode");
+        });
+
+
+        addToNavbar(toggle, title, themeSelect, darkMode);
 
         SideNav nav = new SideNav();
 
@@ -35,5 +58,39 @@ public class MainLayout extends AppLayout {
                 .forEach(nav::addItem);
 
         addToDrawer(scroller);
+    }
+
+    private Select<Theme> initThemeSelector() {
+        Select<Theme> themeSelect = new Select<>("", Theme.values());
+        themeSelect.addValueChangeListener(e -> {
+            if(currentStyleSheetRegistration != null) {
+                currentStyleSheetRegistration.remove();
+                currentStyleSheetRegistration = null;
+            }
+
+            Theme theme = e.getValue();
+
+            if (theme.getClientSideRepresentation() != null) {
+                currentStyleSheetRegistration = UI.getCurrent().getPage().addStyleSheet(theme.getClientSideRepresentation());
+            }
+        });
+        themeSelect.setValue(Theme.LUMO);
+        return themeSelect;
+    }
+
+    private enum Theme implements ClientSideReference {
+        LUMO(Lumo.STYLESHEET),
+        AURA(Aura.STYLESHEET);
+
+        private final String value;
+
+        Theme(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String getClientSideRepresentation() {
+            return value;
+        }
     }
 }

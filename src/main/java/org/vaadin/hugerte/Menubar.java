@@ -1,6 +1,6 @@
 package org.vaadin.hugerte;
 
-public enum Menubar {
+public enum Menubar implements ClientSideReference {
     //@formatter:off
     FILE("file"),
     EDIT("edit"),
@@ -12,10 +12,14 @@ public enum Menubar {
     HELP("help");
     //@formatter:on
 
-    public final String menubarLabel;
+    private final String clientSideRepresentation;
 
-    private Menubar(String menubarLabel) {
-        this.menubarLabel = menubarLabel;
+    Menubar(String clientSideRepresentation) {
+        this.clientSideRepresentation = clientSideRepresentation;
     }
 
+    @Override
+    public String getClientSideRepresentation() {
+        return clientSideRepresentation;
+    }
 }

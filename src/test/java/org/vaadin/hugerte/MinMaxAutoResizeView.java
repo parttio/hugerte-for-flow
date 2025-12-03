@@ -9,11 +9,15 @@ import com.vaadin.flow.router.Route;
 public class MinMaxAutoResizeView extends VerticalLayout {
 
     public MinMaxAutoResizeView() {
+        setSizeFull();
+        setAlignItems(Alignment.STRETCH);
+
         HugeRte rte = new HugeRte("Autoresize with a range of 200-600px");
 
         rte.configurePlugins(Plugin.AUTORESIZE);
         rte.configure("max_height", 600);
         rte.setMinHeight("200px");
+        rte.setHelperText("This demo shows the autoresize feature in combination with min and max height. Enter some text to see, how the editor behaves.");
 
         add(rte);
     }

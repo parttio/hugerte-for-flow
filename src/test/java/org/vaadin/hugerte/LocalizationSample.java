@@ -37,7 +37,7 @@ public class LocalizationSample extends VerticalLayout {
     private void showInstanceForCurrentLanguage() {
         String value = null;
         if (rte != null) {
-            value = rte.getCurrentValue();
+            value = rte.getValue();
             remove(rte);
         }
         rte = new HugeRte();
@@ -48,5 +48,6 @@ public class LocalizationSample extends VerticalLayout {
 
         languageComboBox.getOptionalValue().ifPresent(rte::configureLanguage);
         add(rte);
+        setHorizontalComponentAlignment(Alignment.STRETCH, rte);
     }
 }

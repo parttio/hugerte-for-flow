@@ -2,11 +2,8 @@ package org.vaadin.hugerte;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
-import org.vaadin.firitin.components.RichText;
-import org.vaadin.hugerte.HugeRte.ResizeDirection;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
+
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -59,11 +56,15 @@ public class FullDemoView extends Div {
 //        hugeRte.setInvalid(true);
 
         hugeRte.setValue("<p>Voi <strong>jorma</strong>!<p>");
-        hugeRte.setHeight("700px");
+        hugeRte.setHeight("450px");
+        hugeRte.setMinHeight("150px");
+        hugeRte.setMaxHeight("600px");
 
         hugeRte.configurePlugins(ALL_PLUGINS_WITHOUT_AUTO_RESIZE);
         hugeRte.configureToolbar(FULL_TOOLBAR);
         hugeRte.configureResize(ResizeDirection.BOTH);
+
+        hugeRte.setHelperText("The Huge RTE is a community driven fork of the Tiny MCE 6.");
 
         add(hugeRte);
 
@@ -77,7 +78,7 @@ public class FullDemoView extends Div {
             var n = new Notification("", 3000);
             n.add(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getCurrentValue())
+                    new Html("<div>" + hugeRte.getValue() + "</div>")
                     )
             );
             n.open();
@@ -95,11 +96,17 @@ public class FullDemoView extends Div {
             Notification.show("Blur event!");
         });
 
-        Button disable = new Button("Disabble", e-> {
+        Button disable = new Button("Disable", e-> {
             hugeRte.setEnabled(!hugeRte.isEnabled());
             e.getSource().setText(hugeRte.isEnabled() ? "Disable" : "Enable");
         });
         add(disable);
+
+        Button readonly = new Button("Readonly", e-> {
+            hugeRte.setReadOnly(!hugeRte.isReadOnly());
+            e.getSource().setText(hugeRte.isReadOnly() ? "Writable" : "Readonly");
+        });
+        add(readonly);
 
         Button blur = new Button("blur (NOT SUPPORTED really, but of course works from button)", e-> {
             hugeRte.blur();
@@ -113,7 +120,7 @@ public class FullDemoView extends Div {
             dialog.open();
             dialog.setCloseOnOutsideClick(false);
             dialog.setResizable(true);
-            dialog.setModal(true);
+            dialog.setModality(ModalityMode.VISUAL);
             dialog.setDraggable(true);
             dialog.setWidth("700px");
 
@@ -125,11 +132,6 @@ public class FullDemoView extends Div {
         });
 
         add(bDialog);
-
-        add(new Button("Switch Theme", e -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-            themeList.set("dark", !themeList.contains("dark"));
-        }));
 
         hugeRte.addValueChangeListener(e -> {
             Notification.show("ValueChange event!");

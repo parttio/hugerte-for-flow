@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * This enumeration represents all available languages for the HugeRTE.
  */
-public enum Language {
+public enum Language implements ClientSideReference {
     /**
      * Default language. Has no code, since there is no lang file for it, and is optional to be used. So we provide it
      * for the sake of completeness.
@@ -97,6 +97,11 @@ public enum Language {
      */
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public String getClientSideRepresentation() {
+        return getCode();
     }
 
     /**

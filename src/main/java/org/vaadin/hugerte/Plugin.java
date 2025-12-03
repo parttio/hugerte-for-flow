@@ -1,6 +1,6 @@
 package org.vaadin.hugerte;
 
-public enum Plugin {
+public enum Plugin implements ClientSideReference {
     //@formatter:off    
     ACCORDION("accordion"),
     ADVLIST("advlist"),
@@ -56,10 +56,14 @@ public enum Plugin {
     WORDCOUNT("wordcount");
     //@formatter:on
 
-    public final String pluginLabel;
+    private final String clientSideRepresentation;
 
-    private Plugin(String pluginLabel) {
-        this.pluginLabel = pluginLabel;
+    Plugin(String clientSideRepresentation) {
+        this.clientSideRepresentation = clientSideRepresentation;
     }
 
+    @Override
+    public String getClientSideRepresentation() {
+        return clientSideRepresentation;
+    }
 }

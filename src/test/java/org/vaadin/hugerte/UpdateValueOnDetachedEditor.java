@@ -24,5 +24,6 @@ public class UpdateValueOnDetachedEditor extends VerticalLayout {
 
         add(b, hugeRte);
 
+        setHorizontalComponentAlignment(Alignment.STRETCH, hugeRte);
     }
 }

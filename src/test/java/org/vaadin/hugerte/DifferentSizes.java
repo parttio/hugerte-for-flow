@@ -15,16 +15,12 @@
  */
 package org.vaadin.hugerte;
 
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLink;
 
 /**
  *
@@ -75,12 +71,12 @@ public class DifferentSizes extends VerticalLayout {
 
         //String tmcoptions = "{\"branding\": false,\"menubar\": false,\"contextmenu\": false,\"toolbar\": false,\"statusbar\": false}";
         String tmcoptions = "{\"resize\": false,\"statusbar\": false, \"menubar\": \"tools help\", \"branding\": false, \"plugins\" : \"link image code\",    \"toolbar\" : \"undo redo | styleselect | forecolor | bold italic underline | alignleft aligncenter alignright alignjustify | outdent indent | link image | code\" }";
-        tmcdeditor1.setConfig(tmcoptions);
-        tmcdeditor2.setConfig(tmcoptions);
-        tmcdeditor3.setConfig(tmcoptions);
-        tmcdeditor4.setConfig(tmcoptions);
-        tmcdeditor5.setConfig(tmcoptions);
-        tmcdeditor6.setConfig(tmcoptions);
+        tmcdeditor1.setRawConfig(tmcoptions);
+        tmcdeditor2.setRawConfig(tmcoptions);
+        tmcdeditor3.setRawConfig(tmcoptions);
+        tmcdeditor4.setRawConfig(tmcoptions);
+        tmcdeditor5.setRawConfig(tmcoptions);
+        tmcdeditor6.setRawConfig(tmcoptions);
 
         RadioButtonGroup<String> group = new RadioButtonGroup<>();
         group.setLabel("Have you anything to report like  lot of text?");

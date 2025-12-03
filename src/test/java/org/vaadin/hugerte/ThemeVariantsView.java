@@ -76,7 +76,8 @@ public class ThemeVariantsView extends VerticalLayout {
         add(buttons);
 
         buttons.getStyle().setWidth(FORM_WIDTH);
-        rte.getStyle().setWidth(FORM_WIDTH).setHeight("250px");
+        rte.setWidth(FORM_WIDTH);
+        rte.setHeight("250px");
     }
 
     private void hr() {
