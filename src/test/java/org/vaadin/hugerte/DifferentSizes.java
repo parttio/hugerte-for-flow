@@ -79,7 +79,7 @@ public class DifferentSizes extends VerticalLayout {
         tmcdeditor6.setRawConfig(tmcoptions);
 
         RadioButtonGroup<String> group = new RadioButtonGroup<>();
-        group.setLabel("Have you anything to report like  lot of text?");
+        group.setLabel("Have you anything to report like  lot of text? w 500px, h 200px");
         group.setItems("Yes", "No");
 
         RadioButtonGroup<String> group1 = new RadioButtonGroup<>();
@@ -91,11 +91,11 @@ public class DifferentSizes extends VerticalLayout {
         group2.setItems("Yes", "No");
 
         RadioButtonGroup<String> group3 = new RadioButtonGroup<>();
-        group3.setLabel("Have you anything to report about that ?");
+        group3.setLabel("height 500px , width 50% ");
         group3.setItems("Yes", "No");
 
         RadioButtonGroup<String> group4 = new RadioButtonGroup<>();
-        group4.setLabel("Have you anything to report about that ?");
+        group4.setLabel("height 500px, width 800px ");
         group4.setItems("Yes", "No");
 
         RadioButtonGroup<String> group5 = new RadioButtonGroup<>();
