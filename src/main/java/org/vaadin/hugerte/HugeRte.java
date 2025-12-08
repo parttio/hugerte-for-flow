@@ -16,6 +16,8 @@
 package org.vaadin.hugerte;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.DetachEvent;
+import com.vaadin.flow.component.FocusOption;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomField;
@@ -35,10 +38,6 @@ import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.Style.Overflow;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.shared.Registration;
-import elemental.json.Json;
-import elemental.json.JsonArray;
-import elemental.json.JsonObject;
-import elemental.json.JsonValue;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
@@ -57,7 +56,7 @@ public class HugeRte extends CustomField<String>
     private boolean initialContentSent;
     private String currentValue = "";
     private String rawConfig;
-    JsonObject config = Json.createObject();
+    Map<String,Object> config = new HashMap<>();
     private final Element editorContainer = new Element("div");
     private boolean connectorInitialized;
 
@@ -85,10 +84,9 @@ public class HugeRte extends CustomField<String>
 
         domListenerRegistration = getElement().addEventListener("tchange",
                 (DomEventListener) event -> {
-                    boolean value = event.getEventData()
-                            .hasKey("event.htmlString");
+                    boolean value = event.getEventData().has("event.htmlString");
                     String htmlString = event.getEventData()
-                            .getString("event.htmlString");
+                            .get("event.htmlString").asString();
                     currentValue = htmlString;
                     setModelValue(htmlString, true);
                 });
@@ -297,11 +295,7 @@ public class HugeRte extends CustomField<String>
 
     public HugeRte configure(String configurationKey, String... value) {
         checkAlreadyInitialized();
-        JsonArray array = Json.createArray();
-        for (int i = 0; i < value.length; i++) {
-            array.set(i, value[i]);
-        }
-        config.put(configurationKey, array);
+        config.put(configurationKey, value);
         return this;
     }
 
@@ -354,7 +348,7 @@ public class HugeRte extends CustomField<String>
     }
 
     @Override
-    public void focus() {
+    public void focus(FocusOption... options) {
         runBeforeClientResponse(ui -> {
             // Dialog has timing issues...
             getElement().executeJs("""
@@ -459,21 +453,18 @@ public class HugeRte extends CustomField<String>
             setHeight(null);
         }
 
-        JsonArray jsonArray = config.get("plugins");
-        int initialIndex = 0;
+        Object[] o = (Object[]) config.get("plugins");
+        int oldLenght = o == null ? 0 :o.length;
 
-        if (jsonArray != null) {
-            initialIndex = jsonArray.length();
-        } else {
-            jsonArray = Json.createArray();
+        Object[] newPlugins = new Object[oldLenght + plugins.length];
+        for(int i = 0; i < newPlugins.length; i++) {
+            if(i < oldLenght) {
+                newPlugins[i] = o[i];
+            } else {
+                newPlugins[i] = plugins[i -oldLenght].pluginLabel;
+            }
         }
-
-        for (int i = 0; i < plugins.length; i++) {
-            jsonArray.set(initialIndex, plugins[i].pluginLabel);
-            initialIndex++;
-        }
-
-        config.put("plugins", jsonArray);
+        config.put("plugins", newPlugins);
         return this;
     }
 
@@ -492,8 +483,8 @@ public class HugeRte extends CustomField<String>
                 .collect(Collectors.joining(" "));
 
         String menubar;
-        if (config.hasKey("menubar")) {
-            menubar = config.getString("menubar");
+        if (config.get("menubar") != null) {
+            menubar = (String) config.get("menubar");
             menubar = menubar + " " + newconfig;
         } else {
             menubar = newconfig;
@@ -514,11 +505,9 @@ public class HugeRte extends CustomField<String>
             initBasicEditorConfiguration();
         }
 
-        JsonValue jsonValue = config.get("toolbar");
-        String toolbarStr = "";
-
-        if (jsonValue != null) {
-            toolbarStr = toolbarStr.concat(jsonValue.asString());
+        String toolbarStr = (String) config.get("toolbar");
+        if(toolbarStr == null) {
+            toolbarStr = "";
         }
 
         for (int i = 0; i < toolbars.length; i++) {

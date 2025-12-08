@@ -1,10 +1,10 @@
 package org.vaadin.hugerte;
 
-import org.apache.commons.lang3.StringUtils;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.util.SharedUtil;
 
 @Route
 @Menu(order = 5)
@@ -19,7 +19,7 @@ public class LocalizationSample extends VerticalLayout {
         languageComboBox.setItemLabelGenerator(language -> {
             // Make the enum listing a bit more "attractive"
             String spacedName = String.join(" ", language.name().split("_"));
-            return StringUtils.capitalize(spacedName.toLowerCase());
+            return SharedUtil.capitalize(spacedName.toLowerCase());
         });
         languageComboBox.setClearButtonVisible(true);
         languageComboBox.addValueChangeListener(event -> showInstanceForCurrentLanguage());

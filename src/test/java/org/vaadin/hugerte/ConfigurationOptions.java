@@ -5,6 +5,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Pre;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
+import tools.jackson.databind.ObjectMapper;
 
 @Route
 @Menu(order = 3)
@@ -38,7 +39,7 @@ public class ConfigurationOptions extends Div {
         add(hugeRte);
         getElement().getNode().runWhenAttached(ui -> ui
                 .beforeClientResponse(this, context -> {
-                    pre.setText(hugeRte.config.toJson());
+                    pre.setText(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(hugeRte.config));
                 }));
         return hugeRte;
     }
