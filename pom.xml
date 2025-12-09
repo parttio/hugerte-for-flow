@@ -104,12 +104,6 @@
             <version>0.0.5</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>in.virit</groupId>
-            <artifactId>viritin</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
 
         <!--This can be handy in development phase, if you have no jRebel
         , but it currently breaks e2e tests -> commented out. -->

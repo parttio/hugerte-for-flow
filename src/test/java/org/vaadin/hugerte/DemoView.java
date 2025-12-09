@@ -1,5 +1,6 @@
 package org.vaadin.hugerte;
 
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
@@ -10,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import org.vaadin.firitin.components.RichText;
 
 @Route
 @Menu(order = 0)
@@ -36,7 +36,7 @@ public class DemoView extends Div {
             var n = new Notification("", 3000);
             n.add(new VerticalLayout(
                     new H5("New value:"),
-                    new RichText(hugeRte.getCurrentValue())
+                    new Html(hugeRte.getCurrentValue())
                     )
             );
             n.open();

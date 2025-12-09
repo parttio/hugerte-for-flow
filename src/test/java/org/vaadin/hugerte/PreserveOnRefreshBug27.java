@@ -7,7 +7,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-import org.vaadin.firitin.components.button.VButton;
 
 @Route
 @PreserveOnRefresh
@@ -20,8 +19,8 @@ public class PreserveOnRefreshBug27 extends VerticalLayout {
         hugeRte.configure("statusbar", false);
         hugeRte.setValue("<h2>Hallo Leute,</h2>");
         dialog.add(hugeRte);
-        dialog.add(new VButton("Cancel", e -> dialog.close()).withTabIndex(3));
-        VButton button = new VButton("Focus (CTRL-I)", e -> hugeRte.focus());
+        dialog.add(new Button("Cancel", e -> dialog.close()));
+        Button button = new Button("Focus (CTRL-I)", e -> hugeRte.focus());
         button.setTabIndex(2);
         button.addClickShortcut(Key.of("i"), KeyModifier.CONTROL);
         dialog.add(button);
