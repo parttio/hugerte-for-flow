@@ -133,6 +133,10 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             String delta = event.getEventData().get("event.detail.delta").asString();
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
+
+            // we only update the model value here to prevent an auto sync of the full value with the client on each change (the server would send the full
+            // value to the client each time). Also this allows us to fire a value change event with fromClient = true.
+            // the presentation value is synced on detach, so that on the next attach, the client gets the latest value.
             setModelValue(newValue, true);
         }).addEventData("event.detail.delta");
 
