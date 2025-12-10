@@ -57,15 +57,22 @@ class HugeRte extends SlotStylesMixin(
             :host {
                 display: flex;
                 flex-direction: column;
+                box-sizing: border-box;
             }
 
             .vaadin-huge-rte-container {
                 align-self: stretch;
-                flex-grow: 1;
+                flex: 1;
 
                 display: flex;
                 flex-direction: column;
                 row-gap: var(--lumo-space-xs);
+            }
+            
+            [part="input-field"] {
+                flex: 1;   
+                display: flex;
+                flex-direction: column;
             }
         `];
     }
@@ -154,7 +161,7 @@ class HugeRte extends SlotStylesMixin(
             // create combined config, with based config being overriden by any additional configurations
             const config = {
                 resize: false,
-                height: 250,
+                height: "100%",
                 ...rawConfig, // raw initial config is a string
                 ...this.initialConfig,
                 suffix: '.min',

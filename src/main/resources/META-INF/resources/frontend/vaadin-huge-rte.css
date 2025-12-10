@@ -11,6 +11,7 @@ html {
 vaadin-huge-rte {
     .tox {
         flex-grow: 1;
+        box-sizing: border-box;
 
         &.tox-hugerte {
             border: 1px solid var(--lumo-contrast-20pct);

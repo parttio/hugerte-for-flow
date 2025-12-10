@@ -1,11 +1,5 @@
 package org.vaadin.hugerte;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -13,15 +7,18 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.shared.HasThemeVariant;
 import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
-import com.vaadin.flow.data.binder.Setter;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableConsumer;
-import com.vaadin.flow.function.ValueProvider;
-import tools.jackson.databind.JsonNode;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.JsonNodeType;
 import tools.jackson.databind.node.ObjectNode;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
@@ -140,28 +137,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             getUI().orElseThrow().getPage().addJavaScript(
                     "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
 
-            // some convenience functionality. When resize is active, we try to auto convert dimensions for the devs
-            ObjectNode config = getConfig();
-            if (config.has("resize")) {
-                JsonNode resize = config.get("resize");
-                boolean resizeHorizontalActive = resize.getNodeType() == JsonNodeType.BOOLEAN && resize.asBoolean();
-                boolean resizeBothActive = resize.getNodeType() == JsonNodeType.STRING && Objects.equals(resize.asString(), "both");
-                if (resizeHorizontalActive || resizeBothActive) {
-
-                    // resize and Vaadin's "outer" dimensions does not work very well together, so in that case, we need to move the Vaadin dimension
-                    // to the huge itself, so that it can initialize the correct dimensions and allow correct resizing
-                    if (resizeBothActive) {
-                        convertToConfiguration(HasSize::getWidth, HasSize::setWidth, "width", false);
-                        convertToConfiguration(HasSize::getMinWidth, HasSize::setMinWidth, "min_width", true);
-                        convertToConfiguration(HasSize::getMaxWidth, HasSize::setMaxWidth, "max_width", true);
-                    }
-
-                    convertToConfiguration(HasSize::getHeight, HasSize::setHeight, "height", false);
-                    convertToConfiguration(HasSize::getMinHeight, HasSize::setMinHeight, "min_height", true);
-                    convertToConfiguration(HasSize::getMaxHeight, HasSize::setMaxHeight, "max_height", true);
-                }
-            }
-
             // we do this in before client response to allow other attach listeners to do their configs as well
             runBeforeClientResponse(ui -> this.isInitialized = true);
         });
@@ -169,22 +144,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         addDetachListener(event -> {
             this.isInitialized = false;
         });
-    }
-
-    private void convertToConfiguration(ValueProvider<HugeRte, String> getter, Setter<HugeRte, String> setter, String hugeRteKey, boolean numericPixelOnly) {
-        String value = getter.apply(this);
-        if (value != null && (!numericPixelOnly || value.endsWith("px"))) {
-            setter.accept(this, null);
-            if (numericPixelOnly) {
-                try {
-                    configure(hugeRteKey, Double.parseDouble(value.replace("px", "")));
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(hugeRteKey + " does not point to a valid number");
-                }
-            } else {
-                configure(hugeRteKey, value);
-            }
-        }
     }
 
     /**
@@ -393,8 +352,22 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     }
 
     /**
-     * Configures the resize option for the editor. Please note, that there are additional settings to this instance
-     * necessary, so it is not recommended to call directly {@code configure("resize", ...)}.
+     * <p>
+     *      Configures the resize option for the editor. Please note, that there are additional settings to this instance
+     *      necessary, so it is not recommended to call directly {@code configure("resize", ...)}.
+     * </p><p>
+     *     Please note, that this feature is a built-in feature of the HugeRTE and may lead to some issues with the wrapping Vaadin component regarding
+     *     initial and continuous height settings. If you want to set an initial height or min-max height restrictions, it is strongly recommended to
+     *     do that via the {@code setEditor...Height} methods, NOT the normal ones.
+     * </p><p>
+     *     Also please note, that when you only set a min-max restriction, but no initial editor height, the editor will not be shown with its minimal
+     *     height, but minimized. If you want to show it in its minimal or maximal state, apply the respective pixel value to {@link #setEditorHeight(String)}.
+     * </p>
+     *
+     * @see #setEditorHeight(String)
+     * @see #setEditorMinHeight(int)
+     * @see #setEditorMaxHeight(int)
+     *
      * @param direction direction
      * @return this instance
      */
@@ -493,6 +466,79 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     private void runBeforeClientResponse(SerializableConsumer<UI> command) {
         getElement().getNode().runWhenAttached(ui -> ui
                 .beforeClientResponse(this, context -> command.accept(ui)));
+    }
+
+    /**
+     * <p>
+     * This convenience method sets the editor height. The editor in this case is not the component itself, but a subset of its content.
+     * Basically everything except for the label, error- and helper text. So the component will always be a bit larger (for instance when you set a height
+     * of 600px, the component will have something like ~650px, depending on the used features).
+     * </p><p>
+     * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
+     * </p><p>
+     * Please note, that you may not need this method very often, but in edge cases only (e.g. when using the resizable functionality).
+     * </p>
+     *
+     * @param editorHeight editor height
+     */
+    public void setEditorHeight(String editorHeight) {
+        configure("height", editorHeight);
+    }
+
+
+    /**
+     * <p>
+     * This convenience method sets the editor height in pixels. The editor in this case is not the component itself, but a subset of its content.
+     * Basically everything except for the label, error- and helper text. So the component will always be a bit larger (for instance when you set a height
+     * of 600px, the component will have something like ~650px, depending on the used features).
+     * </p><p>
+     * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
+     * </p><p>
+     * Please note, that you may not need this method very often, but in edge cases only (e.g. when using the resizable functionality).
+     * </p>
+     *
+     * @param editorHeight editor height
+     */
+    public void setEditorHeight(int editorHeight) {
+        setEditorHeight(editorHeight + "px");
+    }
+
+    /**
+     * <p>
+     * This convenience method sets the editor minimal height in pixels.
+     * </p><p>
+     * The editor in this case is not the component itself, but a subset of its content.
+     * Basically everything except for the label, error- and helper text. So the component will always be a bit larger (for instance when you set a min height
+     * of 200px, the component still will something like ~250px, depending on the used features).
+     * </p><p>
+     * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
+     * </p><p>
+     * Please note, that you may not need this method very often, but in edge cases only (e.g. when using the resizable functionality or auto resize plugin).
+     * </p>
+     *
+     * @param editorMinHeight editor minimal height
+     */
+    public void setEditorMinHeight(int editorMinHeight) {
+        configure("min_height", editorMinHeight);
+    }
+
+    /**
+     * <p>
+     * This convenience method sets the editor maximal height in pixels.
+     * </p><p>
+     * The editor in this case is not the component itself, but a subset of its content.
+     * Basically everything except for the label, error- and helper text. So the component will always be a bit larger (for instance when you set a max height
+     * of 600px, the component still will something like ~650px, depending on the used features).
+     * </p><p>
+     * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
+     * </p><p>
+     * Please note, that you may not need this method very often, but in edge cases only (e.g. when using the resizable functionality or auto resize plugin).
+     * </p>
+     *
+     * @param editorMaxHeight editor maximal height
+     */
+    public void setEditorMaxHeight(int editorMaxHeight) {
+        configure("max_height", editorMaxHeight);
     }
 
 
