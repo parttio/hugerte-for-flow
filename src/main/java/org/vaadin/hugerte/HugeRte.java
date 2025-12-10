@@ -4,6 +4,7 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.shared.HasThemeVariant;
 import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
@@ -133,6 +134,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
             setModelValue(newValue, true);
+            setPresentationValue(newValue);
         }).addEventData("event.detail.delta");
 
         addAttachListener(event -> {
