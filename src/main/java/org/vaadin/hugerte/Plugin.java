@@ -9,7 +9,7 @@ public enum Plugin implements ClientSideReference {
 
     /**
      * <p>
-     *      Enables the "autoresize" plugin. This will let take the editor as much space as necessary to display
+     *      Enables the "autoresize" plugin. This will let the editor take as much space as necessary to display
      *      all the content.
      * </p><p>
      *     Please note, that the normal height settings may conflict with the editor's behavior.

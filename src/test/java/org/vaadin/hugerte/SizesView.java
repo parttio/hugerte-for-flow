@@ -28,7 +28,7 @@ public class SizesView extends VerticalLayout {
 
         tabs.setAutoselect(true);
         tabs.addSelectedChangeListener(event -> {
-            if(currentContent != null) {
+            if (currentContent != null) {
                 currentContent.removeFromParent();
             }
 

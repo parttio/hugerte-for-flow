@@ -23,8 +23,7 @@ public class MinMaxAutoResizePluginPart extends VerticalLayout {
         rte.setEditorMinHeight(250);
         rte.setEditorMaxHeight(600);
 
-        rte.setHelperText("This demo shows the autoresize feature in combination with min and max height. The editor will grow with its content. Please note," +
-                " that, for best visual results, you should apply height restrictions on the editor, not the component.");
+        rte.setHelperText("This demo shows the autoresize feature in combination with min and max height. The editor will grow with its content. Please note that, for best visual results, you should apply height restrictions on the editor, not the component.");
 
         add(rte);
     }

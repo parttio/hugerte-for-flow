@@ -508,7 +508,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
      * </p><p>
      * The editor in this case is not the component itself, but a subset of its content.
      * Basically everything except for the label, error- and helper text. So the component will always be a bit larger (for instance when you set a min height
-     * of 200px, the component still will something like ~250px, depending on the used features).
+     * of 200px, the component still will be something like ~250px, depending on the used features).
      * </p><p>
      * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
      * </p><p>
@@ -527,7 +527,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
      * </p><p>
      * The editor in this case is not the component itself, but a subset of its content.
      * Basically everything except for the label, error- and helper text. So the component will always be a bit larger (for instance when you set a max height
-     * of 600px, the component still will something like ~650px, depending on the used features).
+     * of 600px, the component will still be something like ~650px, depending on the used features).
      * </p><p>
      * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
      * </p><p>
