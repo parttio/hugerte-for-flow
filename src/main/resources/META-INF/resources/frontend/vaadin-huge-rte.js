@@ -70,7 +70,7 @@ class HugeRte extends SlotStylesMixin(
             }
             
             [part="input-field"] {
-                flex: 1;   
+                flex: 1;
                 display: flex;
                 flex-direction: column;
             }

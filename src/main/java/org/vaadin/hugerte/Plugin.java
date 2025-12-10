@@ -20,7 +20,7 @@ public enum Plugin implements ClientSideReference {
      *HugeRte myRte = new HugeRte();
      *myRte.configurePlugins(Plugin.AUTORESIZE);
      *myRte.setEditorMaxHeight(400);
-     * </p>
+     * </pre>
      */
     AUTORESIZE("autoresize"),
     AUTOSAVE("autosave"),
