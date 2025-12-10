@@ -9,10 +9,8 @@ import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableConsumer;
-import com.vaadin.flow.internal.StringUtil;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
@@ -132,6 +130,10 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             String delta = event.getEventData().get("event.detail.delta").asString();
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
+
+            // we only update the model value here to prevent an auto sync of the full value with the client on each change (the server would send the full
+            // value to the client each time). Also this allows us to fire a value change event with fromClient = true.
+            // the presentation value is synced on detach, so that on the next attach, the client gets the latest value.
             setModelValue(newValue, true);
         }).addEventData("event.detail.delta");
 
@@ -156,6 +158,12 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
         addDetachListener(event -> {
             this.isInitialized = false;
+
+            // we set the presentation value here to ensure that on the next attach, it will be set correctly
+            // background is, that in our delta value change handler, only the model value is set, but not the presentation value,
+            // since this would re-send the whole value to the client on each value change. Since we do not want to have this, but
+            // just sync the value, when the editor is re-attached, we set the value here.
+            setPresentationValue(getValue());
         });
     }
 
