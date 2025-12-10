@@ -8,9 +8,9 @@ public class FixedHeightInBlockPart extends Div {
     public FixedHeightInBlockPart() {
         setSizeFull();
         HugeRte rte = new HugeRte("Fixed height inside a block element (div)");
-        rte.setHeight("500px");
+        rte.setHeight("800px");
 
-        rte.setHelperText("This demo shows the RTE inside a normal block container with a height of 500px.");
+        rte.setHelperText("This demo shows the RTE inside a normal block container with a height of 800px.");
 
         add(rte);
     }

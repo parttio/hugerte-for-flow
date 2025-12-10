@@ -11,9 +11,10 @@ public class FixedHeightInFlexboxPart extends VerticalLayout {
         setPadding(false);
 
         HugeRte rte = new HugeRte("Fixed height in a flexbox container");
-        rte.setHelperText("This demo shows the RTE inside a flexbox container with a flex basis of 500px.");
+        rte.setHelperText("This demo shows the RTE inside a flexbox container with a flex basis of 800px.");
 
         add(rte);
-        rte.getStyle().setFlexBasis("500px");
+        rte.setHeight(null); // not necessary, but to prevent misinterpretation
+        rte.getStyle().setFlexBasis("800px");
     }
 }

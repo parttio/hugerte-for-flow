@@ -9,8 +9,10 @@ import com.vaadin.flow.component.shared.HasValidationProperties;
 import com.vaadin.flow.data.binder.HasValidator;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableConsumer;
+import com.vaadin.flow.internal.StringUtil;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Patch;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
@@ -38,6 +40,7 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
 
     private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
+    public static final String DEFAULT_HEIGHT = "500px";
 
     private final ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
     private boolean isInitialized;
@@ -111,6 +114,8 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     public HugeRte() {
         super("value", "", true);
 
+        setHeight(DEFAULT_HEIGHT);
+
         setValueChangeMode(DEFAULT_VALUE_CHANGE_MODE);
         setValueChangeTimeout(DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
 
@@ -130,11 +135,15 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             setModelValue(newValue, true);
         }).addEventData("event.detail.delta");
 
-
         addAttachListener(event -> {
             // remove this call once the import is done via npm
             getUI().orElseThrow().getPage().addJavaScript(
                     "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
+
+            // resizable and auto resize break when a component height is set.
+            if (resizeDirection != ResizeDirection.NONE || Set.of(activePlugins).contains(Plugin.AUTORESIZE)) {
+                setHeight(null);
+            }
 
             // we do this in before client response to allow other attach listeners to do their configs as well
             runBeforeClientResponse(ui -> this.isInitialized = true);
@@ -475,7 +484,8 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
      * </p><p>
      * This value cannot be changed, while the editor is attached. This is a limitation of the underlying editor engine.
      * </p><p>
-     * Please note, that you may not need this method very often, but in edge cases only (e.g. when using the resizable functionality).
+     * Please note, that you may not need this method very often, but in edge cases only (e.g. when using the resizable functionality). Also ensure,
+     * that no normal height is set (i.e. remove the default height).
      * </p>
      *
      * @param editorHeight editor height
