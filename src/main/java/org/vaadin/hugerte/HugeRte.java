@@ -22,7 +22,6 @@ import java.util.Set;
 
 /**
  * A Rich Text editor, based on HugeRTE JS component.
- * <p>
  *
  * @author mstahv, Stefan Uebe
  */
