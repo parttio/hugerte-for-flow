@@ -20,7 +20,7 @@ public class MinMaxResizablePart extends VerticalLayout {
 //        rte.setMaxHeight("600px");
 
         // but the editor's ones only
-        rte.setEditorHeight(500);
+//        rte.setEditorHeight(500);
         rte.setEditorMinHeight(200);
         rte.setEditorMaxHeight(600);
 

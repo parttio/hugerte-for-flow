@@ -141,8 +141,13 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
                     "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
 
             // resizable and auto resize break when a component height is set.
+            // TODO think about a potentially better solution to marry component and editor heights for these constellations
             if (resizeDirection != ResizeDirection.NONE || Set.of(activePlugins).contains(Plugin.AUTORESIZE)) {
                 setHeight(null);
+            }
+
+            if(resizeDirection != ResizeDirection.NONE && !initialConfig.hasNonNull("height")) {
+                setEditorHeight(DEFAULT_HEIGHT);
             }
 
             // we do this in before client response to allow other attach listeners to do their configs as well
