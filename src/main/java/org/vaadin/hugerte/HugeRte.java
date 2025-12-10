@@ -134,7 +134,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
             setModelValue(newValue, true);
-            setPresentationValue(newValue);
         }).addEventData("event.detail.delta");
 
         addAttachListener(event -> {
@@ -158,6 +157,12 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
         addDetachListener(event -> {
             this.isInitialized = false;
+
+            // we set the presentation value here to ensure that on the next attach, it will be set correctly
+            // background is, that in our delta value change handler, only the model value is set, but not the presentation value,
+            // since this would re-send the whole value to the client on each value change. Since we do not want to have this, but
+            // just sync the value, when the editor is re-attached, we set the value here.
+            setPresentationValue(getValue());
         });
     }
 
