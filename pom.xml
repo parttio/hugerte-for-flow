@@ -107,6 +107,12 @@
             <version>4.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>in.virit</groupId>
+            <artifactId>mopo</artifactId>
+            <version>0.0.6</version>
+            <scope>test</scope>
+        </dependency>
          <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
