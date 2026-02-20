@@ -61,7 +61,7 @@ public class MopoSmokeTest {
     @Test
     public void menuConfig() throws InterruptedException {
         mopo.trackClientSideErrors();
-        String url = "http://localhost:" + port + "/demo";
+        String url = "http://localhost:" + port + "/menuconfig";
         page.navigate(url);
         PlaywrightAssertions.assertThat(page.locator("button").getByText("File")).isVisible();
         mopo.failOnClientSideErrors();
