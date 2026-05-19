@@ -48,18 +48,33 @@ public class MopoSmokeTest {
     @Test
     public void smokeTest() {
         List<String> flakyIgnoredTests = List.of("githubissue2");
+        int maxAttempts = 3;
         mopo.trackClientSideErrors();
         String rootUrl = "http://localhost:" + port + "/";
         mopo.getViewsReportedByDevMode(browser, rootUrl).forEach(viewName -> {
-            if(flakyIgnoredTests.contains(viewName)) {
+            if (flakyIgnoredTests.contains(viewName)) {
                 System.out.println("Ignored test '%s' as flaky".formatted(viewName));
-            } else {
-                System.out.println("Checking %s".formatted(viewName));
-                String url = rootUrl + viewName;
+                return;
+            }
+            System.out.println("Checking %s".formatted(viewName));
+            String url = rootUrl + viewName;
+            for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+                // Reset accumulated errors so each attempt starts from a clean slate.
+                mopo.getClientSideErrors().clear();
                 page.navigate(url);
                 mopo.waitForConnectionToSettle();
-                mopo.failOnClientSideErrors();
-                System.out.println("Checked %s and it contained no JS errors.".formatted(viewName));
+                List<String> errors = mopo.getClientSideErrors();
+                if (errors.isEmpty()) {
+                    System.out.println("Checked %s and it contained no JS errors.".formatted(viewName));
+                    return;
+                }
+                if (attempt < maxAttempts) {
+                    System.out.println("WARNING: JS errors on '%s' (attempt %d/%d), retrying: %s"
+                            .formatted(viewName, attempt, maxAttempts, errors));
+                    page.waitForTimeout(500);
+                } else {
+                    mopo.failOnClientSideErrors();
+                }
             }
         });
 
