@@ -202,8 +202,11 @@ class HugeRte extends SlotStylesMixin(
                                 }
                             });
                         } else {
+                            // The aux element may not exist yet when the editor is not in a dialog; guard against it.
                             const aux = document.getElementsByClassName('tox-hugerte-aux')[0];
-                            aux.dontmove = true;
+                            if (aux) {
+                                aux.dontmove = true;
+                            }
                         }
 
                         if (this._lastSyncedValue) {
