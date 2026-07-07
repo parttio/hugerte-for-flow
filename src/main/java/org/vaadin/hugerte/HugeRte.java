@@ -167,6 +167,23 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         });
     }
 
+    @Override
+    protected void setPresentationValue(String value) {
+
+        // Client edits are applied via delta to the model only (see the _value-delta handler) and never touch the
+        // "value" property, so its server-side mirror can lag behind what the editor actually shows. When the value
+        // we set equals that mirror, Flow treats the property as unchanged and skips the client update - leaving the
+        // editor on its stale content. Detect exactly that case and push the value to the editor explicitly. Null is
+        // handled by the client's value setter (value ?? "") and by null-safe comparison here.
+        boolean clientValueNeedsUpdate = isInitialized && Objects.equals(value, getElement().getProperty("value"));
+
+        super.setPresentationValue(value);
+
+        if (clientValueNeedsUpdate) {
+            getElement().executeJs("this.value = $0", value);
+        }
+    }
+
     /**
      * Applies the given delta onto the "old" value. Returns the "new", resulting value
      *
