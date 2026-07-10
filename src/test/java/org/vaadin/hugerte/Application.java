@@ -13,8 +13,8 @@ import com.vaadin.flow.component.page.Push;
  */
 @SpringBootApplication
 @Push
-@StyleSheet(Aura.STYLESHEET)
-//@StyleSheet(Lumo.STYLESHEET)
+//@StyleSheet(Aura.STYLESHEET)
+@StyleSheet(Lumo.STYLESHEET)
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
