@@ -140,7 +140,9 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         addAttachListener(event -> {
             // remove this call once the import is done via npm
             getUI().orElseThrow().getPage().addJavaScript(
-                    "context://frontend/hugerte_addon/hugerte/hugerte.min.js");
+                    // "assets" is whitelisted by default in Vaadin's Spring Security integration
+                    // (HandlerHelper.getPublicResources()), "frontend" is not
+                    "context://assets/hugerte_addon/hugerte/hugerte.min.js");
 
             // resizable and auto resize break when a component height is set.
             // TODO think about a potentially better solution to marry component and editor heights for these constellations
