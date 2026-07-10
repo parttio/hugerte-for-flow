@@ -395,7 +395,11 @@ vaadin-huge-rte {
     }
 
     .tox-toolbar__overflow {
-        background-color: var(--hugerte-menubar-background-color) !important;
+        /* the menubar color is a semi-transparent tint in both Lumo and Aura, but this strip
+           floats over the editor content, so it needs an opaque base color under the tint to
+           prevent the content from bleeding through */
+        background-color: var(--hugerte-overlay-background) !important;
+        background-image: linear-gradient(var(--hugerte-menubar-background-color), var(--hugerte-menubar-background-color)) !important;
         box-shadow: var(--hugerte-shadow-m) !important;
         border: 1px solid var(--hugerte-border-color-secondary) !important;
     }
