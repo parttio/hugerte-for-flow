@@ -66,7 +66,7 @@ class HugeRte extends SlotStylesMixin(
 
                 display: flex;
                 flex-direction: column;
-                row-gap: var(--lumo-space-xs);
+                row-gap: var(--lumo-space-xs, var(--vaadin-gap-xs));
             }
             
             [part="input-field"] {
@@ -124,13 +124,36 @@ class HugeRte extends SlotStylesMixin(
     async connectedCallback() {
         super.connectedCallback();
 
+        this._syncApplicationThemeToDocument();
+        this._applicationThemeObserver = new MutationObserver(() => this._syncApplicationThemeToDocument());
+        this._applicationThemeObserver.observe(this, {attributes: true, attributeFilter: ['data-application-theme']});
+
         // not sure if this might be an issue, if called here already, since "render" has not yet happend
         // if so, add a check for "has been rendered" for reattachments and also add a call of init editor to
         // first update.
         await this._initEditor();
     }
 
+    /**
+     * The ThemeDetectionMixin stamps the detected application theme (lumo/aura) on this element,
+     * but the stylesheet also needs to theme the HugeRTE overlay elements attached to <body>.
+     * Mirror the attribute to the document root, where the theme-specific style tokens are scoped.
+     */
+    _syncApplicationThemeToDocument() {
+        const theme = this.dataset.applicationTheme;
+        if (theme) {
+            document.documentElement.dataset.applicationTheme = theme;
+        } else {
+            delete document.documentElement.dataset.applicationTheme;
+        }
+    }
+
     disconnectedCallback() {
+        if (this._applicationThemeObserver) {
+            this._applicationThemeObserver.disconnect();
+            delete this._applicationThemeObserver;
+        }
+
         if (this.editor) {
             this.editor.remove();
             this.lightDomContainer.remove();
