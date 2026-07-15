@@ -26,7 +26,7 @@ import java.util.Set;
  * @author mstahv, Stefan Uebe
  */
 @Tag("vaadin-huge-rte")
-//@NpmPackage(value = "hugerte", version = "1.0.9") // > Part of the npm integration (not yet working, therefore commented out)
+//@NpmPackage(value = "hugerte", version = "1.0.12") // > Part of the npm integration (not yet working, therefore commented out)
 @NpmPackage(value = "diff-match-patch", version = "1.0.5")
 @JsModule("./vaadin-huge-rte.js")
 @CssImport("./vaadin-huge-rte.css")
