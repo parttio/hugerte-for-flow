@@ -24,6 +24,9 @@ public class MopoSmokeTest {
 
     static Playwright playwright = Playwright.create();
 
+    // The dev server is started only once per test JVM
+    private static boolean devServerWarmedUp;
+
     private Browser browser;
     private Page page;
     private Mopo mopo;
@@ -37,8 +40,22 @@ public class MopoSmokeTest {
                 );
 
         page = browser.newPage();
+        warmUpDevServer();
         page.setDefaultTimeout(5000); // die faster if needed
         mopo = new Mopo(page);
+    }
+
+    /**
+     * The first request in dev mode waits for npm install and Vite, which can take more than the 30 s that e.g.
+     * {@link Mopo#getViewsReportedByDevMode(Browser, String)} waits on a clean CI build.
+     */
+    private void warmUpDevServer() {
+        if (devServerWarmedUp) {
+            return;
+        }
+        page.navigate("http://localhost:" + port + "/");
+        page.waitForSelector("#outlet a", new Page.WaitForSelectorOptions().setTimeout(180_000));
+        devServerWarmedUp = true;
     }
 
     @AfterEach
