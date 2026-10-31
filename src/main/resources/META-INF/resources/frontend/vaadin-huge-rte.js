@@ -15,6 +15,7 @@ import {SlotStylesMixin} from '@vaadin/component-base/src/slot-styles-mixin.js';
 import {ThemeDetectionMixin} from "@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js";
 
 import {diff_match_patch} from 'diff-match-patch';
+import {loadHugeRte} from './hugerte-loader.js';
 
 class HugeRte extends SlotStylesMixin(
     FieldMixin(
@@ -156,10 +157,12 @@ class HugeRte extends SlotStylesMixin(
 
         if (this.editor) {
             this.editor.remove();
-            this.lightDomContainer.remove();
-
-            delete this.lightDomContainer;
             delete this.editor;
+        }
+
+        if (this.lightDomContainer) {
+            this.lightDomContainer.remove();
+            delete this.lightDomContainer;
         }
 
         if (this.beforeUnloadHandler) {
@@ -169,8 +172,8 @@ class HugeRte extends SlotStylesMixin(
         super.disconnectedCallback();
     }
 
-    _initEditor() {
-        if (!this.editor) {
+    async _initEditor() {
+        if (!this.editor && !this.lightDomContainer) {
             this.lightDomContainer = document.createElement('div');
             this.append(this.lightDomContainer); // will be put into the default slot
 
@@ -187,15 +190,8 @@ class HugeRte extends SlotStylesMixin(
                 height: "100%",
                 ...rawConfig, // raw initial config is a string
                 ...this.initialConfig,
-                suffix: '.min',
                 promotion: false,
                 branding: false, // hides the hugerte branding in the editor
-
-                // > Part of the npm integration (not yet working, therefore commented out)
-                // skin: false,
-                // content_css: false, // due to the postcss lit plugin we cannot pass in the min css files directly
-                // content_style: [oxideContentCss, defaultContentCss].join('\n'),
-                // < Part of the npm integration (not yet working, therefore commented out)
 
                 target: this.lightDomContainer,
 
@@ -272,13 +268,13 @@ class HugeRte extends SlotStylesMixin(
                 }
             };
 
+            const container = this.lightDomContainer;
+            const hugerte = await loadHugeRte(config);
 
-            // > Part of the npm integration (not yet working, therefore commented out)
-            // load all configured plugins dynamically
-            // if (config.plugins?.length) {
-            //     await loadHugeRtePlugins(config.plugins);
-            // }
-            // < Part of the npm integration (not yet working, therefore commented out)
+            // the element may have been detached (and reattached) while loading
+            if (this.lightDomContainer !== container) {
+                return;
+            }
 
             hugerte.init(config);
         }

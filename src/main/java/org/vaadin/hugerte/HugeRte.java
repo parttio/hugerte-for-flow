@@ -26,7 +26,7 @@ import java.util.Set;
  * @author mstahv, Stefan Uebe
  */
 @Tag("vaadin-huge-rte")
-//@NpmPackage(value = "hugerte", version = "1.0.12") // > Part of the npm integration (not yet working, therefore commented out)
+@NpmPackage(value = "hugerte", version = "1.0.15")
 @NpmPackage(value = "diff-match-patch", version = "1.0.5")
 @JsModule("./vaadin-huge-rte.js")
 @CssImport("./vaadin-huge-rte.css")
@@ -138,12 +138,6 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         }).addEventData("event.detail.delta");
 
         addAttachListener(event -> {
-            // remove this call once the import is done via npm
-            getUI().orElseThrow().getPage().addJavaScript(
-                    // "assets" is whitelisted by default in Vaadin's Spring Security integration
-                    // (HandlerHelper.getPublicResources()), "frontend" is not
-                    "context://assets/hugerte_addon/hugerte/hugerte.min.js");
-
             // resizable and auto resize break when a component height is set.
             // TODO think about a potentially better solution to marry component and editor heights for these constellations
             if (resizeDirection != ResizeDirection.NONE || Set.of(activePlugins).contains(Plugin.AUTORESIZE)) {
