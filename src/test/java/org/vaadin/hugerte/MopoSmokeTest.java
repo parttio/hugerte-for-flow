@@ -116,6 +116,21 @@ public class MopoSmokeTest {
         assertEquals("", cleared);
     }
 
+    @Test
+    public void toolbarActionsFireValueChangeInTimeoutMode() {
+        page.navigate("http://localhost:" + port + "/issue35");
+        page.waitForFunction("() => document.querySelector('vaadin-huge-rte')?.editor?.initialized");
+
+        // toolbar action, focus stays in the editor (no blur)
+        page.evaluate("() => document.querySelector('vaadin-huge-rte').editor.execCommand('SelectAll')");
+        page.locator("[data-mce-name='bold']").click();
+        PlaywrightAssertions.assertThat(page.locator("#last-value")).containsText("<strong>Some text</strong>");
+
+        // command, like used by custom plugins
+        page.evaluate("() => document.querySelector('vaadin-huge-rte').editor.execCommand('InsertHTML', false, '<em>inserted</em>')");
+        PlaywrightAssertions.assertThat(page.locator("#last-value")).containsText("<em>inserted</em>");
+    }
+
     /**
      * Simulates a user edit by setting the editor content and pushing the delta to the server. The throttle timestamp
      * is reset first, otherwise the delta can be swallowed by the throttle right after the editor's init flush.
