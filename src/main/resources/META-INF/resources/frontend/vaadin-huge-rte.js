@@ -236,8 +236,11 @@ class HugeRte extends SlotStylesMixin(
                         this.updateReadonlyMode();
                     });
 
+                    // "change" is also fired for content modifications without an "input" event, like toolbar
+                    // actions or commands (e.g. bold, InsertHTML), so the timeout mode has to listen to it as well
                     editor.on('change', e => {
                         this.onValueChangeIfMode("change");
+                        this.scheduleValueChangeIfTimeoutMode();
                     });
 
                     // we need to fire custom focus and blur events and trigger the Vaadin events on the
@@ -258,10 +261,7 @@ class HugeRte extends SlotStylesMixin(
                     });
 
                     editor.on('input', e => {
-                        if (this.valueChangeMode === "timeout") {
-                            clearTimeout(this._valueChangeHandleForTimeout);
-                            this._valueChangeHandleForTimeout = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
-                        }
+                        this.scheduleValueChangeIfTimeoutMode();
 
                         return this.dispatchEvent(new Event('input'));
                     });
@@ -290,6 +290,16 @@ class HugeRte extends SlotStylesMixin(
 
     get value() {
         return this.editor?.getContent() ?? this._lastSyncedValue;
+    }
+
+    /**
+     * (Re)starts the timeout for #onValueChange(), if the current value change mode is "timeout".
+     */
+    scheduleValueChangeIfTimeoutMode() {
+        if (this.valueChangeMode === "timeout") {
+            clearTimeout(this._valueChangeHandleForTimeout);
+            this._valueChangeHandleForTimeout = setTimeout(this.onValueChange.bind(this), this.valueChangeTimeout);
+        }
     }
 
     /**
