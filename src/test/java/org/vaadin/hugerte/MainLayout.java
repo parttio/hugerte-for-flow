@@ -19,13 +19,11 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
-import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 @Layout
 public class MainLayout extends AppLayout {
-
-    private Registration currentStyleSheetRegistration;
 
     public MainLayout() {
         DrawerToggle toggle = new DrawerToggle();
@@ -62,23 +60,19 @@ public class MainLayout extends AppLayout {
 
     private Select<Theme> initThemeSelector() {
         Select<Theme> themeSelect = new Select<>("", Theme.values());
+        themeSelect.setValue(Theme.current());
         themeSelect.addValueChangeListener(e -> {
-            if(currentStyleSheetRegistration != null) {
-                currentStyleSheetRegistration.remove();
-                currentStyleSheetRegistration = null;
-            }
-
-            Theme theme = e.getValue();
-
-            if (theme.getClientSideRepresentation() != null) {
-                currentStyleSheetRegistration = UI.getCurrent().getPage().addStyleSheet(theme.getClientSideRepresentation());
-            }
+            VaadinSession.getCurrent().setAttribute(Theme.class, e.getValue());
+            UI.getCurrent().getPage().reload();
         });
-        themeSelect.setValue(Theme.LUMO);
         return themeSelect;
     }
 
-    private enum Theme implements ClientSideReference {
+    /**
+     * The theme is stored in the session and only its style sheet is loaded, by {@link Application}. Changing it
+     * reloads the page, as removing a theme style sheet at runtime doesn't fully restore the components styled by it.
+     */
+    enum Theme implements ClientSideReference {
         LUMO(Lumo.STYLESHEET),
         AURA(Aura.STYLESHEET);
 
@@ -86,6 +80,10 @@ public class MainLayout extends AppLayout {
 
         Theme(String value) {
             this.value = value;
+        }
+
+        static Theme current() {
+            return Optional.ofNullable(VaadinSession.getCurrent().getAttribute(Theme.class)).orElse(LUMO);
         }
 
         @Override
