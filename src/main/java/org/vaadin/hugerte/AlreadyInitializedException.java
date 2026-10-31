@@ -5,6 +5,9 @@ package org.vaadin.hugerte;
  * afterwards and is a typical source for this exception.
  */
 public class AlreadyInitializedException extends RuntimeException {
+    /**
+     * Creates a new instance with a default message.
+     */
     public AlreadyInitializedException() {
         super("Cannot apply configuration to the editor, it already has been initialized. You need to " +
               "detach it first");
