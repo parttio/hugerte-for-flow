@@ -34,10 +34,22 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         HasValidationProperties, HasValidator<String>, InputNotifier,
         HasSize, HasStyle, Focusable<HugeRte>, HasLabel, HasHelper, HasThemeVariant<HugeRteVariant> {
 
+    /**
+     * The default timeout in milliseconds for {@link ValueChangeMode#TIMEOUT} and {@link ValueChangeMode#INTERVAL}.
+     */
     public static final int DEFAULT_VALUE_CHANGE_MODE_TIMEOUT = 2000;
+
+    /**
+     * The default value change mode.
+     */
     public static final ValueChangeMode DEFAULT_VALUE_CHANGE_MODE = ValueChangeMode.ON_CHANGE;
 
     private static final DiffMatchPatch DIFF_MATCH_PATCH = new DiffMatchPatch();
+
+    /**
+     * The default height of the component. Also used as the editor height of a resizable editor, that has no
+     * editor height set.
+     */
     public static final String DEFAULT_HEIGHT = "500px";
 
     private final ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();

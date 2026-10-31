@@ -2,6 +2,9 @@ package org.vaadin.hugerte;
 
 import com.vaadin.flow.component.shared.ThemeVariant;
 
+/**
+ * Theme variants of the editor, to be used with {@code addThemeVariants} of {@link HugeRte}.
+ */
 public enum HugeRteVariant implements ThemeVariant {
 
     /**

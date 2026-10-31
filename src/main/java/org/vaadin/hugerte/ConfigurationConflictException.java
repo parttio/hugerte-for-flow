@@ -5,6 +5,11 @@ package org.vaadin.hugerte;
  * a plugin and another configuration should not be used in combination (e.g. config "resize" and plugin "autoresize").
  */
 public class ConfigurationConflictException extends RuntimeException {
+    /**
+     * Creates a new instance with the given message.
+     *
+     * @param message message describing the conflict
+     */
     public ConfigurationConflictException(String message) {
         super(message);
     }
