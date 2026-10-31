@@ -10,7 +10,7 @@ import {ElementMixin} from '@vaadin/component-base/src/element-mixin.js';
 import {PolylitMixin} from '@vaadin/component-base/src/polylit-mixin.js';
 import {FieldMixin} from '@vaadin/field-base/src/field-mixin.js';
 import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import {inputFieldShared} from '@vaadin/vaadin-lumo-styles/mixins/input-field-shared.js';
+import {inputFieldShared} from '@vaadin/field-base/src/styles/input-field-shared-styles.js';
 import {SlotStylesMixin} from '@vaadin/component-base/src/slot-styles-mixin.js';
 import {ThemeDetectionMixin} from "@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js";
 
@@ -74,6 +74,52 @@ class HugeRte extends SlotStylesMixin(
                 flex: 1;
                 display: flex;
                 flex-direction: column;
+            }
+
+            /* Lumo look for the field decorations, on top of the theme neutral base styles of the Vaadin fields */
+            :host([data-application-theme="lumo"]) {
+                padding: var(--lumo-space-xs) 0;
+                --vaadin-input-field-label-color: var(--lumo-secondary-text-color);
+                --vaadin-input-field-label-font-size: var(--lumo-font-size-s);
+                --vaadin-input-field-label-line-height: 1;
+                --vaadin-input-field-required-indicator: "\\2022";
+                --vaadin-input-field-required-indicator-color: var(--lumo-primary-text-color);
+                --vaadin-input-field-helper-color: var(--lumo-secondary-text-color);
+                --vaadin-input-field-helper-font-size: var(--lumo-font-size-xs);
+                --vaadin-input-field-helper-line-height: var(--lumo-line-height-xs);
+                --vaadin-input-field-error-color: var(--lumo-error-text-color);
+                --vaadin-input-field-error-font-size: var(--lumo-font-size-xs);
+                --vaadin-input-field-error-line-height: var(--lumo-line-height-xs);
+            }
+
+            :host([data-application-theme="lumo"][has-label]) {
+                padding-top: var(--lumo-space-m);
+            }
+
+            :host([data-application-theme="lumo"]) [part="label"] {
+                /* top padding with negative margin to not cut off diacritics, as in Lumo fields */
+                padding-top: 0.25em;
+                margin-top: -0.25em;
+                padding-bottom: 0.5em;
+                margin-bottom: 0;
+            }
+
+            :host([data-application-theme="lumo"]) [part="helper-text"],
+            :host([data-application-theme="lumo"]) [part="error-message"] {
+                margin-top: 0;
+                padding-top: 0.4em;
+            }
+
+            :host([data-application-theme="lumo"][invalid]) {
+                --vaadin-input-field-required-indicator-color: var(--lumo-error-text-color);
+            }
+
+            :host([data-application-theme="lumo"][focused]:not([readonly])) {
+                --vaadin-input-field-label-color: var(--lumo-primary-text-color);
+            }
+
+            :host([data-application-theme="lumo"]) [part="error-message"]::before {
+                display: none;
             }
         `];
     }
