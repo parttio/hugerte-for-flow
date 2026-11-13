@@ -8,6 +8,63 @@ Works with binder as the component implements HasValue interfaces. The value is 
 
 Builds will be available from https://vaadin.com/directory 
 
+## Plugins
+
+Since version 2.2.0, HugeRTE comes from the `hugerte` npm package and is bundled into the application's frontend
+bundle by Vite. Plugins are no longer served as static files from `assets/hugerte_addon/hugerte/`, so HugeRTE can't
+load them by URL from its default plugin path (`plugins/<name>/plugin.js`) anymore.
+
+### Plugins included in HugeRTE
+
+All plugins of HugeRTE (e.g. `table`, `lists`, `link`) are included. Enable them with `configurePlugins`, or with the
+`plugins` option, and the add-on bundles them automatically:
+
+```java
+editor.configurePlugins(Plugin.TABLE, Plugin.LISTS);
+// or
+editor.configure("plugins", "table lists");
+```
+
+Don't load them via the `external_plugins` option or `hugerte.PluginManager.load()` with the default plugin path, like
+`plugins/table/plugin.min.js`. That path pointed to the add-on's static files before 2.2.0, but now results in a 404
+and a missing plugin.
+
+### Custom and third party plugins
+
+Load your own plugin with a JS module that registers it to HugeRTE, and enable it with the `plugins` option. As the
+plugin is already registered when the editor starts, HugeRTE doesn't try to load it by URL.
+
+```js
+// src/main/frontend/my-plugin.js
+import 'hugerte';
+
+hugerte.PluginManager.add('myplugin', editor => {
+    editor.ui.registry.addButton('myplugin', {
+        text: 'My button',
+        onAction: () => editor.insertContent('Hello!')
+    });
+});
+```
+
+```java
+@JsModule("./my-plugin.js")
+public class MyView extends VerticalLayout {
+    public MyView() {
+        HugeRte editor = new HugeRte();
+        editor.configure("plugins", "myplugin table");
+        editor.configure("toolbar", "myplugin table");
+        add(editor);
+    }
+}
+```
+
+A plugin from npm works the same way: add it with `@NpmPackage` and import its plugin module with `@JsModule`. The
+plugin must register itself to the global `hugerte` object (plugins made for TinyMCE expect `tinymce` instead).
+
+Alternatively, you can still serve a plugin file yourself (e.g. from `src/main/resources/META-INF/resources/`) and
+point to it with the `external_plugins` option, using an absolute URL or a path starting with `/` (include the context
+path of your application, if it has one).
+
 ## Development instructions
 
 Check out the project to your IDE and run the Application class from src/test/java folder.
