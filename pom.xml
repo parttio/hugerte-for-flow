@@ -110,7 +110,14 @@
         <dependency>
             <groupId>in.virit</groupId>
             <artifactId>mopo</artifactId>
-            <version>0.0.6</version>
+            <version>0.0.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- newer than the one from mopo (1.56), which failed to install browsers on GitHub Actions -->
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.64.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
