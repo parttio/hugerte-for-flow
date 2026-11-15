@@ -38,6 +38,9 @@ class HugeRte extends SlotStylesMixin(
 
     _valueChangeTimeout = 2_000;
 
+    // can be overridden by the server using #setShortcutForwardingEnabled
+    shortcutForwarding = true;
+
     static properties = {
         disabled: {
             type: Boolean,
@@ -295,6 +298,9 @@ class HugeRte extends SlotStylesMixin(
                         this.scheduleValueChangeIfTimeoutMode();
                     });
 
+                    // key presses in the editor's iframe don't reach the shortcut listeners of the application
+                    editor.on('keydown', e => this.forwardShortcut(e));
+
                     // we need to fire custom focus and blur events and trigger the Vaadin events on the
                     // client. If we would simply forward them, it would lead to a mass of focus and blur events.
                     editor.on('focus', e => {
@@ -361,6 +367,46 @@ class HugeRte extends SlotStylesMixin(
     onValueChangeIfMode(expectedValueChangeMode) {
         if (this.valueChangeMode === expectedValueChangeMode) {
             this.onValueChange();
+        }
+    }
+
+    /**
+     * Forwards a key press in the editor, that might be a shortcut of the application (a combination with Ctrl, Cmd
+     * or Alt, Escape or a function key), as a keydown event on this element, as the events of the editor's iframe
+     * don't reach the shortcut listeners of the application. Key presses handled by the editor itself (e.g. Ctrl+B)
+     * are not forwarded. The value is synced to the server first, so that e.g. a "save" shortcut gets the current
+     * value. If a shortcut listener handles the forwarded event, the original key press is prevented as well (e.g.
+     * the browser's "save page" for Ctrl+S).
+     * @param e keydown event of the editor
+     */
+    forwardShortcut(e) {
+        if (!this.shortcutForwarding || e.defaultPrevented || e.isComposing) {
+            return;
+        }
+        const possibleShortcut = e.ctrlKey || e.metaKey || e.altKey || e.key === "Escape" || /^F\d{1,2}$/.test(e.key);
+        if (!possibleShortcut) {
+            return;
+        }
+
+        // sync the value immediately, bypassing the throttle
+        this._lastSyncedValueTimestamp = 0;
+        this.onValueChange();
+
+        const forwarded = new KeyboardEvent("keydown", {
+            key: e.key,
+            code: e.code,
+            location: e.location,
+            repeat: e.repeat,
+            ctrlKey: e.ctrlKey,
+            metaKey: e.metaKey,
+            altKey: e.altKey,
+            shiftKey: e.shiftKey,
+            bubbles: true,
+            composed: true,
+            cancelable: true
+        });
+        if (!this.dispatchEvent(forwarded)) {
+            e.preventDefault();
         }
     }
 
