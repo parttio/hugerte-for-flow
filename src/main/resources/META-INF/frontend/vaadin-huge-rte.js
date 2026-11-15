@@ -215,6 +215,9 @@ class HugeRte extends SlotStylesMixin(
             window.removeEventListener('beforeunload', this.beforeUnloadHandler);
         }
 
+        clearTimeout(this._throttledValueChangeHandle);
+        delete this._throttledValueChangeHandle;
+
         super.disconnectedCallback();
     }
 
@@ -364,7 +367,18 @@ class HugeRte extends SlotStylesMixin(
      */
     onValueChange() {
         let now = Date.now();
-        if (this._lastSyncedValueTimestamp < now - 50) { // explicit throttle to prevent too many events fired at all
+        const throttleRemaining = this._lastSyncedValueTimestamp + 50 - now;
+        if (throttleRemaining > 0) {
+            // explicit throttle to prevent too many events fired at all, but the throttled change must still be sent
+            // afterwards, otherwise e.g. the last of several quick changes (like a table cell edit and the Tab key
+            // adding a row) would only reach the server with the next change
+            if (!this._throttledValueChangeHandle) {
+                this._throttledValueChangeHandle = setTimeout(() => {
+                    delete this._throttledValueChangeHandle;
+                    this.onValueChange();
+                }, throttleRemaining);
+            }
+        } else {
             this._lastSyncedValueTimestamp = now;
 
             const currentValue = this.editor?.getContent() ?? this._lastSyncedValue;

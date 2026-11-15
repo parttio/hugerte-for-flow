@@ -148,6 +148,19 @@ public class MopoSmokeTest {
         PlaywrightAssertions.assertThat(page.locator("#last-value")).containsText("<em>inserted</em>");
     }
 
+    @Test
+    public void quickConsecutiveChangesAllReachTheServer() {
+        page.navigate("http://localhost:" + port + "/issue42");
+        page.waitForFunction("() => document.querySelector('vaadin-huge-rte')?.editor?.initialized");
+
+        // e.g. editing a table cell and adding a row with Tab fires two change events within the throttle time, the
+        // throttled one must still be sent afterwards
+        page.evaluate("() => { const editor = document.querySelector('vaadin-huge-rte').editor;"
+                + " editor.execCommand('InsertHTML', false, '<p>first</p>');"
+                + " editor.execCommand('InsertHTML', false, '<p>second</p>'); }");
+        PlaywrightAssertions.assertThat(page.locator("#server-value")).containsText("second");
+    }
+
     /**
      * Simulates a user edit by setting the editor content and pushing the delta to the server. The throttle timestamp
      * is reset first, otherwise the delta can be swallowed by the throttle right after the editor's init flush.
