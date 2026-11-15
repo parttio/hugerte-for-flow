@@ -217,6 +217,7 @@ class HugeRte extends SlotStylesMixin(
 
         clearTimeout(this._throttledValueChangeHandle);
         delete this._throttledValueChangeHandle;
+        delete this._throttledUserChange;
 
         super.disconnectedCallback();
     }
@@ -279,7 +280,9 @@ class HugeRte extends SlotStylesMixin(
 
                         if (this._lastSyncedValue) {
                             editor.setContent(this._lastSyncedValue);
-                            this.onValueChange(); // flush updated value - needed, if the initial value is not original hugerte html
+                            // flush updated value - needed, if the initial value is not original hugerte html. The
+                            // normalised value is not a change by the user, though.
+                            this.onValueChange(false);
                         }
 
                         this.updateReadonlyMode();
@@ -364,18 +367,23 @@ class HugeRte extends SlotStylesMixin(
     /**
      * This method is to be called when ever a value change should be triggered. It will calculate the current value
      * delta, update the "old value" property and send an event to the server.
+     * @param userChange false, if the change is not made by the user (e.g. the editor normalising the initial value)
      */
-    onValueChange() {
+    onValueChange(userChange = true) {
         let now = Date.now();
         const throttleRemaining = this._lastSyncedValueTimestamp + 50 - now;
         if (throttleRemaining > 0) {
             // explicit throttle to prevent too many events fired at all, but the throttled change must still be sent
             // afterwards, otherwise e.g. the last of several quick changes (like a table cell edit and the Tab key
             // adding a row) would only reach the server with the next change
+            // if any of the throttled changes is made by the user, so is the combined delta
+            this._throttledUserChange = this._throttledUserChange || userChange;
             if (!this._throttledValueChangeHandle) {
                 this._throttledValueChangeHandle = setTimeout(() => {
+                    const throttledUserChange = this._throttledUserChange;
                     delete this._throttledValueChangeHandle;
-                    this.onValueChange();
+                    delete this._throttledUserChange;
+                    this.onValueChange(throttledUserChange);
                 }, throttleRemaining);
             }
         } else {
@@ -393,7 +401,8 @@ class HugeRte extends SlotStylesMixin(
             if (delta) {
                 this.dispatchEvent(new CustomEvent("_value-delta", {
                     detail: {
-                        delta
+                        delta,
+                        userChange
                     }
                 }));
             }

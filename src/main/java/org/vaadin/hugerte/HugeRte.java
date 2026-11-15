@@ -140,14 +140,16 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
         element.addEventListener("_value-delta", event -> {
             String delta = event.getEventData().get("event.detail.delta").asString();
+            // false e.g. when the editor normalises the initial value, which must not look like an edit by the user
+            boolean userChange = event.getEventData().get("event.detail.userChange").asBoolean();
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
 
             // we only update the model value here to prevent an auto sync of the full value with the client on each change (the server would send the full
             // value to the client each time). Also this allows us to fire a value change event with fromClient = true.
             // the presentation value is synced on detach, so that on the next attach, the client gets the latest value.
-            setModelValue(newValue, true);
-        }).addEventData("event.detail.delta");
+            setModelValue(newValue, userChange);
+        }).addEventData("event.detail.delta").addEventData("event.detail.userChange");
 
         addAttachListener(event -> {
             // resizable and auto resize break when a component height is set.

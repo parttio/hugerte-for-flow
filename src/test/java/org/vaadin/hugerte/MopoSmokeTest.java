@@ -161,6 +161,17 @@ public class MopoSmokeTest {
         PlaywrightAssertions.assertThat(page.locator("#server-value")).containsText("second");
     }
 
+    @Test
+    public void normalizedInitialValueIsNotAUserChange() {
+        page.navigate("http://localhost:" + port + "/initialvaluenormalization");
+        page.waitForFunction("() => document.querySelector('vaadin-huge-rte')?.editor?.initialized");
+
+        // the normalised initial value is synced to the server, but not as a change by the user
+        PlaywrightAssertions.assertThat(page.locator("#server-value")).hasText("<p>K&ouml;yh&auml;</p>");
+        mopo.waitForConnectionToSettle();
+        PlaywrightAssertions.assertThat(page.locator("#user-changes")).isEmpty();
+    }
+
     /**
      * Simulates a user edit by setting the editor content and pushing the delta to the server. The throttle timestamp
      * is reset first, otherwise the delta can be swallowed by the throttle right after the editor's init flush.
