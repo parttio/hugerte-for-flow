@@ -23,6 +23,8 @@ public class ThemeVariantsView extends VerticalLayout {
         createInstance("No Editor Focus Highlight", HugeRteVariant.NO_EDITOR_FOCUS_HIGHLIGHT);
         hr();
         createInstance("No Invalid Background", HugeRteVariant.NO_INVALID_BACKGROUND);
+        hr();
+        createInstance("Compact", HugeRteVariant.COMPACT);
     }
 
     private void createInstance(String label, HugeRteVariant... variants) {

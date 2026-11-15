@@ -349,6 +349,33 @@ vaadin-huge-rte {
     }
 }
 
+/* compact theme variant: a lower toolbar row with smaller buttons, e.g. for forms */
+vaadin-huge-rte[theme~="compact"] {
+    --vaadin-huge-rte-toolbar-height: 29px;
+
+    .tox .tox-toolbar__group {
+        padding: 0 3px;
+    }
+
+    .tox .tox-tbtn,
+    .tox .tox-split-button {
+        height: 24px;
+        margin: 2px 1px 2px 0;
+    }
+
+    .tox .tox-split-button .tox-tbtn {
+        margin: 0;
+    }
+
+    .tox .tox-tbtn:not(.tox-tbtn--select, .tox-split-button__chevron) {
+        width: 26px;
+    }
+
+    .tox .tox-tbtn svg {
+        transform: scale(0.85);
+    }
+}
+
 /*
  * In a Vaadin Dialog the aux element (menus and dialogs) is moved into the editor, i.e. into the dialog's content.
  * While an editor dialog (e.g. link) is open, it must cover the viewport: the content part's clip-path would clip it

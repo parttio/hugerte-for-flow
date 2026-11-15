@@ -258,6 +258,26 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
     }
 
     /**
+     * Configures this instance with a compact setup for forms: no menubar or statusbar, a single compact toolbar row
+     * with basic formatting, lists, links and undo/redo, and an editor that grows with its content from 150 to 450
+     * pixels. Adds the {@link HugeRteVariant#COMPACT} theme variant.
+     *
+     * @return this instance
+     */
+    public HugeRte configureCompactSetup() {
+        configureMenubar(false);
+        configureStatusbar(false);
+        configurePlugins(Plugin.LISTS, Plugin.LINK, Plugin.AUTOLINK, Plugin.AUTORESIZE);
+        configureToolbar(Toolbar.BOLD, Toolbar.ITALIC, Toolbar.SEPARATOR,
+                Toolbar.BULLIST, Toolbar.NUMLIST, Toolbar.SEPARATOR,
+                Toolbar.LINK, Toolbar.SEPARATOR, Toolbar.UNDO, Toolbar.REDO);
+        setEditorMinHeight(150);
+        setEditorMaxHeight(450);
+        addThemeVariants(HugeRteVariant.COMPACT);
+        return this;
+    }
+
+    /**
      * Sets a single string for the given configuration key. Please note, that there is no check, if the
      * given config key exists or the value is valid or might be applied to this key.
      * @param configurationKey config key
@@ -384,6 +404,27 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         configure("menubar", ClientSideReference.join(menubarItems));
 
         return this;
+    }
+
+    /**
+     * Shows or hides the menubar. When shown without configuring the items with {@link #configureMenubar(Menubar...)},
+     * the editor's default menubar is shown.
+     *
+     * @param visible true to show the menubar
+     * @return this instance
+     */
+    public HugeRte configureMenubar(boolean visible) {
+        return configure("menubar", visible);
+    }
+
+    /**
+     * Shows or hides the statusbar (element path, word count and the resize handle) at the bottom of the editor.
+     *
+     * @param visible true to show the statusbar
+     * @return this instance
+     */
+    public HugeRte configureStatusbar(boolean visible) {
+        return configure("statusbar", visible);
     }
 
     /**

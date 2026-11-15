@@ -19,7 +19,7 @@ public class LinkEditorInDialogView extends Div {
         add(new Button("Open dialog", e -> new EditorDialog(false).open()) {{
                 setId("open-dialog");
             }});
-        add(new Button("Open dialog with compact editor (setEditorMinHeight(150))", e -> new EditorDialog(true).open()) {{
+        add(new Button("Open dialog with compact editor (configureCompactSetup())", e -> new EditorDialog(true).open()) {{
                 setId("open-compact-dialog");
             }});
     }
@@ -41,14 +41,14 @@ public class LinkEditorInDialogView extends Div {
         LinkEditor(boolean compact) {
             setLabel("Description");
             setId("editor");
-            configurePlugins(Plugin.LINK, Plugin.AUTOLINK);
-            configure("menubar", false);
-            configureToolbar(Toolbar.UNDO, Toolbar.REDO, Toolbar.SEPARATOR, Toolbar.BOLD, Toolbar.ITALIC,
-                    Toolbar.SEPARATOR, Toolbar.LINK);
             setWidth("500px");
             if (compact) {
-                setEditorMinHeight(150);
+                configureCompactSetup();
             } else {
+                configurePlugins(Plugin.LINK, Plugin.AUTOLINK);
+                configureMenubar(false);
+                configureToolbar(Toolbar.UNDO, Toolbar.REDO, Toolbar.SEPARATOR, Toolbar.BOLD, Toolbar.ITALIC,
+                        Toolbar.SEPARATOR, Toolbar.LINK);
                 setHeight("250px");
             }
             setValue("<p>Select this text and add a link, or edit <a href=\"https://vaadin.com\">this link</a>.</p>");

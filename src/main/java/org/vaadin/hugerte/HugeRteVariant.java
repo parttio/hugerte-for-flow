@@ -19,7 +19,13 @@ public enum HugeRteVariant implements ThemeVariant {
      * Vaadin input fields. This theme variant disables this behavior. The editor will then only apply an error color
      * to the focus border.
      */
-    NO_INVALID_BACKGROUND("no-invalid-background");
+    NO_INVALID_BACKGROUND("no-invalid-background"),
+
+    /**
+     * A more compact toolbar for forms: smaller buttons and a lower toolbar row. Used by
+     * {@link HugeRte#configureCompactSetup()}.
+     */
+    COMPACT("compact");
 
     private final String variantName;
 
