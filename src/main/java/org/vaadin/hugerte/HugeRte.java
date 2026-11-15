@@ -140,14 +140,16 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
 
         element.addEventListener("_value-delta", event -> {
             String delta = event.getEventData().get("event.detail.delta").asString();
+            // false e.g. when the editor normalises the initial value, which must not look like an edit by the user
+            boolean userChange = event.getEventData().get("event.detail.userChange").asBoolean();
             String oldValue = getValue();
             String newValue = applyDelta(oldValue, delta);
 
             // we only update the model value here to prevent an auto sync of the full value with the client on each change (the server would send the full
             // value to the client each time). Also this allows us to fire a value change event with fromClient = true.
             // the presentation value is synced on detach, so that on the next attach, the client gets the latest value.
-            setModelValue(newValue, true);
-        }).addEventData("event.detail.delta");
+            setModelValue(newValue, userChange);
+        }).addEventData("event.detail.delta").addEventData("event.detail.userChange");
 
         addAttachListener(event -> {
             // resizable and auto resize break when a component height is set.
@@ -253,6 +255,26 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
                         Toolbar.ALIGN_LEFT, Toolbar.ALIGN_CENTER, Toolbar.ALIGN_RIGHT,
                         Toolbar.ALIGN_JUSTIFY, Toolbar.SEPARATOR, Toolbar.OUTDENT,
                         Toolbar.INDENT);
+    }
+
+    /**
+     * Configures this instance with a compact setup for forms: no menubar or statusbar, a single compact toolbar row
+     * with basic formatting, lists, links and undo/redo, and an editor that grows with its content from 150 to 450
+     * pixels. Adds the {@link HugeRteVariant#COMPACT} theme variant.
+     *
+     * @return this instance
+     */
+    public HugeRte configureCompactSetup() {
+        configureMenubar(false);
+        configureStatusbar(false);
+        configurePlugins(Plugin.LISTS, Plugin.LINK, Plugin.AUTOLINK, Plugin.AUTORESIZE);
+        configureToolbar(Toolbar.BOLD, Toolbar.ITALIC, Toolbar.SEPARATOR,
+                Toolbar.BULLIST, Toolbar.NUMLIST, Toolbar.SEPARATOR,
+                Toolbar.LINK, Toolbar.SEPARATOR, Toolbar.UNDO, Toolbar.REDO);
+        setEditorMinHeight(150);
+        setEditorMaxHeight(450);
+        addThemeVariants(HugeRteVariant.COMPACT);
+        return this;
     }
 
     /**
@@ -382,6 +404,27 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         configure("menubar", ClientSideReference.join(menubarItems));
 
         return this;
+    }
+
+    /**
+     * Shows or hides the menubar. When shown without configuring the items with {@link #configureMenubar(Menubar...)},
+     * the editor's default menubar is shown.
+     *
+     * @param visible true to show the menubar
+     * @return this instance
+     */
+    public HugeRte configureMenubar(boolean visible) {
+        return configure("menubar", visible);
+    }
+
+    /**
+     * Shows or hides the statusbar (element path, word count and the resize handle) at the bottom of the editor.
+     *
+     * @param visible true to show the statusbar
+     * @return this instance
+     */
+    public HugeRte configureStatusbar(boolean visible) {
+        return configure("statusbar", visible);
     }
 
     /**
