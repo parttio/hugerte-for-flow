@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
@@ -170,6 +171,30 @@ public class MopoSmokeTest {
         PlaywrightAssertions.assertThat(page.locator("#server-value")).hasText("<p>K&ouml;yh&auml;</p>");
         mopo.waitForConnectionToSettle();
         PlaywrightAssertions.assertThat(page.locator("#user-changes")).isEmpty();
+    }
+
+    @Test
+    public void editorDialogInAuraDialogIsUsable() {
+        // Aura's backdrop-filter on the overlay and the clip-path on the content part confined the editor's own
+        // dialogs to the Vaadin Dialog's content area, so e.g. the link dialog's buttons were hidden
+        page.setViewportSize(1280, 420);
+        page.navigate("http://localhost:" + port + "/linkeditorindialog");
+        // opened via property, as the dev tools may intercept the click right after loading
+        page.locator("vaadin-select").evaluate("select => select.opened = true");
+        page.locator("vaadin-select-item").filter(new Locator.FilterOptions().setHasText("AURA")).click();
+        page.waitForURL("**/linkeditorindialog");
+        page.locator("#open-compact-dialog").click();
+        page.waitForFunction("() => document.querySelector('vaadin-huge-rte')?.editor?.initialized");
+
+        page.evaluate("() => { const editor = document.querySelector('vaadin-huge-rte').editor; editor.focus();"
+                + " editor.selection.select(editor.getBody().querySelector('a')); }");
+        page.locator(".tox-tbtn[data-mce-name='link']").click();
+        page.locator(".tox-dialog input[type='url']").fill("https://hugerte.org");
+        page.locator(".tox-dialog button[data-mce-name='Save']").click();
+
+        PlaywrightAssertions.assertThat(page.locator(".tox-dialog")).hasCount(0);
+        assertEquals("https://hugerte.org", page.evaluate(
+                "() => document.querySelector('vaadin-huge-rte').editor.getBody().querySelector('a').getAttribute('href')"));
     }
 
     /**
