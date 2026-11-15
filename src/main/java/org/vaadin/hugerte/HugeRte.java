@@ -543,6 +543,30 @@ public class HugeRte extends AbstractSinglePropertyField<HugeRte, String> implem
         return getElement().getProperty("valueChangeTimeout", DEFAULT_VALUE_CHANGE_MODE_TIMEOUT);
     }
 
+    /// Sets whether key presses in the editor are forwarded to the shortcut listeners of the application, e.g. the
+    /// ones added with `addClickShortcut` or `Shortcuts.addShortcutListener` to the editor's ancestors. The editor
+    /// content lives in an iframe, so its key presses would otherwise never reach them.
+    ///
+    /// Forwarded are key presses with Ctrl, Cmd or Alt, Escape and function keys, that the editor doesn't handle
+    /// itself (e.g. Ctrl+B for bold is not forwarded). The value is synced to the server before the shortcut, so
+    /// that e.g. a "save" shortcut gets the current value. When a shortcut handles the key press, the browser's
+    /// default action (e.g. "save page" for Ctrl+S) is prevented as well.
+    ///
+    /// Enabled by default.
+    ///
+    /// @param enabled true to forward shortcuts
+    public void setShortcutForwardingEnabled(boolean enabled) {
+        getElement().setProperty("shortcutForwarding", enabled);
+    }
+
+    /// Returns whether key presses in the editor are forwarded to the shortcut listeners of the application.
+    ///
+    /// @return true, if shortcuts are forwarded
+    /// @see #setShortcutForwardingEnabled(boolean)
+    public boolean isShortcutForwardingEnabled() {
+        return getElement().getProperty("shortcutForwarding", true);
+    }
+
     /// Replaces the current selection with the given html string. If no text is selected, then the new content
     /// will be inserted at the caret's current position.
     ///

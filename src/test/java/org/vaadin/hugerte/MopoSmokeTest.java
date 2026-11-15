@@ -197,6 +197,35 @@ public class MopoSmokeTest {
                 "() => document.querySelector('vaadin-huge-rte').editor.getBody().querySelector('a').getAttribute('href')"));
     }
 
+    @Test
+    public void shortcutsAreForwardedFromTheEditor() {
+        page.navigate("http://localhost:" + port + "/shortcutforwarding");
+        page.waitForFunction("() => document.querySelector('vaadin-huge-rte')?.editor?.initialized");
+        Locator body = page.frameLocator("vaadin-huge-rte iframe").locator("body");
+        body.click();
+
+        // the value typed right before the shortcut must be saved
+        page.keyboard().type("Saved with a shortcut");
+        page.keyboard().press("Control+s");
+        PlaywrightAssertions.assertThat(page.locator("#saved")).containsText("Saved with a shortcut");
+
+        page.keyboard().press("Escape");
+        PlaywrightAssertions.assertThat(page.locator("#cancel-count")).hasText("1");
+
+        // handled by the editor, not forwarded
+        page.keyboard().press("Control+a");
+        page.keyboard().press("Control+b");
+        PlaywrightAssertions.assertThat(body.locator("strong")).hasText("Saved with a shortcut");
+        mopo.waitForConnectionToSettle();
+        PlaywrightAssertions.assertThat(page.locator("#ctrl-b-count")).hasText("0");
+
+        page.locator("#forwarding").click();
+        body.click();
+        page.keyboard().press("Escape");
+        mopo.waitForConnectionToSettle();
+        PlaywrightAssertions.assertThat(page.locator("#cancel-count")).hasText("1");
+    }
+
     /**
      * Simulates a user edit by setting the editor content and pushing the delta to the server. The throttle timestamp
      * is reset first, otherwise the delta can be swallowed by the throttle right after the editor's init flush.
