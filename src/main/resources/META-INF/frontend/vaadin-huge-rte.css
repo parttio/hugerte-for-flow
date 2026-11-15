@@ -378,15 +378,24 @@ vaadin-huge-rte[theme~="compact"] {
 
 /*
  * In a Vaadin Dialog the aux element (menus and dialogs) is moved into the editor, i.e. into the dialog's content.
- * While an editor dialog (e.g. link) is open, it must cover the viewport: the content part's clip-path would clip it
- * and a backdrop-filter on the overlay (Aura) would confine its fixed position wrapper to the overlay.
+ * While an editor dialog (e.g. link) is open, it must cover the viewport: the content part's clip-path would clip it,
+ * and a backdrop-filter on the overlay (Aura) or containment of e.g. Scroller and FormLayout would confine its fixed
+ * position wrapper to that element. Without the backdrop-filter, Aura's translucent dialog surface is made opaque.
  */
+vaadin-dialog:has(.tox-hugerte-aux .tox-dialog-wrap) {
+    --aura-overlay-surface-opacity: 1;
+}
+
 vaadin-dialog:has(.tox-hugerte-aux .tox-dialog-wrap)::part(content) {
     clip-path: none;
 }
 
 vaadin-dialog:has(.tox-hugerte-aux .tox-dialog-wrap)::part(overlay) {
     backdrop-filter: none;
+}
+
+:is(vaadin-scroller, vaadin-form-layout, vaadin-split-layout):has(.tox-hugerte-aux .tox-dialog-wrap) {
+    contain: none;
 }
 
 /* overlays */
