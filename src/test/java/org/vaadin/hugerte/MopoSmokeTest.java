@@ -227,8 +227,8 @@ public class MopoSmokeTest {
         PlaywrightAssertions.assertThat(page.locator("#cancel-count")).hasText("1");
 
         // handled by the editor, not forwarded
-        page.keyboard().press("Control+a");
-        page.keyboard().press("Control+b");
+        page.keyboard().press("ControlOrMeta+a");
+        page.keyboard().press("ControlOrMeta+b");
         PlaywrightAssertions.assertThat(body.locator("strong")).hasText("Saved with a shortcut");
         mopo.waitForConnectionToSettle();
         PlaywrightAssertions.assertThat(page.locator("#ctrl-b-count")).hasText("0");

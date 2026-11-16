@@ -17,3 +17,4 @@ src/main/frontend/generated
 /src/main/bundles/dev.bundle
 /package-lock.json
 /src/main/bundles/README.md
+.claude-contained/
